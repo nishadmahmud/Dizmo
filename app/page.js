@@ -12,6 +12,8 @@ import TopRated from "@/components/TopRated";
 import SpecialBanner from "@/components/SpecialBanner";
 import BlogSection from "@/components/BlogSection";
 import HelpTab from "@/components/HelpTab";
+import PromoBanners from "@/components/PromoBanners";
+import FullWidthBanner from "@/components/FullWidthBanner";
 
 export default function Home() {
   return (
@@ -22,10 +24,12 @@ export default function Home() {
         <HeroSection />
         <CategoryIcons />
         <FlashSale />
+        <PromoBanners />
         <FeaturedProducts />
         <OfferTabs />
         <BrandShowcase />
         <NewArrivals />
+        <FullWidthBanner />
         <TrendingProducts />
         <TopRated />
         <SpecialBanner />

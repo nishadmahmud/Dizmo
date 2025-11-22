@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, ShieldCheck, Truck, CreditCard, RefreshCw, Tag } from "lucide-react";
 
-const mainSlides = [
+const defaultSlides = [
     {
         id: 1,
         image: "https://www.gadgetboddaa.com/_next/image?url=https%3A%2F%2Fwww.outletexpense.xyz%2Fuploads%2F188-MD.-Alamin%2F1757580565.jpg&w=1920&q=75&dpl=dpl_6WN3M3DvNUSRMDgWoGLnzs95CDYS",
@@ -22,7 +22,7 @@ const mainSlides = [
     }
 ];
 
-const sideBanners = [
+const defaultBanners = [
     {
         id: 1,
         image: "https://images.macrumors.com/t/hOuhsJYfJN_KtfPwJWT4WeohyPk=/1600x0/article-new/2024/09/apple-watch-ultra-2-new-black.jpg",
@@ -45,21 +45,105 @@ const features = [
 
 export default function HeroSection() {
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [slides, setSlides] = useState(defaultSlides);
+    const [banners, setBanners] = useState(defaultBanners);
+    const [loading, setLoading] = useState(true);
 
+    // Fetch sliders and banners from API
     useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % mainSlides.length);
-        }, 5000);
-        return () => clearInterval(timer);
+        const fetchData = async () => {
+            try {
+                const apiBaseUrl = process.env.NEXT_PUBLIC_API_BLOG_BASE_URL;
+                const storeId = process.env.NEXT_PUBLIC_STORE_ID;
+                const sliderEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_SLIDERS;
+                const bannerEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_BANNERS;
+
+                // Fetch sliders
+                const sliderUrl = `${apiBaseUrl}${sliderEndpoint}/${storeId}`;
+                console.log('Fetching sliders from:', sliderUrl);
+
+                const sliderResponse = await fetch(sliderUrl);
+
+                if (sliderResponse.ok) {
+                    const sliderData = await sliderResponse.json();
+                    console.log('Slider data:', sliderData);
+
+                    if (sliderData.success && sliderData.data && sliderData.data.length > 0) {
+                        const sliderInfo = sliderData.data[0];
+                        const fetchedSlides = sliderInfo.image_path.map((imagePath, index) => ({
+                            id: index + 1,
+                            image: imagePath,
+                            link: sliderInfo.product_id[index]
+                                ? `/products/${sliderInfo.product_id[index]}`
+                                : "/products"
+                        }));
+                        setSlides(fetchedSlides);
+                    }
+                }
+
+                // Fetch banners
+                const bannerUrl = `${apiBaseUrl}${bannerEndpoint}/${storeId}`;
+                console.log('Fetching banners from:', bannerUrl);
+
+                const bannerResponse = await fetch(bannerUrl);
+
+                if (bannerResponse.ok) {
+                    const bannerData = await bannerResponse.json();
+                    console.log('Banner data:', bannerData);
+
+                    if (bannerData.success && bannerData.data && bannerData.data.length >= 2) {
+                        // Get first two banners for side section
+                        const fetchedBanners = bannerData.data.slice(0, 2).map((banner) => ({
+                            id: banner.id,
+                            image: banner.image_path,
+                            link: banner.button_url,
+                            title: banner.title
+                        }));
+                        setBanners(fetchedBanners);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                // Keep default slides and banners on error
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, []);
 
+    // Auto-play slider
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % slides.length);
+        }, 5000);
+        return () => clearInterval(timer);
+    }, [slides.length]);
+
     const nextSlide = () => {
-        setCurrentSlide((prev) => (prev + 1) % mainSlides.length);
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
     };
 
     const prevSlide = () => {
-        setCurrentSlide((prev) => (prev - 1 + mainSlides.length) % mainSlides.length);
+        setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
     };
+
+    if (loading) {
+        return (
+            <section className="py-6 bg-background">
+                <div className="container">
+                    <div className="mb-6">
+                        <div className="relative rounded-2xl overflow-hidden bg-secondary/30 h-[400px] animate-pulse">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <p className="text-muted-foreground">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="py-6 bg-background">
@@ -68,7 +152,7 @@ export default function HeroSection() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
                     {/* Large Slider - Left Side */}
                     <div className="lg:col-span-2 relative rounded-2xl overflow-hidden group h-[400px]">
-                        {mainSlides.map((slide, index) => (
+                        {slides.map((slide, index) => (
                             <Link
                                 key={slide.id}
                                 href={slide.link}
@@ -100,7 +184,7 @@ export default function HeroSection() {
 
                         {/* Dots Indicator */}
                         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                            {mainSlides.map((_, index) => (
+                            {slides.map((_, index) => (
                                 <button
                                     key={index}
                                     onClick={() => setCurrentSlide(index)}
@@ -113,7 +197,7 @@ export default function HeroSection() {
 
                     {/* Side Banners - Right Side */}
                     <div className="flex flex-col gap-4">
-                        {sideBanners.map((banner) => (
+                        {banners.map((banner) => (
                             <Link
                                 key={banner.id}
                                 href={banner.link}
@@ -122,7 +206,7 @@ export default function HeroSection() {
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={banner.image}
-                                    alt={`Banner ${banner.id}`}
+                                    alt={banner.title || `Banner ${banner.id}`}
                                     className="w-full h-full object-cover"
                                 />
                             </Link>

@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
     Search, ShoppingCart, Menu, Zap, FileText, GitCompare, Package,
-    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera
+    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 
-// Categories for the secondary navbar
-const categories = [
+// Default categories with icons as fallback
+const defaultCategories = [
     { id: "phones", name: "Phones", Icon: Smartphone },
     { id: "laptops", name: "Laptops", Icon: Laptop },
     { id: "tablets", name: "Tablets", Icon: Tablet },
@@ -20,9 +21,56 @@ const categories = [
     { id: "cameras", name: "Cameras", Icon: Camera },
 ];
 
+// Icon mapping for categories
+const iconMap = {
+    "I Phone Series": Smartphone,
+    "Smart Phone": Smartphone,
+    "Smart Watch": Watch,
+    "Airpods": Headphones,
+    "Accessories": Cable,
+    "Adapter": Cable,
+    "Used Phone": Smartphone,
+    "Powerbank": Cable,
+};
+
 export default function Navbar() {
     const { openDrawer, cartCount } = useCart();
     const pathname = usePathname();
+    const [showSearch, setShowSearch] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
+    const [categories, setCategories] = useState(defaultCategories);
+
+    // Fetch categories from API
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+                const storeId = process.env.NEXT_PUBLIC_STORE_ID;
+                const endpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORIES;
+
+                const url = `${apiBaseUrl}${endpoint}/${storeId}`;
+                const response = await fetch(url);
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (data.success && data.data && data.data.length > 0) {
+                        const fetchedCategories = data.data.map((cat) => ({
+                            id: cat.category_id.toString(),
+                            name: cat.name,
+                            Icon: iconMap[cat.name] || Package
+                        }));
+                        setCategories(fetchedCategories);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+                // Keep default categories on error
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     // Hide category bar on products page
     const showCategoryBar = pathname !== "/products";
@@ -77,13 +125,16 @@ export default function Navbar() {
 
                     {/* Icons */}
                     <div className="flex items-center gap-3">
-                        <button className="lg:hidden p-2 hover:bg-accent/10 rounded-full">
+                        <button
+                            onClick={() => setShowSearch(true)}
+                            className="lg:hidden p-2 hover:bg-accent/10 rounded-full"
+                        >
                             <Search className="h-5 w-5 text-foreground" />
                         </button>
 
                         <button
                             onClick={openDrawer}
-                            className="p-2 hover:bg-accent/10 rounded-full transition-colors relative"
+                            className="hidden md:block p-2 hover:bg-accent/10 rounded-full transition-colors relative"
                         >
                             <ShoppingCart className="h-5 w-5 text-foreground" />
                             {cartCount > 0 && (
@@ -93,7 +144,10 @@ export default function Navbar() {
                             )}
                         </button>
 
-                        <button className="md:hidden p-2 hover:bg-accent/10 rounded-full">
+                        <button
+                            onClick={() => setShowMenu(true)}
+                            className="md:hidden p-2 hover:bg-accent/10 rounded-full"
+                        >
                             <Menu className="h-5 w-5 text-foreground" />
                         </button>
                     </div>
@@ -123,6 +177,151 @@ export default function Navbar() {
                 </div>
             )}
 
+            {/* Mobile Search Modal */}
+            {showSearch && (
+                <div className="fixed inset-0 z-[60] bg-background">
+                    <div className="container h-full flex flex-col">
+                        <div className="flex items-center gap-3 h-16 border-b border-border">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                                <input
+                                    type="search"
+                                    placeholder="Search gadgets..."
+                                    autoFocus
+                                    className="w-full rounded-full border border-input bg-secondary py-2 pl-11 pr-4 text-sm outline-none focus:ring-2 focus:ring-ring"
+                                />
+                            </div>
+                            <button
+                                onClick={() => setShowSearch(false)}
+                                className="p-2 hover:bg-accent/10 rounded-full"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto py-4">
+                            <p className="text-sm text-muted-foreground text-center">Start typing to search...</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Mobile Side Menu */}
+            {showMenu && (
+                <>
+                    <div
+                        className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm"
+                        onClick={() => setShowMenu(false)}
+                    />
+                    <div className="fixed top-0 right-0 bottom-0 z-[70] w-72 bg-background border-l border-border shadow-xl">
+                        <div className="flex flex-col h-full">
+                            <div className="flex items-center justify-between p-4 border-b border-border">
+                                <h2 className="text-lg font-bold">Menu</h2>
+                                <button
+                                    onClick={() => setShowMenu(false)}
+                                    className="p-2 hover:bg-accent/10 rounded-full"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+                            <nav className="flex-1 overflow-y-auto p-4">
+                                <div className="space-y-2">
+                                    <Link
+                                        href="/products"
+                                        onClick={() => setShowMenu(false)}
+                                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                                    >
+                                        <Package className="h-5 w-5" />
+                                        <span className="font-medium">All Products</span>
+                                    </Link>
+                                    <Link
+                                        href="/blog"
+                                        onClick={() => setShowMenu(false)}
+                                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                                    >
+                                        <FileText className="h-5 w-5" />
+                                        <span className="font-medium">Blog</span>
+                                    </Link>
+                                    <Link
+                                        href="/offers"
+                                        onClick={() => setShowMenu(false)}
+                                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                                    >
+                                        <Zap className="h-5 w-5" />
+                                        <span className="font-medium">Offers</span>
+                                    </Link>
+                                    <Link
+                                        href="/compare"
+                                        onClick={() => setShowMenu(false)}
+                                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                                    >
+                                        <GitCompare className="h-5 w-5" />
+                                        <span className="font-medium">Compare</span>
+                                    </Link>
+                                    <Link
+                                        href="/track-order"
+                                        onClick={() => setShowMenu(false)}
+                                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                                    >
+                                        <Package className="h-5 w-5" />
+                                        <span className="font-medium">Track Order</span>
+                                    </Link>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </>
+            )}
+
+            {/* Mobile Bottom Navigation */}
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border shadow-lg">
+                <div className="grid grid-cols-4 h-16">
+                    {/* Cart */}
+                    <button
+                        onClick={openDrawer}
+                        className={`flex flex-col items-center justify-center gap-1 transition-colors relative ${pathname === '/cart' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                    >
+                        <ShoppingCart className="h-5 w-5" />
+                        <span className="text-[10px] font-medium">Cart</span>
+                        {cartCount > 0 && (
+                            <span className="absolute top-2 right-1/2 translate-x-3 h-4 w-4 flex items-center justify-center text-[9px] font-bold rounded-full bg-accent text-accent-foreground">
+                                {cartCount}
+                            </span>
+                        )}
+                    </button>
+
+                    {/* Products */}
+                    <Link
+                        href="/products"
+                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/products' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                    >
+                        <Package className="h-5 w-5" />
+                        <span className="text-[10px] font-medium">Products</span>
+                    </Link>
+
+                    {/* Offers */}
+                    <Link
+                        href="/offers"
+                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/offers' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                    >
+                        <Zap className="h-5 w-5" />
+                        <span className="text-[10px] font-medium">Offers</span>
+                    </Link>
+
+                    {/* Blog */}
+                    <Link
+                        href="/blog"
+                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/blog' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                    >
+                        <FileText className="h-5 w-5" />
+                        <span className="text-[10px] font-medium">Blog</span>
+                    </Link>
+                </div>
+            </nav>
+
             <style jsx global>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
@@ -130,6 +329,13 @@ export default function Navbar() {
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+        
+        /* Add padding to body for mobile bottom nav */
+        @media (max-width: 768px) {
+          body {
+            padding-bottom: 4rem;
+          }
         }
       `}</style>
         </>

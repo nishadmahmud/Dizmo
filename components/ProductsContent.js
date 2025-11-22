@@ -5,8 +5,8 @@ import { Search, SlidersHorizontal, ArrowUpDown, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-// Dummy Categories
-const categories = [
+// Default Categories as fallback
+const defaultCategories = [
     { id: "all", name: "All" },
     { id: "phones", name: "Phones" },
     { id: "laptops", name: "Laptops" },
@@ -37,16 +37,122 @@ const allProducts = [
 export default function ProductsContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const [categories, setCategories] = useState(defaultCategories);
+    const [products, setProducts] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [searchQuery, setSearchQuery] = useState("");
     const [sortBy, setSortBy] = useState("default");
     const [showFilters, setShowFilters] = useState(false);
     const [priceRange, setPriceRange] = useState([0, 200000]);
     const [inStockOnly, setInStockOnly] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [minPrice, setMinPrice] = useState(0);
+    const [maxPrice, setMaxPrice] = useState(200000);
 
-    // Calculate min and max prices
-    const minPrice = Math.min(...allProducts.map(p => p.price));
-    const maxPrice = Math.max(...allProducts.map(p => p.price));
+    // Fetch categories from API
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+                const storeId = process.env.NEXT_PUBLIC_STORE_ID;
+                const endpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORIES;
+
+                const url = `${apiBaseUrl}${endpoint}/${storeId}`;
+                const response = await fetch(url);
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (data.success && data.data && data.data.length > 0) {
+                        const fetchedCategories = [
+                            { id: "all", name: "All" },
+                            ...data.data.map((cat) => ({
+                                id: cat.category_id.toString(),
+                                name: cat.name
+                            }))
+                        ];
+                        setCategories(fetchedCategories);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+                // Keep default categories on error
+            }
+        };
+
+        fetchCategories();
+    }, []);
+
+    // Fetch products based on selected category
+    useEffect(() => {
+        const fetchProducts = async () => {
+            setLoading(true);
+            try {
+                const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+                const storeId = process.env.NEXT_PUBLIC_STORE_ID;
+                const endpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
+
+                // Use store ID for "all" category, otherwise use the selected category ID
+                const categoryId = selectedCategory === "all" ? storeId : selectedCategory;
+                const url = `${apiBaseUrl}${endpoint}/${categoryId}`;
+
+                console.log('Fetching products from:', url);
+                const response = await fetch(url);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Products data:', data);
+
+                    if (data.success && data.data && data.data.length > 0) {
+                        const fetchedProducts = data.data.map((product) => {
+                            // Get the lowest price from imeis if available
+                            let lowestPrice = parseFloat(product.retails_price);
+                            if (product.imeis && product.imeis.length > 0) {
+                                const prices = product.imeis.map(imei => parseFloat(imei.sale_price));
+                                lowestPrice = Math.min(...prices);
+                            }
+
+                            return {
+                                id: product.id,
+                                name: product.name,
+                                price: lowestPrice,
+                                originalPrice: parseFloat(product.retails_price),
+                                discount: parseFloat(product.discount) || 0,
+                                category: selectedCategory,
+                                inStock: product.status === "In stock",
+                                image: product.image_path,
+                                brand: product.brand_name,
+                                stock: product.current_stock,
+                                rating: parseFloat(product.review_summary?.average_rating) || 0,
+                                reviews: product.review_summary?.total_reviews || 0
+                            };
+                        });
+
+                        setProducts(fetchedProducts);
+
+                        // Update price range based on fetched products
+                        if (fetchedProducts.length > 0) {
+                            const prices = fetchedProducts.map(p => p.price);
+                            const min = Math.floor(Math.min(...prices) / 1000) * 1000;
+                            const max = Math.ceil(Math.max(...prices) / 1000) * 1000;
+                            setMinPrice(min);
+                            setMaxPrice(max);
+                            setPriceRange([min, max]);
+                        }
+                    } else {
+                        setProducts([]);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching products:", error);
+                setProducts([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, [selectedCategory]);
 
     // Read category from URL on mount
     useEffect(() => {
@@ -71,12 +177,11 @@ export default function ProductsContent() {
     };
 
     // Filter products
-    const filteredProducts = allProducts.filter((product) => {
-        const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
+    const filteredProducts = products.filter((product) => {
         const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
         const matchesStock = !inStockOnly || product.inStock;
-        return matchesCategory && matchesSearch && matchesPrice && matchesStock;
+        return matchesSearch && matchesPrice && matchesStock;
     });
 
     // Sort products
@@ -243,26 +348,44 @@ export default function ProductsContent() {
                         {categories.find(c => c.id === selectedCategory)?.name}
                     </h1>
                     <span className="text-muted-foreground">
-                        {sortedProducts.length} items found
+                        {loading ? "Loading..." : `${sortedProducts.length} items found`}
                     </span>
                 </div>
 
-                {/* Products Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                    {sortedProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
-
-                {/* No Results */}
-                {sortedProducts.length === 0 && (
-                    <div className="text-center py-20">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary mb-4">
-                            <Search className="h-8 w-8 text-muted-foreground" />
-                        </div>
-                        <h3 className="text-lg font-bold mb-2">No products found</h3>
-                        <p className="text-muted-foreground">Try adjusting your search or filters</p>
+                {/* Loading State */}
+                {loading ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                        {[...Array(10)].map((_, i) => (
+                            <div key={i} className="bg-card rounded-xl overflow-hidden border border-border">
+                                <div className="aspect-square bg-secondary/50 animate-pulse" />
+                                <div className="p-4 space-y-3">
+                                    <div className="h-4 bg-secondary/50 rounded animate-pulse" />
+                                    <div className="h-4 bg-secondary/50 rounded w-2/3 animate-pulse" />
+                                    <div className="h-6 bg-secondary/50 rounded w-1/2 animate-pulse" />
+                                </div>
+                            </div>
+                        ))}
                     </div>
+                ) : (
+                    <>
+                        {/* Products Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                            {sortedProducts.map((product) => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+
+                        {/* No Results */}
+                        {sortedProducts.length === 0 && (
+                            <div className="text-center py-20">
+                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary mb-4">
+                                    <Search className="h-8 w-8 text-muted-foreground" />
+                                </div>
+                                <h3 className="text-lg font-bold mb-2">No products found</h3>
+                                <p className="text-muted-foreground">Try adjusting your search or filters</p>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

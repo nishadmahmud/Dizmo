@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ShoppingCart, Zap } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
@@ -34,11 +35,19 @@ export default function ProductCard({ product }) {
 
             {/* Image Container */}
             <div className="relative aspect-square bg-secondary/50 overflow-hidden">
-                {/* Placeholder for Image */}
-                <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-gray-100">
-                    {/* Replace with actual Image component later */}
-                    <span className="text-xs">Product Image</span>
-                </div>
+                {image ? (
+                    <Image
+                        src={image}
+                        alt={name}
+                        fill
+                        className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-gray-100">
+                        <span className="text-xs">No Image</span>
+                    </div>
+                )}
 
                 {/* Overlay Actions (Dazzle Style) */}
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
