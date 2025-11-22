@@ -79,25 +79,25 @@ export default function FlashSale() {
         <section className="py-12 bg-background">
             <div className="container">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-                    <div className="flex items-center gap-4">
-                        <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
-                            <Timer className="h-6 w-6 text-accent" />
+                <div className="flex flex-col md:flex-row items-center justify-between mb-6 md:mb-8 gap-4">
+                    <div className="flex items-center justify-between w-full md:w-auto gap-4">
+                        <h2 className="text-xl md:text-2xl font-bold text-primary flex items-center gap-2">
+                            <Timer className="h-5 w-5 md:h-6 md:w-6 text-accent" />
                             Flash Sale
                         </h2>
 
                         {/* Countdown Display */}
-                        <div className="flex items-center gap-2 text-sm font-bold text-white bg-red-600 px-4 py-1 rounded-full">
+                        <div className="flex items-center gap-2 text-xs md:text-sm font-bold text-white bg-red-600 px-3 py-1 md:px-4 md:py-1 rounded-full">
                             <span>Ending in:</span>
                             <div className="flex gap-1">
-                                <span className="w-6 text-center">{String(timeLeft.hours).padStart(2, '0')}</span>:
-                                <span className="w-6 text-center">{String(timeLeft.minutes).padStart(2, '0')}</span>:
-                                <span className="w-6 text-center">{String(timeLeft.seconds).padStart(2, '0')}</span>
+                                <span className="w-5 md:w-6 text-center">{String(timeLeft.hours).padStart(2, '0')}</span>:
+                                <span className="w-5 md:w-6 text-center">{String(timeLeft.minutes).padStart(2, '0')}</span>:
+                                <span className="w-5 md:w-6 text-center">{String(timeLeft.seconds).padStart(2, '0')}</span>
                             </div>
                         </div>
                     </div>
 
-                    <Link href="/flash-sale" className="text-primary hover:text-accent font-medium flex items-center gap-1 transition-colors">
+                    <Link href="/flash-sale" className="hidden md:flex text-primary hover:text-accent font-medium items-center gap-1 transition-colors">
                         View All <ArrowRight className="h-4 w-4" />
                     </Link>
                 </div>
@@ -107,6 +107,16 @@ export default function FlashSale() {
                     {products.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
+                </div>
+
+                {/* Mobile View All Button */}
+                <div className="mt-6 flex justify-center md:hidden">
+                    <Link
+                        href="/flash-sale"
+                        className="px-6 py-2 rounded-full border border-primary text-primary font-medium text-sm hover:bg-primary hover:text-white transition-all flex items-center gap-2"
+                    >
+                        View All Deals <ArrowRight className="h-4 w-4" />
+                    </Link>
                 </div>
             </div>
         </section>

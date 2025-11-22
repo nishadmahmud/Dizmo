@@ -151,7 +151,7 @@ export default function HeroSection() {
                 {/* Main Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
                     {/* Large Slider - Left Side */}
-                    <div className="lg:col-span-2 relative rounded-2xl overflow-hidden group h-[400px]">
+                    <div className="lg:col-span-2 relative rounded-2xl overflow-hidden group h-[200px] md:h-[300px] lg:h-[400px]">
                         {slides.map((slide, index) => (
                             <Link
                                 key={slide.id}
@@ -195,8 +195,8 @@ export default function HeroSection() {
                         </div>
                     </div>
 
-                    {/* Side Banners - Right Side */}
-                    <div className="flex flex-col gap-4">
+                    {/* Side Banners - Right Side (Hidden on mobile) */}
+                    <div className="hidden lg:flex flex-col gap-4">
                         {banners.map((banner) => (
                             <Link
                                 key={banner.id}
@@ -216,9 +216,9 @@ export default function HeroSection() {
 
                 {/* Features Bar */}
                 <div className="bg-secondary/30 rounded-2xl p-4">
-                    <div className="flex flex-wrap items-center justify-around gap-4">
+                    <div className="flex lg:flex-wrap items-center lg:justify-around gap-4 overflow-x-auto pb-2 lg:pb-0 no-scrollbar">
                         {features.map((feature, index) => (
-                            <div key={index} className="flex items-center gap-2">
+                            <div key={index} className="flex items-center gap-2 flex-shrink-0">
                                 <feature.icon className={`h-5 w-5 ${feature.color}`} />
                                 <span className="text-sm font-medium text-foreground whitespace-nowrap">
                                     {feature.text}

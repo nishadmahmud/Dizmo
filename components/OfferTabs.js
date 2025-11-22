@@ -83,12 +83,12 @@ export default function OfferTabs() {
                     <h2 className="text-2xl font-bold text-primary mb-6">Special Offers</h2>
 
                     {/* Tabs */}
-                    <div className="flex flex-wrap justify-center gap-2 md:gap-4">
+                    <div className="flex flex-nowrap overflow-x-auto pb-2 md:pb-0 no-scrollbar justify-start md:justify-center gap-2 md:gap-4 w-full md:w-auto px-4 md:px-0">
                         {tabs.map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeTab === tab
+                                className={`px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300 whitespace-nowrap flex-shrink-0 ${activeTab === tab
                                     ? "bg-primary text-white shadow-md scale-105"
                                     : "bg-white text-muted-foreground hover:bg-white/80 border border-border"
                                     }`}
