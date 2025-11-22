@@ -30,8 +30,8 @@ export default function Home() {
         <BrandShowcase />
         <NewArrivals />
         <FullWidthBanner />
-        <TrendingProducts />
-        <TopRated />
+        {/* <TrendingProducts /> */}
+        {/* <TopRated /> */}
         <SpecialBanner />
         <BlogSection />
       </div>

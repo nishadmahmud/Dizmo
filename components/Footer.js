@@ -1,68 +1,113 @@
+"use client";
+
 import Link from "next/link";
-import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { Facebook, Instagram, Youtube, MapPin, Phone, Mail, Clock } from "lucide-react";
 
 export default function Footer() {
     return (
-        <footer className="bg-primary text-primary-foreground mt-auto">
-            <div className="container py-12 md:py-16">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    {/* Brand Info */}
-                    <div className="space-y-4">
-                        <h3 className="text-2xl font-bold tracking-tight">
-                            DIZMO<span className="text-accent">™</span>
-                        </h3>
-                        <p className="text-sm text-primary-foreground/80 leading-relaxed">
-                            Your one-stop shop for authentic mobile phones, laptops, and premium gadgets in Bangladesh.
-                        </p>
-                        <div className="flex gap-4">
-                            <Link href="#" className="hover:text-accent transition-colors">
-                                <Facebook className="h-5 w-5" />
-                            </Link>
-                            <Link href="#" className="hover:text-accent transition-colors">
-                                <Instagram className="h-5 w-5" />
-                            </Link>
-                            <Link href="#" className="hover:text-accent transition-colors">
-                                <Youtube className="h-5 w-5" />
-                            </Link>
+        <footer className="bg-primary text-primary-foreground pt-12 pb-6 mt-auto border-t border-primary-foreground/10">
+            <div className="container">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                    {/* Column 1: Contact & Support - Spans 2 rows on large screens */}
+                    <div className="space-y-6 lg:row-span-2">
+                        <div>
+                            <p className="text-sm text-primary-foreground/80 mb-1">Got Questions ? Call us 24/7!</p>
+                            <p className="text-2xl font-bold text-accent">01710 42 54 54</p>
+                        </div>
+
+                        <div className="space-y-4 text-primary-foreground/80 text-sm">
+                            <h4 className="font-bold text-accent text-lg">Contact Us</h4>
+                            <ul className="space-y-3">
+                                <li className="flex gap-3 items-start">
+                                    <MapPin className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+                                    <span>Level: 4, Block: B, Shop:028A & 028B, Jamuna Future Park, Dhaka, Bangladesh</span>
+                                </li>
+                                <li className="flex gap-3 items-center">
+                                    <Phone className="h-5 w-5 text-accent shrink-0" />
+                                    <span>Emergency: 01751 05 32 52</span>
+                                </li>
+                                <li className="flex gap-3 items-center">
+                                    <Mail className="h-5 w-5 text-accent shrink-0" />
+                                    <span>dizmo.bd@gmail.com</span>
+                                </li>
+                                <li className="flex gap-3 items-center">
+                                    <Clock className="h-5 w-5 text-accent shrink-0" />
+                                    <span>Office Time: 11.00 am To 9.00 pm</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
 
-                    {/* Quick Links */}
+                    {/* Column 2: Company */}
                     <div>
-                        <h4 className="font-semibold mb-4 text-accent">Quick Links</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><Link href="/about" className="hover:text-white/90">About Us</Link></li>
-                            <li><Link href="/contact" className="hover:text-white/90">Contact</Link></li>
-                            <li><Link href="/blog" className="hover:text-white/90">Blog</Link></li>
-                            <li><Link href="/careers" className="hover:text-white/90">Careers</Link></li>
+                        <h3 className="text-lg font-bold mb-4 text-accent">Company</h3>
+                        <ul className="space-y-2 text-primary-foreground/80 text-sm">
+                            <li><Link href="/about" className="hover:text-accent transition-colors">About Us</Link></li>
+                            <li><Link href="/careers" className="hover:text-accent transition-colors">Careers</Link></li>
+                            <li><Link href="/brands" className="hover:text-accent transition-colors">Our Brands</Link></li>
+                            <li><Link href="/blog" className="hover:text-accent transition-colors">Blog</Link></li>
                         </ul>
                     </div>
 
-                    {/* Customer Service */}
+                    {/* Column 3: Policy */}
                     <div>
-                        <h4 className="font-semibold mb-4 text-accent">Customer Service</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><Link href="/help" className="hover:text-white/90">Help Center</Link></li>
-                            <li><Link href="/terms" className="hover:text-white/90">Terms & Conditions</Link></li>
-                            <li><Link href="/privacy" className="hover:text-white/90">Privacy Policy</Link></li>
-                            <li><Link href="/returns" className="hover:text-white/90">Returns & Refunds</Link></li>
-                            <li><Link href="/emi" className="hover:text-white/90">EMI Policy</Link></li>
+                        <h3 className="text-lg font-bold mb-4 text-accent">Policy</h3>
+                        <ul className="space-y-2 text-primary-foreground/80 text-sm">
+                            <li><Link href="/privacy" className="hover:text-accent transition-colors">Privacy Policy</Link></li>
+                            <li><Link href="/terms" className="hover:text-accent transition-colors">Terms & Conditions</Link></li>
+                            <li><Link href="/cookies" className="hover:text-accent transition-colors">Cookie Policy</Link></li>
+                            <li><Link href="/warranty" className="hover:text-accent transition-colors">Warranty Policy</Link></li>
+                            <li><Link href="/emi" className="hover:text-accent transition-colors">EMI Policy</Link></li>
                         </ul>
                     </div>
 
-                    {/* Contact */}
-                    <div>
-                        <h4 className="font-semibold mb-4 text-accent">Contact Us</h4>
-                        <ul className="space-y-2 text-sm text-primary-foreground/80">
-                            <li>Level 4, Bashundhara City</li>
-                            <li>Dhaka, Bangladesh</li>
-                            <li className="pt-2">+880 1234-567890</li>
-                            <li>support@dizmo.com</li>
-                        </ul>
+                    {/* Column 4: Newsletter & Socials */}
+                    <div className="space-y-6">
+                        <div>
+                            <h4 className="font-bold mb-2 text-accent">Newsletter</h4>
+                            <p className="text-sm text-primary-foreground/80 mb-3">Sign up for get latest news and update</p>
+                            <div className="flex flex-col gap-2">
+                                <input
+                                    type="email"
+                                    placeholder="Enter your email"
+                                    className="w-full bg-white text-black px-3 py-2 rounded text-sm focus:outline-none"
+                                />
+                                <button className="w-full bg-accent text-white px-4 py-2 rounded text-sm font-bold hover:bg-accent/90 transition-colors">
+                                    Subscribe
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 className="font-bold mb-3 text-accent">Follow Us</h4>
+                            <div className="flex gap-3 mb-4">
+                                <Link href="https://facebook.com" className="bg-primary-foreground/10 p-2 rounded-full hover:bg-accent transition-colors">
+                                    <Facebook className="h-4 w-4" />
+                                </Link>
+                                <Link href="https://instagram.com" className="bg-primary-foreground/10 p-2 rounded-full hover:bg-accent transition-colors">
+                                    <Instagram className="h-4 w-4" />
+                                </Link>
+                                <Link href="https://youtube.com" className="bg-primary-foreground/10 p-2 rounded-full hover:bg-accent transition-colors">
+                                    <Youtube className="h-4 w-4" />
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Payment Image - Spans 3 columns (Company, Policy, Newsletter) */}
+                    <div className="md:col-span-2 lg:col-span-3 flex items-end">
+                        <div className="w-full bg-white rounded-lg">
+                            <img
+                                src="https://securepay.sslcommerz.com/public/image/SSLCommerz-Pay-With-logo-All-Size-01.png"
+                                alt="Payment Methods"
+                                className="w-full h-auto object-contain"
+                            />
+                        </div>
                     </div>
                 </div>
 
-                <div className="mt-12 pt-8 border-t border-primary-foreground/10 text-center text-xs text-primary-foreground/60">
+                {/* Bottom Bar */}
+                <div className="pt-6 border-t border-primary-foreground/10 text-center text-xs text-primary-foreground/60">
                     <p>&copy; {new Date().getFullYear()} Dizmo. All rights reserved.</p>
                 </div>
             </div>
