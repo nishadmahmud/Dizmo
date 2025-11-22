@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
-    Search, ShoppingCart, Menu, Zap, FileText, GitCompare, Package,
+    Search, ShoppingCart, Menu, Zap, FileText, GitCompare, Package, Home,
     Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
@@ -78,7 +78,7 @@ export default function Navbar() {
     return (
         <>
             {/* Main Navbar */}
-            <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <nav className="sticky top-0 z-50 w-full border-b border-primary/30 bg-primary/15 backdrop-blur-md supports-[backdrop-filter]:bg-primary/20">
                 <div className="container flex h-16 items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2">
@@ -101,23 +101,23 @@ export default function Navbar() {
 
                     {/* Desktop Navigation Links */}
                     <div className="hidden md:flex items-center gap-4 text-sm font-medium">
-                        <Link href="/products" className="flex items-center gap-1.5 hover:text-primary transition-colors text-muted-foreground">
+                        <Link href="/products" className="flex items-center gap-1.5 hover:text-accent transition-colors text-foreground/80">
                             <Package className="h-4 w-4" />
                             All Products
                         </Link>
-                        <Link href="/blog" className="flex items-center gap-1.5 hover:text-primary transition-colors text-muted-foreground">
+                        <Link href="/blog" className="flex items-center gap-1.5 hover:text-accent transition-colors text-foreground/80">
                             <FileText className="h-4 w-4" />
                             Blog
                         </Link>
-                        <Link href="/offers" className="flex items-center gap-1.5 hover:text-primary transition-colors text-muted-foreground">
+                        <Link href="/offers" className="flex items-center gap-1.5 hover:text-accent transition-colors text-foreground/80">
                             <Zap className="h-4 w-4" />
                             Offers
                         </Link>
-                        <Link href="/compare" className="flex items-center gap-1.5 hover:text-primary transition-colors text-muted-foreground">
+                        <Link href="/compare" className="flex items-center gap-1.5 hover:text-accent transition-colors text-foreground/80">
                             <GitCompare className="h-4 w-4" />
                             Compare
                         </Link>
-                        <Link href="/track-order" className="flex items-center gap-1.5 hover:text-primary transition-colors text-muted-foreground">
+                        <Link href="/track-order" className="flex items-center gap-1.5 hover:text-accent transition-colors text-foreground/80">
                             <Package className="h-4 w-4" />
                             Track Order
                         </Link>
@@ -156,18 +156,18 @@ export default function Navbar() {
 
             {/* Category Bar - Slimmer (Hidden on products page) */}
             {showCategoryBar && (
-                <div className="sticky top-16 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <div className="sticky top-16 z-40 w-full border-b border-primary/30 bg-primary/15 backdrop-blur-md supports-[backdrop-filter]:bg-primary/20">
                     <div className="container">
-                        <div className="flex items-center gap-2 overflow-x-auto py-2 scrollbar-hide">
+                        <div className="flex items-center gap-2 overflow-x-auto py-1.5 scrollbar-hide">
                             {categories.map((category) => {
                                 const IconComponent = category.Icon;
                                 return (
                                     <Link
                                         key={category.id}
                                         href={`/products?category=${category.id}`}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-secondary hover:bg-primary hover:text-white transition-all whitespace-nowrap text-sm font-medium"
+                                        className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-secondary hover:bg-primary hover:text-white transition-all whitespace-nowrap text-xs font-medium"
                                     >
-                                        <IconComponent className="h-4 w-4" />
+                                        <IconComponent className="h-3.5 w-3.5" />
                                         <span>{category.name}</span>
                                     </Link>
                                 );
@@ -273,8 +273,18 @@ export default function Navbar() {
             )}
 
             {/* Mobile Bottom Navigation */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border shadow-lg">
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-primary/15 backdrop-blur-md border-t border-primary/30 shadow-lg">
                 <div className="grid grid-cols-4 h-16">
+                    {/* Home */}
+                    <Link
+                        href="/"
+                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                    >
+                        <Home className="h-5 w-5" />
+                        <span className="text-[10px] font-medium">Home</span>
+                    </Link>
+
                     {/* Cart */}
                     <button
                         onClick={openDrawer}
@@ -308,16 +318,6 @@ export default function Navbar() {
                     >
                         <Zap className="h-5 w-5" />
                         <span className="text-[10px] font-medium">Offers</span>
-                    </Link>
-
-                    {/* Blog */}
-                    <Link
-                        href="/blog"
-                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/blog' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-                            }`}
-                    >
-                        <FileText className="h-5 w-5" />
-                        <span className="text-[10px] font-medium">Blog</span>
                     </Link>
                 </div>
             </nav>
