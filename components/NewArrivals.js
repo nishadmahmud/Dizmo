@@ -1,17 +1,70 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import ProductCard from "./ProductCard";
 import { ArrowRight, Sparkles } from "lucide-react";
 
-const newProducts = [
-    { id: 101, name: "iPhone 16 Pro", price: 165000, originalPrice: null, discount: null, category: "phones", isNew: true },
-    { id: 102, name: "Galaxy S25 Ultra", price: 155000, originalPrice: null, discount: null, category: "phones", isNew: true },
-    { id: 103, name: "Pixel 9 Pro XL", price: 125000, originalPrice: null, discount: null, category: "phones", isNew: true },
-    { id: 104, name: "MacBook Pro M4", price: 245000, originalPrice: null, discount: null, category: "laptops", isNew: true },
-];
-
 export default function NewArrivals() {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchNewArrivals = async () => {
+            try {
+                const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+                const endpoint = process.env.NEXT_PUBLIC_ENDPOINT_NEW_ARRIVALS;
+                const storeId = process.env.NEXT_PUBLIC_STORE_ID;
+
+                const response = await fetch(`${baseUrl}${endpoint}/${storeId}`);
+                const data = await response.json();
+
+                if (data.success && data.data && data.data.data) {
+                    const mappedProducts = data.data.data.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        price: parseFloat(item.retails_price), // New arrivals might not have discount
+                        originalPrice: parseFloat(item.retails_price),
+                        discount: 0,
+                        image: item.image_path,
+                        inStock: item.status === "In stock",
+                        category: item.category_name || "New",
+                        isNew: true,
+                        rating: parseFloat(item.review_summary?.average_rating) || 0,
+                        reviews: item.review_summary?.total_reviews || 0
+                    }));
+                    setProducts(mappedProducts.slice(0, 8)); // Limit to 8 items
+                }
+            } catch (error) {
+                console.error("Error fetching new arrivals:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchNewArrivals();
+    }, []);
+
+    if (loading) {
+        return (
+            <section className="py-12 bg-background">
+                <div className="container">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="h-8 w-48 bg-secondary/50 rounded animate-pulse" />
+                        <div className="h-6 w-24 bg-secondary/50 rounded animate-pulse" />
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className="aspect-[3/4] bg-secondary/50 rounded-xl animate-pulse" />
+                        ))}
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    if (products.length === 0) return null;
+
     return (
         <section className="py-12 bg-background">
             <div className="container">
@@ -35,7 +88,7 @@ export default function NewArrivals() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {newProducts.map((product) => (
+                    {products.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
                 </div>

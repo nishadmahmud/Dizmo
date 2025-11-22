@@ -1,37 +1,13 @@
 "use client";
 
 import ProductCard from "@/components/ProductCard";
-import { Search, SlidersHorizontal, ArrowUpDown, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Search, SlidersHorizontal, ArrowUpDown, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 // Default Categories as fallback
 const defaultCategories = [
     { id: "all", name: "All" },
-    { id: "phones", name: "Phones" },
-    { id: "laptops", name: "Laptops" },
-    { id: "watches", name: "Watches" },
-    { id: "audio", name: "Audio" },
-    { id: "tablets", name: "Tablets" },
-    { id: "accessories", name: "Accessories" },
-    { id: "gadgets", name: "Gadgets" },
-    { id: "cameras", name: "Cameras" },
-];
-
-// Dummy Data with categories and stock status
-const allProducts = [
-    { id: 1, name: "iPhone 15 Pro Max", price: 145000, originalPrice: 160000, discount: 10, category: "phones", inStock: true },
-    { id: 2, name: "Samsung S24 Ultra", price: 135000, originalPrice: 150000, discount: 10, category: "phones", inStock: true },
-    { id: 3, name: "MacBook Air M2", price: 115000, originalPrice: 130000, discount: 12, category: "laptops", inStock: false },
-    { id: 4, name: "Sony WH-1000XM5", price: 32000, originalPrice: 38000, discount: 15, category: "audio", inStock: true },
-    { id: 5, name: "Apple Watch Ultra 2", price: 85000, originalPrice: 95000, discount: 10, category: "watches", inStock: true },
-    { id: 11, name: "OnePlus 12", price: 85000, originalPrice: 90000, discount: 5, category: "phones", inStock: true },
-    { id: 12, name: "Dell XPS 15", price: 145000, originalPrice: 160000, discount: 9, category: "laptops", inStock: true },
-    { id: 13, name: "AirPods Pro 2", price: 28000, originalPrice: 32000, discount: 13, category: "audio", inStock: false },
-    { id: 14, name: "Galaxy Watch 6", price: 35000, originalPrice: 40000, discount: 13, category: "watches", inStock: true },
-    { id: 15, name: "iPad Pro M2", price: 125000, originalPrice: 140000, discount: 11, category: "tablets", inStock: true },
-    { id: 16, name: "Google Pixel 8 Pro", price: 95000, originalPrice: 105000, discount: 10, category: "phones", inStock: true },
-    { id: 17, name: "Lenovo ThinkPad X1", price: 135000, originalPrice: 150000, discount: 10, category: "laptops", inStock: false },
 ];
 
 export default function ProductsContent() {
@@ -48,6 +24,13 @@ export default function ProductsContent() {
     const [loading, setLoading] = useState(true);
     const [minPrice, setMinPrice] = useState(0);
     const [maxPrice, setMaxPrice] = useState(200000);
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 20;
+
+    // Cache for storing fetched products by category
+    const productsCache = useRef({});
 
     // Fetch categories from API
     useEffect(() => {
@@ -83,62 +66,168 @@ export default function ProductsContent() {
         fetchCategories();
     }, []);
 
-    // Fetch products based on selected category
+    // Fetch products based on selected category with caching
     useEffect(() => {
         const fetchProducts = async () => {
+            // Check if products are already cached
+            if (productsCache.current[selectedCategory]) {
+                console.log('Loading from cache for category:', selectedCategory);
+                const cachedData = productsCache.current[selectedCategory];
+                setProducts(cachedData.products);
+                setMinPrice(cachedData.minPrice);
+                setMaxPrice(cachedData.maxPrice);
+                setPriceRange([cachedData.minPrice, cachedData.maxPrice]);
+                setLoading(false);
+                setCurrentPage(1); // Reset to first page
+                return;
+            }
+
             setLoading(true);
+
+            // Helper function to process product data
+            const processProducts = (productData, category) => {
+                return productData
+                    .map((product) => {
+                        // Get the lowest price from imeis if available
+                        let lowestPrice = parseFloat(product.retails_price);
+                        if (product.imeis && product.imeis.length > 0) {
+                            const prices = product.imeis.map(imei => parseFloat(imei.sale_price));
+                            lowestPrice = Math.min(...prices);
+                        }
+
+                        return {
+                            id: product.id,
+                            name: product.name,
+                            price: lowestPrice,
+                            originalPrice: parseFloat(product.retails_price),
+                            discount: parseFloat(product.discount) || 0,
+                            category: category,
+                            inStock: product.status === "In stock",
+                            image: product.image_path,
+                            brand: product.brand_name,
+                            stock: product.current_stock,
+                            rating: parseFloat(product.review_summary?.average_rating) || 0,
+                            reviews: product.review_summary?.total_reviews || 0
+                        };
+                    })
+                    .filter(product => product.price >= 100); // Filter out products below 100 taka
+            };
+
+            // Special handling for "All" category - fetch from all categories
+            if (selectedCategory === "all") {
+                try {
+                    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+                    const endpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
+
+                    // Get all category IDs (excluding "all")
+                    const categoryIds = categories
+                        .filter(cat => cat.id !== "all")
+                        .map(cat => cat.id);
+
+                    if (categoryIds.length === 0) {
+                        // Wait for categories to load
+                        return;
+                    }
+
+                    // Fetch first category immediately to show initial products
+                    const firstCategoryUrl = `${apiBaseUrl}${endpoint}/${categoryIds[0]}`;
+                    console.log('Fetching first category from API:', firstCategoryUrl);
+
+                    const firstResponse = await fetch(firstCategoryUrl);
+                    let allProducts = [];
+
+                    if (firstResponse.ok) {
+                        const firstData = await firstResponse.json();
+                        if (firstData.success && firstData.data && firstData.data.length > 0) {
+                            allProducts = processProducts(firstData.data, "all");
+                            setProducts(allProducts);
+                            setLoading(false); // Show first batch immediately
+                        }
+                    }
+
+                    // Fetch remaining categories in parallel
+                    const remainingIds = categoryIds.slice(1);
+                    console.log('Fetching remaining categories in background...');
+
+                    const remainingPromises = remainingIds.map(categoryId =>
+                        fetch(`${apiBaseUrl}${endpoint}/${categoryId}`)
+                            .then(res => res.json())
+                            .catch(err => {
+                                console.error(`Error fetching category ${categoryId}:`, err);
+                                return null;
+                            })
+                    );
+
+                    const remainingResults = await Promise.all(remainingPromises);
+
+                    // Process and combine all products
+                    remainingResults.forEach(data => {
+                        if (data && data.success && data.data && data.data.length > 0) {
+                            const newProducts = processProducts(data.data, "all");
+                            allProducts = [...allProducts, ...newProducts];
+                        }
+                    });
+
+                    setProducts(allProducts);
+
+                    // Update price range
+                    if (allProducts.length > 0) {
+                        const prices = allProducts.map(p => p.price);
+                        const min = Math.floor(Math.min(...prices) / 1000) * 1000;
+                        const max = Math.ceil(Math.max(...prices) / 1000) * 1000;
+                        setMinPrice(min);
+                        setMaxPrice(max);
+                        setPriceRange([min, max]);
+
+                        // Cache the combined data
+                        productsCache.current["all"] = {
+                            products: allProducts,
+                            minPrice: min,
+                            maxPrice: max
+                        };
+                    }
+
+                } catch (error) {
+                    console.error("Error fetching all products:", error);
+                    setProducts([]);
+                    setLoading(false);
+                }
+                return;
+            }
+
+            // Regular single category fetch
             try {
                 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-                const storeId = process.env.NEXT_PUBLIC_STORE_ID;
                 const endpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
+                const url = `${apiBaseUrl}${endpoint}/${selectedCategory}`;
 
-                // Use store ID for "all" category, otherwise use the selected category ID
-                const categoryId = selectedCategory === "all" ? storeId : selectedCategory;
-                const url = `${apiBaseUrl}${endpoint}/${categoryId}`;
-
-                console.log('Fetching products from:', url);
+                console.log('Fetching products from API:', url);
                 const response = await fetch(url);
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('Products data:', data);
 
                     if (data.success && data.data && data.data.length > 0) {
-                        const fetchedProducts = data.data.map((product) => {
-                            // Get the lowest price from imeis if available
-                            let lowestPrice = parseFloat(product.retails_price);
-                            if (product.imeis && product.imeis.length > 0) {
-                                const prices = product.imeis.map(imei => parseFloat(imei.sale_price));
-                                lowestPrice = Math.min(...prices);
-                            }
-
-                            return {
-                                id: product.id,
-                                name: product.name,
-                                price: lowestPrice,
-                                originalPrice: parseFloat(product.retails_price),
-                                discount: parseFloat(product.discount) || 0,
-                                category: selectedCategory,
-                                inStock: product.status === "In stock",
-                                image: product.image_path,
-                                brand: product.brand_name,
-                                stock: product.current_stock,
-                                rating: parseFloat(product.review_summary?.average_rating) || 0,
-                                reviews: product.review_summary?.total_reviews || 0
-                            };
-                        });
-
+                        const fetchedProducts = processProducts(data.data, selectedCategory);
                         setProducts(fetchedProducts);
 
                         // Update price range based on fetched products
+                        let min = 0, max = 200000;
                         if (fetchedProducts.length > 0) {
                             const prices = fetchedProducts.map(p => p.price);
-                            const min = Math.floor(Math.min(...prices) / 1000) * 1000;
-                            const max = Math.ceil(Math.max(...prices) / 1000) * 1000;
+                            min = Math.floor(Math.min(...prices) / 1000) * 1000;
+                            max = Math.ceil(Math.max(...prices) / 1000) * 1000;
                             setMinPrice(min);
                             setMaxPrice(max);
                             setPriceRange([min, max]);
                         }
+
+                        // Cache the fetched data
+                        productsCache.current[selectedCategory] = {
+                            products: fetchedProducts,
+                            minPrice: min,
+                            maxPrice: max
+                        };
                     } else {
                         setProducts([]);
                     }
@@ -148,11 +237,12 @@ export default function ProductsContent() {
                 setProducts([]);
             } finally {
                 setLoading(false);
+                setCurrentPage(1); // Reset to first page
             }
         };
 
         fetchProducts();
-    }, [selectedCategory]);
+    }, [selectedCategory, categories]);
 
     // Read category from URL on mount
     useEffect(() => {
@@ -198,9 +288,21 @@ export default function ProductsContent() {
         }
     });
 
+    // Pagination Logic
+    const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const resetFilters = () => {
         setPriceRange([minPrice, maxPrice]);
         setInStockOnly(false);
+        setCurrentPage(1);
     };
 
     return (
@@ -340,8 +442,6 @@ export default function ProductsContent() {
                     </div>
                 </div>
 
-
-
                 {/* Results Header */}
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="text-2xl font-bold text-primary">
@@ -369,11 +469,63 @@ export default function ProductsContent() {
                 ) : (
                     <>
                         {/* Products Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                            {sortedProducts.map((product) => (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
+                            {currentProducts.map((product) => (
                                 <ProductCard key={product.id} product={product} />
                             ))}
                         </div>
+
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div className="flex items-center justify-center gap-2 mt-8">
+                                <button
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="p-2 rounded-lg border border-border bg-background hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    <ChevronLeft className="h-5 w-5" />
+                                </button>
+
+                                <div className="flex items-center gap-1">
+                                    {[...Array(totalPages)].map((_, i) => {
+                                        const page = i + 1;
+                                        // Show first, last, current, and adjacent pages
+                                        if (
+                                            page === 1 ||
+                                            page === totalPages ||
+                                            (page >= currentPage - 1 && page <= currentPage + 1)
+                                        ) {
+                                            return (
+                                                <button
+                                                    key={page}
+                                                    onClick={() => handlePageChange(page)}
+                                                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${currentPage === page
+                                                            ? "bg-primary text-white"
+                                                            : "bg-background border border-border hover:bg-secondary"
+                                                        }`}
+                                                >
+                                                    {page}
+                                                </button>
+                                            );
+                                        } else if (
+                                            page === currentPage - 2 ||
+                                            page === currentPage + 2
+                                        ) {
+                                            return <span key={page} className="px-1 text-muted-foreground">...</span>;
+                                        }
+                                        return null;
+                                    })}
+                                </div>
+
+                                <button
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="p-2 rounded-lg border border-border bg-background hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    <ChevronRight className="h-5 w-5" />
+                                </button>
+                            </div>
+                        )}
 
                         {/* No Results */}
                         {sortedProducts.length === 0 && (

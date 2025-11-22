@@ -27,7 +27,7 @@ export default function ProductCard({ product }) {
     return (
         <div className="group relative bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300">
             {/* Discount Badge */}
-            {discount && (
+            {discount > 0 && (
                 <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                     -{discount}%
                 </div>
