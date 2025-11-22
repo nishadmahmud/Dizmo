@@ -1,39 +1,80 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
 
-const tabs = ["Eid Super Sale", "New Arrivals", "Best Sellers", "Clearance"];
-
-const products = {
-    "Eid Super Sale": [
-        { id: 11, name: "OnePlus 12", price: 85000, originalPrice: 90000, discount: 5 },
-        { id: 12, name: "Pixel 8 Pro", price: 95000, originalPrice: 105000, discount: 10 },
-        { id: 13, name: "Xiaomi 14 Ultra", price: 110000, originalPrice: 120000, discount: 8 },
-        { id: 14, name: "Nothing Phone (2)", price: 65000, originalPrice: 70000, discount: 7 },
-    ],
-    "New Arrivals": [
-        { id: 21, name: "iPad Pro M4", price: 125000, originalPrice: null, discount: null },
-        { id: 22, name: "Galaxy Watch 7", price: 35000, originalPrice: null, discount: null },
-        { id: 23, name: "AirPods 4", price: 22000, originalPrice: null, discount: null },
-        { id: 24, name: "Surface Laptop 6", price: 180000, originalPrice: null, discount: null },
-    ],
-    "Best Sellers": [
-        { id: 31, name: "iPhone 13", price: 65000, originalPrice: 75000, discount: 13 },
-        { id: 32, name: "Galaxy S23 FE", price: 55000, originalPrice: 65000, discount: 15 },
-        { id: 33, name: "JBL Flip 6", price: 12000, originalPrice: 15000, discount: 20 },
-        { id: 34, name: "Anker Soundcore", price: 8000, originalPrice: 10000, discount: 20 },
-    ],
-    "Clearance": [
-        { id: 41, name: "iPhone 12", price: 45000, originalPrice: 60000, discount: 25 },
-        { id: 42, name: "Galaxy S22", price: 40000, originalPrice: 55000, discount: 27 },
-        { id: 43, name: "MacBook Air M1", price: 85000, originalPrice: 95000, discount: 10 },
-        { id: 44, name: "Sony XM4", price: 25000, originalPrice: 30000, discount: 16 },
-    ]
-};
+const tabs = ["New Arrivals", "Best Deals", "Best Sellers"];
 
 export default function OfferTabs() {
     const [activeTab, setActiveTab] = useState(tabs[0]);
+    const [products, setProducts] = useState({
+        "New Arrivals": [],
+        "Best Deals": [],
+        "Best Sellers": []
+    });
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            // If we already have data for this tab, don't fetch again
+            if (products[activeTab].length > 0) return;
+
+            setLoading(true);
+            try {
+                const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+                const storeId = process.env.NEXT_PUBLIC_STORE_ID;
+                let endpoint = "";
+
+                switch (activeTab) {
+                    case "New Arrivals":
+                        endpoint = process.env.NEXT_PUBLIC_ENDPOINT_NEW_ARRIVALS;
+                        break;
+                    case "Best Deals":
+                        endpoint = process.env.NEXT_PUBLIC_ENDPOINT_BEST_DEALS;
+                        break;
+                    case "Best Sellers":
+                        endpoint = process.env.NEXT_PUBLIC_ENDPOINT_BEST_SELLERS;
+                        break;
+                    default:
+                        return;
+                }
+
+                const response = await fetch(`${baseUrl}${endpoint}/${storeId}`);
+                const data = await response.json();
+
+                let mappedProducts = [];
+
+                if (data.success) {
+                    // Handle different response structures
+                    const productsData = Array.isArray(data.data) ? data.data : (data.data?.data || []);
+
+                    mappedProducts = productsData.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        price: parseFloat(item.discounted_price || item.retails_price),
+                        originalPrice: parseFloat(item.retails_price),
+                        discount: parseFloat(item.discount || item.discount_rate) || 0,
+                        image: item.image_path,
+                        inStock: item.status === "In stock",
+                        rating: parseFloat(item.review_summary?.average_rating) || 0,
+                        reviews: item.review_summary?.total_reviews || 0
+                    }));
+                }
+
+                setProducts(prev => ({
+                    ...prev,
+                    [activeTab]: mappedProducts.slice(0, 8) // Limit to 8 items
+                }));
+
+            } catch (error) {
+                console.error(`Error fetching ${activeTab}:`, error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, [activeTab]);
 
     return (
         <section className="py-12 bg-secondary/30">
@@ -48,8 +89,8 @@ export default function OfferTabs() {
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeTab === tab
-                                        ? "bg-primary text-white shadow-md scale-105"
-                                        : "bg-white text-muted-foreground hover:bg-white/80 border border-border"
+                                    ? "bg-primary text-white shadow-md scale-105"
+                                    : "bg-white text-muted-foreground hover:bg-white/80 border border-border"
                                     }`}
                             >
                                 {tab}
@@ -59,11 +100,24 @@ export default function OfferTabs() {
                 </div>
 
                 {/* Content Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-in fade-in zoom-in duration-500 key={activeTab}">
-                    {products[activeTab]?.map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
+                {loading && products[activeTab].length === 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className="aspect-[3/4] bg-secondary/50 rounded-xl animate-pulse" />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-in fade-in zoom-in duration-500 key={activeTab}">
+                        {products[activeTab]?.map((product) => (
+                            <ProductCard key={product.id} product={product} />
+                        ))}
+                        {products[activeTab]?.length === 0 && (
+                            <div className="col-span-full text-center py-12 text-muted-foreground">
+                                No products found in this category.
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </section>
     );
