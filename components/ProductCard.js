@@ -33,47 +33,58 @@ export default function ProductCard({ product }) {
                 </div>
             )}
 
-            {/* Image Container */}
-            <div className="relative aspect-square bg-secondary/50 overflow-hidden">
-                {image ? (
-                    <Image
-                        src={image}
-                        alt={name}
-                        fill
-                        className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
-                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-gray-100">
-                        <span className="text-xs">No Image</span>
-                    </div>
-                )}
-
-                {/* Overlay Actions (Dazzle Style) */}
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <button onClick={handleAddToCart} className="bg-white text-primary p-2 rounded-full hover:bg-accent hover:text-accent-foreground transition-colors" title="Add to Cart">
-                        <ShoppingCart className="h-5 w-5" />
-                    </button>
-                    <button onClick={handleBuyNow} className="bg-accent text-accent-foreground p-2 rounded-full hover:bg-white hover:text-primary transition-colors" title="Buy Now">
-                        <Zap className="h-5 w-5" />
-                    </button>
-                </div>
-            </div>
-
-            {/* Content */}
-            <div className="p-4">
-                <Link href={`/product/${id}`} className="block">
-                    <h3 className="font-medium text-foreground line-clamp-2 h-10 mb-2 hover:text-primary transition-colors">
-                        {name}
-                    </h3>
-                </Link>
-
-                <div className="flex items-baseline gap-2">
-                    <span className="text-lg font-bold text-primary">৳{price.toLocaleString()}</span>
-                    {originalPrice && (
-                        <span className="text-sm text-muted-foreground line-through">৳{originalPrice.toLocaleString()}</span>
+            {/* Clickable Card Link */}
+            <Link href={`/product/${id}`} className="block">
+                {/* Image Container */}
+                <div className="relative aspect-square bg-secondary/50 overflow-hidden">
+                    {image ? (
+                        <Image
+                            src={image}
+                            alt={name}
+                            fill
+                            className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+                            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-gray-100">
+                            <span className="text-xs">No Image</span>
+                        </div>
                     )}
                 </div>
+
+                {/* Content */}
+                <div className="p-4">
+                    <h3 className="font-medium text-foreground mb-2 hover:text-primary transition-colors min-h-[2.5rem]">
+                        {name}
+                    </h3>
+
+                    <div className="flex items-baseline gap-2 mb-3">
+                        <span className="text-lg font-bold text-primary">৳{price.toLocaleString()}</span>
+                        {originalPrice && (
+                            <span className="text-sm text-muted-foreground line-through">৳{originalPrice.toLocaleString()}</span>
+                        )}
+                    </div>
+                </div>
+            </Link>
+
+            {/* Action Buttons - Always Visible */}
+            <div className="px-4 pb-4 flex flex-col gap-2">
+                <button
+                    onClick={handleAddToCart}
+                    className="w-full bg-[#103E34] hover:bg-[#FCB042] text-white py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                    title="Add to Cart"
+                >
+                    <ShoppingCart className="h-4 w-4" />
+                    <span>Add to Cart</span>
+                </button>
+                <button
+                    onClick={handleBuyNow}
+                    className="w-full bg-[#FCB042] hover:bg-[#103E34] text-white py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                    title="Buy Now"
+                >
+                    <Zap className="h-4 w-4" />
+                    <span>Buy Now</span>
+                </button>
             </div>
         </div>
     );

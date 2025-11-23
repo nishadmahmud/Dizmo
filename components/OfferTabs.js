@@ -63,7 +63,7 @@ export default function OfferTabs() {
 
                 setProducts(prev => ({
                     ...prev,
-                    [activeTab]: mappedProducts.slice(0, 8) // Limit to 8 items
+                    [activeTab]: mappedProducts.slice(0, 12) // Limit to 12 items
                 }));
 
             } catch (error) {
@@ -101,13 +101,13 @@ export default function OfferTabs() {
 
                 {/* Content Grid */}
                 {loading && products[activeTab].length === 0 ? (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {[...Array(4)].map((_, i) => (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        {[...Array(6)].map((_, i) => (
                             <div key={i} className="aspect-[3/4] bg-secondary/50 rounded-xl animate-pulse" />
                         ))}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-in fade-in zoom-in duration-500 key={activeTab}">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 animate-in fade-in zoom-in duration-500 key={activeTab}">
                         {products[activeTab]?.map((product) => (
                             <ProductCard key={product.id} product={product} />
                         ))}

@@ -119,7 +119,7 @@ export default function CategoryIcons() {
                                 href={`/products?category=${cat.slug}`}
                                 className="flex flex-col items-center group"
                             >
-                                <div className="w-full aspect-square bg-secondary rounded-xl p-4 flex items-center justify-center group-hover:shadow-lg transition-all duration-300 border border-border group-hover:border-primary/30">
+                                <div className="w-full aspect-square bg-secondary rounded-xl  flex items-center justify-center group-hover:shadow-lg transition-all duration-300 border border-border group-hover:border-primary/30">
                                     <div className="relative w-full h-full">
                                         <Image
                                             src={cat.image}

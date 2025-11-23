@@ -20,20 +20,23 @@ export default function Home() {
     <main className="min-h-screen flex flex-col bg-background">
       <Navbar />
 
-      <div className="flex-1">
-        <HeroSection />
-        <CategoryIcons />
-        <FlashSale />
-        <PromoBanners />
-        <FeaturedProducts />
-        <OfferTabs />
-        <BrandShowcase />
-        <NewArrivals />
-        <FullWidthBanner />
-        {/* <TrendingProducts /> */}
-        {/* <TopRated /> */}
-        <SpecialBanner />
-        <BlogSection />
+      <div className="flex-1 w-full">
+        {/* Content wrapper with max-width */}
+        <div className="max-w-6xl mx-auto px-4">
+          <HeroSection />
+          <CategoryIcons />
+          <FlashSale />
+          <PromoBanners />
+          <FeaturedProducts />
+          <OfferTabs />
+          <BrandShowcase />
+          <NewArrivals />
+          <FullWidthBanner />
+          {/* <TrendingProducts /> */}
+          {/* <TopRated /> */}
+          <SpecialBanner />
+          <BlogSection />
+        </div>
       </div>
 
       <Footer />

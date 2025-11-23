@@ -33,7 +33,7 @@ export default function NewArrivals() {
                         rating: parseFloat(item.review_summary?.average_rating) || 0,
                         reviews: item.review_summary?.total_reviews || 0
                     }));
-                    setProducts(mappedProducts.slice(0, 8)); // Limit to 8 items
+                    setProducts(mappedProducts.slice(0, 12)); // Limit to 12 items
                 }
             } catch (error) {
                 console.error("Error fetching new arrivals:", error);
@@ -53,8 +53,8 @@ export default function NewArrivals() {
                         <div className="h-8 w-48 bg-secondary/50 rounded animate-pulse" />
                         <div className="h-6 w-24 bg-secondary/50 rounded animate-pulse" />
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {[...Array(4)].map((_, i) => (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        {[...Array(6)].map((_, i) => (
                             <div key={i} className="aspect-[3/4] bg-secondary/50 rounded-xl animate-pulse" />
                         ))}
                     </div>
@@ -87,7 +87,7 @@ export default function NewArrivals() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     {products.map((product) => (
                         <ProductCard key={product.id} product={product} />
                     ))}
