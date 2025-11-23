@@ -215,12 +215,12 @@ export default function HeroSection() {
                 </div>
 
                 {/* Features Bar */}
-                <div className="bg-secondary/30 rounded-2xl p-4">
-                    <div className="flex lg:flex-wrap items-center lg:justify-around gap-4 overflow-x-auto pb-2 lg:pb-0 no-scrollbar">
+                <div className="bg-secondary/30 rounded-2xl p-6 md:p-8">
+                    <div className="flex items-center justify-around gap-6 md:gap-8 overflow-x-auto pb-2 lg:pb-0 no-scrollbar">
                         {features.map((feature, index) => (
-                            <div key={index} className="flex items-center gap-2 flex-shrink-0">
-                                <feature.icon className={`h-5 w-5 ${feature.color}`} />
-                                <span className="text-sm font-medium text-foreground whitespace-nowrap">
+                            <div key={index} className="flex items-center gap-3 flex-shrink-0">
+                                <feature.icon className={`h-7 w-7 md:h-8 md:w-8 ${feature.color}`} />
+                                <span className="text-base md:text-lg font-semibold text-foreground whitespace-nowrap">
                                     {feature.text}
                                 </span>
                             </div>
