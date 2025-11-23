@@ -78,12 +78,12 @@ export default function Navbar() {
     return (
         <>
             {/* Main Navbar */}
-            <nav className="sticky top-0 z-50 w-full border-b border-primary/30 bg-primary/15 backdrop-blur-md supports-[backdrop-filter]:bg-primary/20">
+            <nav className="sticky top-0 z-50 w-full border-b border-[#103E34]/20 bg-[#103E34]">
                 <div className="container flex h-16 items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-primary tracking-tight">
-                            DIZMO<span className="text-accent">™</span>
+                        <span className="text-2xl font-bold text-white tracking-tight">
+                            DIZMO<span className="text-[#FCB042]">™</span>
                         </span>
                     </Link>
 
@@ -100,25 +100,25 @@ export default function Navbar() {
                     </div>
 
                     {/* Desktop Navigation Links */}
-                    <div className="hidden md:flex items-center gap-4 text-sm font-medium">
-                        <Link href="/products" className="flex items-center gap-1.5 hover:text-accent transition-colors text-foreground/80">
-                            <Package className="h-4 w-4" />
+                    <div className="hidden md:flex items-center gap-5 text-base font-semibold">
+                        {/* Offers Link - visible on desktop beside search */}
+                        <Link
+                            href="/offers"
+                            className="hidden lg:flex items-center gap-2 text-[#FCB042] hover:text-white hover:bg-[#FCB042] transition-all animate-pulse px-4 py-2 rounded-full bg-white/10 font-bold text-base shadow-md hover:shadow-lg"
+                        >
+                            <Zap className="h-5 w-5" />
+                            <span>🔥 Offers</span>
+                        </Link>
+                        <Link href="/products" className="flex items-center gap-2 text-white hover:text-[#FCB042] transition-colors px-3 py-2 rounded-lg hover:bg-white/10">
+                            <Package className="h-5 w-5" />
                             All Products
                         </Link>
-                        <Link href="/blog" className="flex items-center gap-1.5 hover:text-accent transition-colors text-foreground/80">
+                        {/* <Link href="/blog" className="flex items-center gap-1.5 text-white hover:text-[#FCB042] transition-colors">
                             <FileText className="h-4 w-4" />
                             Blog
-                        </Link>
-                        <Link href="/offers" className="flex items-center gap-1.5 hover:text-accent transition-colors text-foreground/80">
-                            <Zap className="h-4 w-4" />
-                            Offers
-                        </Link>
-                        <Link href="/compare" className="flex items-center gap-1.5 hover:text-accent transition-colors text-foreground/80">
-                            <GitCompare className="h-4 w-4" />
-                            Compare
-                        </Link>
-                        <Link href="/track-order" className="flex items-center gap-1.5 hover:text-accent transition-colors text-foreground/80">
-                            <Package className="h-4 w-4" />
+                        </Link> */}
+                        <Link href="/track-order" className="flex items-center gap-2 text-white hover:text-[#FCB042] transition-colors px-3 py-2 rounded-lg hover:bg-white/10">
+                            <Package className="h-5 w-5" />
                             Track Order
                         </Link>
                     </div>
@@ -127,18 +127,20 @@ export default function Navbar() {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setShowSearch(true)}
-                            className="lg:hidden p-2 hover:bg-accent/10 rounded-full"
+                            className="lg:hidden p-2 hover:bg-white/10 rounded-full"
                         >
-                            <Search className="h-5 w-5 text-foreground" />
+                            <Search className="h-5 w-5 text-white" />
                         </button>
+
+
 
                         <button
                             onClick={openDrawer}
-                            className="hidden md:block p-2 hover:bg-accent/10 rounded-full transition-colors relative"
+                            className="hidden md:block p-2 hover:bg-white/10 rounded-full transition-colors relative"
                         >
-                            <ShoppingCart className="h-5 w-5 text-foreground" />
+                            <ShoppingCart className="h-5 w-5 text-white" />
                             {cartCount > 0 && (
-                                <span className="absolute top-1 right-1 h-4 w-4 flex items-center justify-center text-[10px] font-bold rounded-full bg-accent text-accent-foreground ring-2 ring-background">
+                                <span className="absolute top-1 right-1 h-4 w-4 flex items-center justify-center text-[10px] font-bold rounded-full bg-[#FCB042] text-white ring-2 ring-[#103E34]">
                                     {cartCount}
                                 </span>
                             )}
@@ -146,9 +148,9 @@ export default function Navbar() {
 
                         <button
                             onClick={() => setShowMenu(true)}
-                            className="md:hidden p-2 hover:bg-accent/10 rounded-full"
+                            className="md:hidden p-2 hover:bg-white/10 rounded-full"
                         >
-                            <Menu className="h-5 w-5 text-foreground" />
+                            <Menu className="h-5 w-5 text-white" />
                         </button>
                     </div>
                 </div>
@@ -156,7 +158,7 @@ export default function Navbar() {
 
             {/* Category Bar - Slimmer (Hidden on products page) */}
             {showCategoryBar && (
-                <div className="sticky top-16 z-40 w-full border-b border-primary/30 bg-primary/15 backdrop-blur-md supports-[backdrop-filter]:bg-primary/20">
+                <div className="sticky top-16 z-40 w-full border-b border-[#103E34]/20 bg-[#103E34]">
                     <div className="container">
                         <div className="flex items-center gap-2 overflow-x-auto py-1.5 scrollbar-hide">
                             {categories.map((category) => {
@@ -165,9 +167,9 @@ export default function Navbar() {
                                     <Link
                                         key={category.id}
                                         href={`/products?category=${category.id}`}
-                                        className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-secondary hover:bg-primary hover:text-white transition-all whitespace-nowrap text-xs font-medium"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-secondary hover:bg-[#FCB042] hover:text-white transition-all whitespace-nowrap text-sm font-medium"
                                     >
-                                        <IconComponent className="h-3.5 w-3.5" />
+                                        <IconComponent className="h-4 w-4" />
                                         <span>{category.name}</span>
                                     </Link>
                                 );
@@ -273,7 +275,7 @@ export default function Navbar() {
             )}
 
             {/* Mobile Bottom Navigation */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-primary/15 backdrop-blur-md border-t border-primary/30 shadow-lg">
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#103E34] border-t border-[#103E34]/20 shadow-lg">
                 <div className="grid grid-cols-4 h-16">
                     {/* Home */}
                     <Link

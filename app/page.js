@@ -11,7 +11,7 @@ import TrendingProducts from "@/components/TrendingProducts";
 import TopRated from "@/components/TopRated";
 import SpecialBanner from "@/components/SpecialBanner";
 import BlogSection from "@/components/BlogSection";
-import HelpTab from "@/components/HelpTab";
+import FloatingActions from "@/components/FloatingActions";
 import PromoBanners from "@/components/PromoBanners";
 import FullWidthBanner from "@/components/FullWidthBanner";
 
@@ -39,7 +39,7 @@ export default function Home() {
       <Footer />
 
       {/* Floating Widgets */}
-      <HelpTab />
+      <FloatingActions />
     </main>
   );
 }
