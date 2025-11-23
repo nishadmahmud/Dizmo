@@ -244,13 +244,19 @@ export default function ProductsContent() {
         fetchProducts();
     }, [selectedCategory, categories]);
 
-    // Read category from URL on mount
+    // Read category and search from URL on mount
     useEffect(() => {
         const categoryParam = searchParams.get('category');
+        const searchParam = searchParams.get('search');
+
         if (categoryParam) {
             setSelectedCategory(categoryParam);
         } else {
             setSelectedCategory("all");
+        }
+
+        if (searchParam) {
+            setSearchQuery(searchParam);
         }
     }, [searchParams]);
 
@@ -500,8 +506,8 @@ export default function ProductsContent() {
                                                     key={page}
                                                     onClick={() => handlePageChange(page)}
                                                     className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${currentPage === page
-                                                            ? "bg-primary text-white"
-                                                            : "bg-background border border-border hover:bg-secondary"
+                                                        ? "bg-primary text-white"
+                                                        : "bg-background border border-border hover:bg-secondary"
                                                         }`}
                                                 >
                                                     {page}

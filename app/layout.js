@@ -1,6 +1,7 @@
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
+import { ProductProvider } from "@/context/ProductContext";
 import CartDrawer from "@/components/CartDrawer";
 
 const outfit = Outfit({
@@ -19,8 +20,10 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${outfit.variable} antialiased`}>
         <CartProvider>
-          {children}
-          <CartDrawer />
+          <ProductProvider>
+            {children}
+            <CartDrawer />
+          </ProductProvider>
         </CartProvider>
       </body>
     </html>

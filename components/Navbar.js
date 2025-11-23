@@ -8,6 +8,8 @@ import {
     Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useProduct } from "@/context/ProductContext";
+import { useRouter } from "next/navigation";
 
 // Default categories with icons as fallback
 const defaultCategories = [
@@ -35,10 +37,56 @@ const iconMap = {
 
 export default function Navbar() {
     const { openDrawer, cartCount } = useCart();
+    const { searchProducts, loading: productsLoading } = useProduct();
+    const router = useRouter();
     const pathname = usePathname();
     const [showSearch, setShowSearch] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const [categories, setCategories] = useState(defaultCategories);
+
+    // Search State
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const [showResults, setShowResults] = useState(false);
+
+    // Handle search input change
+    const handleSearch = (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+
+        if (query.length > 0) {
+            const results = searchProducts(query);
+            setSearchResults(results.slice(0, 5)); // Limit to 5 results
+            setShowResults(true);
+        } else {
+            setSearchResults([]);
+            setShowResults(false);
+        }
+    };
+
+    // Handle search submit (Enter key)
+    const handleSearchSubmit = (e) => {
+        if (e.key === 'Enter' && searchQuery.trim()) {
+            setShowResults(false);
+            setShowSearch(false); // Close mobile search if open
+            router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+        }
+    };
+
+    // Handle clicking a search result
+    const handleResultClick = (productId) => {
+        setSearchQuery("");
+        setShowResults(false);
+        setShowSearch(false);
+        router.push(`/products/${productId}`);
+    };
+
+    // Close search results when clicking outside
+    useEffect(() => {
+        const handleClickOutside = () => setShowResults(false);
+        window.addEventListener("click", handleClickOutside);
+        return () => window.removeEventListener("click", handleClickOutside);
+    }, []);
 
     // Fetch categories from API
     useEffect(() => {
@@ -88,15 +136,59 @@ export default function Navbar() {
                     </Link>
 
                     {/* Search Bar (Hidden on mobile, visible on lg) */}
-                    <div className="hidden lg:flex flex-1 max-w-xl mx-6">
+                    <div className="hidden lg:flex flex-1 max-w-xl mx-6 relative" onClick={(e) => e.stopPropagation()}>
                         <div className="relative w-full">
                             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                             <input
                                 type="search"
                                 placeholder="Search gadgets..."
+                                value={searchQuery}
+                                onChange={handleSearch}
+                                onKeyDown={handleSearchSubmit}
                                 className="w-full rounded-full border border-input bg-secondary py-2 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-ring"
                             />
                         </div>
+
+                        {/* Desktop Search Results Dropdown */}
+                        {showResults && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-xl shadow-xl overflow-hidden z-50">
+                                {searchResults.length > 0 ? (
+                                    <ul>
+                                        {searchResults.map((product) => (
+                                            <li key={product.id}>
+                                                <button
+                                                    onClick={() => handleResultClick(product.id)}
+                                                    className="w-full flex items-center gap-3 p-3 hover:bg-secondary transition-colors text-left"
+                                                >
+                                                    <div className="h-10 w-10 rounded-md bg-secondary overflow-hidden flex-shrink-0">
+                                                        <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium line-clamp-1">{product.name}</p>
+                                                        <p className="text-xs text-muted-foreground">৳{product.price.toLocaleString()}</p>
+                                                    </div>
+                                                </button>
+                                            </li>
+                                        ))}
+                                        <li className="border-t border-border">
+                                            <button
+                                                onClick={() => {
+                                                    router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                                                    setShowResults(false);
+                                                }}
+                                                className="w-full p-3 text-center text-sm text-primary font-medium hover:bg-secondary transition-colors"
+                                            >
+                                                View all results
+                                            </button>
+                                        </li>
+                                    </ul>
+                                ) : (
+                                    <div className="p-4 text-center text-sm text-muted-foreground">
+                                        No products found
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Desktop Navigation Links */}
@@ -104,19 +196,16 @@ export default function Navbar() {
                         {/* Offers Link - visible on desktop beside search */}
                         <Link
                             href="/offers"
-                            className="hidden lg:flex items-center gap-2 text-[#FCB042] hover:text-white hover:bg-[#FCB042] transition-all animate-pulse px-4 py-2 rounded-full bg-white/10 font-bold text-base shadow-md hover:shadow-lg"
+                            className="hidden lg:flex items-center gap-2 text-[#FCB042] hover:text-white hover:bg-[#FCB042] transition-all px-4 py-2 rounded-full bg-white/10 font-bold text-base shadow-md hover:shadow-lg"
                         >
-                            <Zap className="h-5 w-5" />
-                            <span>🔥 Offers</span>
+
+                            <span><span className="animate-pulse">🔥</span> Offers</span>
                         </Link>
                         <Link href="/products" className="flex items-center gap-2 text-white hover:text-[#FCB042] transition-colors px-3 py-2 rounded-lg hover:bg-white/10">
                             <Package className="h-5 w-5" />
                             All Products
                         </Link>
-                        {/* <Link href="/blog" className="flex items-center gap-1.5 text-white hover:text-[#FCB042] transition-colors">
-                            <FileText className="h-4 w-4" />
-                            Blog
-                        </Link> */}
+
                         <Link href="/track-order" className="flex items-center gap-2 text-white hover:text-[#FCB042] transition-colors px-3 py-2 rounded-lg hover:bg-white/10">
                             <Package className="h-5 w-5" />
                             Track Order
@@ -190,6 +279,9 @@ export default function Navbar() {
                                     type="search"
                                     placeholder="Search gadgets..."
                                     autoFocus
+                                    value={searchQuery}
+                                    onChange={handleSearch}
+                                    onKeyDown={handleSearchSubmit}
                                     className="w-full rounded-full border border-input bg-secondary py-2 pl-11 pr-4 text-sm outline-none focus:ring-2 focus:ring-ring"
                                 />
                             </div>
@@ -201,7 +293,45 @@ export default function Navbar() {
                             </button>
                         </div>
                         <div className="flex-1 overflow-y-auto py-4">
-                            <p className="text-sm text-muted-foreground text-center">Start typing to search...</p>
+                            {searchQuery ? (
+                                searchResults.length > 0 ? (
+                                    <ul className="space-y-2">
+                                        {searchResults.map((product) => (
+                                            <li key={product.id}>
+                                                <button
+                                                    onClick={() => handleResultClick(product.id)}
+                                                    className="w-full flex items-center gap-3 p-3 hover:bg-secondary rounded-lg transition-colors text-left"
+                                                >
+                                                    <div className="h-12 w-12 rounded-md bg-secondary overflow-hidden flex-shrink-0">
+                                                        <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium line-clamp-1">{product.name}</p>
+                                                        <p className="text-xs text-muted-foreground">৳{product.price.toLocaleString()}</p>
+                                                    </div>
+                                                </button>
+                                            </li>
+                                        ))}
+                                        <li>
+                                            <button
+                                                onClick={() => {
+                                                    router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                                                    setShowSearch(false);
+                                                }}
+                                                className="w-full p-3 text-center text-sm text-primary font-medium bg-secondary/50 rounded-lg mt-2"
+                                            >
+                                                View all results
+                                            </button>
+                                        </li>
+                                    </ul>
+                                ) : (
+                                    <div className="text-center py-8 text-muted-foreground">
+                                        No products found
+                                    </div>
+                                )
+                            ) : (
+                                <p className="text-sm text-muted-foreground text-center">Start typing to search...</p>
+                            )}
                         </div>
                     </div>
                 </div>
