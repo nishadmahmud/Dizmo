@@ -42,7 +42,7 @@ export default function ProductCard({ product }) {
                             src={image}
                             alt={name}
                             fill
-                            className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+                            className="object-contain group-hover:scale-105 transition-transform duration-300"
                             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                         />
                     ) : (
@@ -53,22 +53,22 @@ export default function ProductCard({ product }) {
                 </div>
 
                 {/* Content */}
-                <div className="p-4">
-                    <h3 className="font-medium text-foreground mb-2 hover:text-primary transition-colors min-h-[2.5rem]">
+                <div className="px-3 py-1">
+                    <h3 className="font-medium text-foreground hover:text-primary transition-colors min-h-[2.5rem] text-sm line-clamp-2">
                         {name}
                     </h3>
 
-                    <div className="flex items-baseline gap-2 mb-3">
-                        <span className="text-lg font-bold text-primary">৳{price.toLocaleString()}</span>
+                    <div className="flex items-baseline gap-2 mb-2">
+                        <span className="text-base font-bold text-primary">৳{price.toLocaleString()}</span>
                         {originalPrice && (
-                            <span className="text-sm text-muted-foreground line-through">৳{originalPrice.toLocaleString()}</span>
+                            <span className="text-xs text-muted-foreground line-through">৳{originalPrice.toLocaleString()}</span>
                         )}
                     </div>
                 </div>
             </Link>
 
             {/* Action Buttons - Always Visible */}
-            <div className="px-4 pb-4 flex flex-col gap-2">
+            <div className="px-3 pb-3 flex flex-col gap-2">
                 <button
                     onClick={handleAddToCart}
                     className="w-full bg-[#103E34] hover:bg-[#FCB042] text-white py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm font-medium"
