@@ -314,7 +314,7 @@ export default function Navbar() {
                                     <Link
                                         key={category.id}
                                         href={`/products?category=${category.id}`}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-secondary hover:bg-[#FCB042] hover:text-white transition-all whitespace-nowrap text-sm font-medium"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-secondary hover:bg-[#103E34] hover:text-white transition-all whitespace-nowrap text-sm font-medium"
                                     >
                                         <IconComponent className="h-4 w-4" />
                                         <span>{category.name}</span>
