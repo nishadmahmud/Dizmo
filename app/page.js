@@ -14,6 +14,7 @@ import BlogSection from "@/components/BlogSection";
 import FloatingActions from "@/components/FloatingActions";
 import PromoBanners from "@/components/PromoBanners";
 import FullWidthBanner from "@/components/FullWidthBanner";
+import SEOContent from "@/components/SEOContent";
 
 export default function Home() {
   return (
@@ -36,6 +37,7 @@ export default function Home() {
           {/* <TopRated /> */}
           <SpecialBanner />
           <BlogSection />
+          <SEOContent />
         </div>
       </div>
 
