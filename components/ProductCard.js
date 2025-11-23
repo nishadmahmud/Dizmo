@@ -2,27 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, Zap } from "lucide-react";
-import { useCart } from "@/context/CartContext";
-import { useRouter } from "next/navigation";
+import { Eye } from "lucide-react";
 
 export default function ProductCard({ product }) {
     const { id, name, price, originalPrice, image, discount } = product;
-    const { addToCart } = useCart();
-    const router = useRouter();
-
-    const handleAddToCart = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        addToCart(product, 1);
-    };
-
-    const handleBuyNow = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        addToCart(product, 1);
-        router.push("/checkout");
-    };
 
     return (
         <div className="group relative bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300">
@@ -50,6 +33,11 @@ export default function ProductCard({ product }) {
                             <span className="text-xs">No Image</span>
                         </div>
                     )}
+
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                        <Eye className="h-8 w-8 text-white drop-shadow-lg transform scale-50 group-hover:scale-100 transition-transform duration-300" />
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -67,25 +55,7 @@ export default function ProductCard({ product }) {
                 </div>
             </Link>
 
-            {/* Action Buttons - Always Visible */}
-            <div className="px-3 pb-3 flex flex-col gap-2">
-                <button
-                    onClick={handleAddToCart}
-                    className="w-full bg-[#103E34] hover:bg-[#FCB042] text-white py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm font-medium"
-                    title="Add to Cart"
-                >
-                    <ShoppingCart className="h-4 w-4" />
-                    <span>Add to Cart</span>
-                </button>
-                <button
-                    onClick={handleBuyNow}
-                    className="w-full bg-[#FCB042] hover:bg-[#103E34] text-white py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm font-medium"
-                    title="Buy Now"
-                >
-                    <Zap className="h-4 w-4" />
-                    <span>Buy Now</span>
-                </button>
-            </div>
+
         </div>
     );
 }

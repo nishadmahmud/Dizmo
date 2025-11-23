@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
     Search, ShoppingCart, Menu, Zap, FileText, GitCompare, Package, Home,
-    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X
+    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useProduct } from "@/context/ProductContext";
@@ -48,6 +48,58 @@ export default function Navbar() {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [showResults, setShowResults] = useState(false);
+    const [isListening, setIsListening] = useState(false);
+    const recognitionRef = useRef(null);
+
+    // Handle Voice Search
+    const handleVoiceSearch = () => {
+        if (isListening) {
+            if (recognitionRef.current) {
+                recognitionRef.current.stop();
+                setIsListening(false);
+            }
+            return;
+        }
+
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            alert("Voice search is not supported in this browser.");
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognitionRef.current = recognition;
+
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+            setIsListening(true);
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setSearchQuery(transcript);
+
+            // Trigger search with the spoken text
+            const results = searchProducts(transcript);
+            setSearchResults(results.slice(0, 5));
+            setShowResults(true);
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Voice search error:", event.error);
+            setIsListening(false);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+            recognitionRef.current = null;
+        };
+
+        recognition.start();
+    };
 
     // Handle search input change
     const handleSearch = (e) => {
@@ -141,12 +193,18 @@ export default function Navbar() {
                             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                             <input
                                 type="search"
-                                placeholder="Search gadgets..."
+                                placeholder={isListening ? "Listening..." : "Search gadgets..."}
                                 value={searchQuery}
                                 onChange={handleSearch}
                                 onKeyDown={handleSearchSubmit}
-                                className="w-full rounded-full border border-input bg-secondary py-2 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-ring"
+                                className={`w-full rounded-full border bg-secondary py-2 pl-10 pr-10 text-sm outline-none focus:ring-2 focus:ring-ring transition-all ${isListening ? 'border-red-500 ring-2 ring-red-500/20 placeholder:text-red-500' : 'border-input'}`}
                             />
+                            <button
+                                onClick={handleVoiceSearch}
+                                className={`absolute right-3 top-2.5 transition-colors ${isListening ? 'text-red-500 animate-pulse' : 'text-muted-foreground hover:text-primary'}`}
+                            >
+                                <Mic className="h-4 w-4" />
+                            </button>
                         </div>
 
                         {/* Desktop Search Results Dropdown */}
@@ -277,13 +335,19 @@ export default function Navbar() {
                                 <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                                 <input
                                     type="search"
-                                    placeholder="Search gadgets..."
+                                    placeholder={isListening ? "Listening..." : "Search gadgets..."}
                                     autoFocus
                                     value={searchQuery}
                                     onChange={handleSearch}
                                     onKeyDown={handleSearchSubmit}
-                                    className="w-full rounded-full border border-input bg-secondary py-2 pl-11 pr-4 text-sm outline-none focus:ring-2 focus:ring-ring"
+                                    className={`w-full rounded-full border bg-secondary py-2 pl-11 pr-10 text-sm outline-none focus:ring-2 focus:ring-ring transition-all ${isListening ? 'border-red-500 ring-2 ring-red-500/20 placeholder:text-red-500' : 'border-input'}`}
                                 />
+                                <button
+                                    onClick={handleVoiceSearch}
+                                    className={`absolute right-3 top-2.5 transition-colors ${isListening ? 'text-red-500 animate-pulse' : 'text-muted-foreground hover:text-primary'}`}
+                                >
+                                    <Mic className="h-5 w-5" />
+                                </button>
                             </div>
                             <button
                                 onClick={() => setShowSearch(false)}

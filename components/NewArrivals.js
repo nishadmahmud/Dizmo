@@ -66,31 +66,37 @@ export default function NewArrivals() {
     if (products.length === 0) return null;
 
     return (
-        <section className="py-12 bg-background">
-            <div className="container">
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-accent/10 p-3 rounded-full">
-                            <Sparkles className="h-6 w-6 text-accent" />
-                        </div>
+        <section className="py-8 bg-[#103E34] rounded-3xl mx-4 lg:mx-auto max-w-[1400px] my-8">
+            <div className="container px-6">
+                <div className="flex flex-col lg:flex-row gap-8 items-center">
+                    {/* Left Side - Text Content */}
+                    <div className="lg:w-1/4 text-white space-y-6">
                         <div>
-                            <h2 className="text-3xl font-bold text-foreground">New Arrivals</h2>
-                            <p className="text-muted-foreground">Latest products in stock</p>
+                            <h2 className="text-3xl md:text-4xl font-bold mb-4">New Arrival</h2>
+                            <h3 className="text-lg md:text-xl font-semibold text-[#FCB042] mb-2">Discover the Latest Tech!</h3>
+                            <p className="text-gray-200 leading-relaxed text-sm md:text-base">
+                                Explore our brand-new collection of cutting-edge gadgets. Fresh arrivals, premium quality, and the newest innovations—shop now and be the first to experience the future of tech!
+                            </p>
+                        </div>
+
+                        <Link
+                            href="/products?sort=newest"
+                            className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-black hover:bg-[#FCB042] text-white transition-colors duration-300"
+                        >
+                            <ArrowRight className="h-6 w-6" />
+                        </Link>
+                    </div>
+
+                    {/* Right Side - Horizontal Scrollable Products */}
+                    <div className="lg:w-3/4 w-full overflow-hidden">
+                        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                            {products.map((product) => (
+                                <div key={product.id} className="min-w-[200px] md:min-w-[240px] snap-start">
+                                    <ProductCard product={product} />
+                                </div>
+                            ))}
                         </div>
                     </div>
-                    <Link
-                        href="/products?sort=newest"
-                        className="flex items-center gap-2 text-primary hover:gap-3 transition-all font-medium"
-                    >
-                        View All
-                        <ArrowRight className="h-5 w-5" />
-                    </Link>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    {products.map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
                 </div>
             </div>
         </section>
