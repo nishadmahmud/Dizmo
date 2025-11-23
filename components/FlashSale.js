@@ -76,7 +76,7 @@ export default function FlashSale() {
     if (products.length === 0) return null;
 
     return (
-        <section className="py-12 bg-secondary/20">
+        <section className="py-6 bg-[#103E34]/15 rounded-2xl mx-4 lg:mx-auto max-w-[1400px] my-8">
             <div className="container">
                 {/* Header with centered timer */}
                 <div className="flex items-center justify-between mb-8">

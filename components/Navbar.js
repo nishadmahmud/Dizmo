@@ -305,7 +305,7 @@ export default function Navbar() {
 
             {/* Category Bar - Slimmer (Hidden on products page) */}
             {showCategoryBar && (
-                <div className="sticky top-16 z-40 w-full border-b border-[#103E34]/20 bg-[#103E34]">
+                <div className="sticky top-16 z-40 w-full border-b border-border bg-white py-2">
                     <div className="container">
                         <div className="flex items-center gap-2 overflow-x-auto py-1.5 scrollbar-hide">
                             {categories.map((category) => {
