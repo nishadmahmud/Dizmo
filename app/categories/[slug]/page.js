@@ -21,6 +21,17 @@ export default function CategoryDetailPage({ params }) {
     const [selectedColors, setSelectedColors] = useState([]);
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [sortBy, setSortBy] = useState('default');
+    const [selectedBatteryRange, setSelectedBatteryRange] = useState(null);
+
+    const batteryRanges = [
+        { label: '96-100%', min: 96, max: 100 },
+        { label: '91-95%', min: 91, max: 95 },
+        { label: '86-90%', min: 86, max: 90 },
+        { label: '81-85%', min: 81, max: 85 },
+        { label: '76-80%', min: 76, max: 80 },
+        { label: '71-75%', min: 71, max: 75 },
+        { label: '66-70%', min: 66, max: 70 }
+    ];
 
     // Unwrap params
     const [slug, setSlug] = useState(null);
@@ -164,6 +175,24 @@ export default function CategoryDetailPage({ params }) {
             );
         }
 
+        // Filter by battery life
+        if (selectedBatteryRange) {
+            filtered = filtered.filter(p =>
+                p.imeis.some(imei => {
+                    if (!imei.battery_life) return false;
+
+                    let battery = parseInt(imei.battery_life);
+
+                    // Handle "Brand New" as 100%
+                    if (isNaN(battery) && typeof imei.battery_life === 'string' && imei.battery_life.toLowerCase().includes('brand new')) {
+                        battery = 100;
+                    }
+
+                    return !isNaN(battery) && battery >= selectedBatteryRange.min && battery <= selectedBatteryRange.max;
+                })
+            );
+        }
+
         // Sort products
         switch (sortBy) {
             case 'price-low':
@@ -184,7 +213,7 @@ export default function CategoryDetailPage({ params }) {
         }
 
         return filtered;
-    }, [products, priceRange, availability, selectedBrand, selectedColors, sortBy]);
+    }, [products, priceRange, availability, selectedBrand, selectedColors, sortBy, selectedBatteryRange]);
 
     // Handle color selection toggle
     const handleColorChange = (colorName) => {
@@ -207,6 +236,7 @@ export default function CategoryDetailPage({ params }) {
         setAvailability('all');
         setSelectedColors([]);
         setSelectedBrand(null);
+        setSelectedBatteryRange(null);
         setSortBy('default');
     };
 
@@ -252,6 +282,31 @@ export default function CategoryDetailPage({ params }) {
                                 selectedBrand={selectedBrand}
                                 onBrandChange={setSelectedBrand}
                             />
+                        )}
+
+                        {/* Battery Life Filter - Only show for Used Phone category */}
+                        {categoryName === 'Used Phone' && (
+                            <div className="mb-6">
+                                <h3 className="text-sm font-semibold text-foreground mb-3">Battery Health</h3>
+                                <div className="overflow-x-auto pb-2 scrollbar-hide">
+                                    <div className="flex items-center gap-2 min-w-max">
+                                        {batteryRanges.map((range) => (
+                                            <button
+                                                key={range.label}
+                                                onClick={() => setSelectedBatteryRange(
+                                                    selectedBatteryRange?.label === range.label ? null : range
+                                                )}
+                                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedBatteryRange?.label === range.label
+                                                    ? "bg-[#10B981] text-white shadow-md"
+                                                    : "bg-white border border-border text-foreground hover:bg-secondary"
+                                                    }`}
+                                            >
+                                                {range.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         )}
 
                         {/* Header with count and sort */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
 
 export default function CategoryFilters({
@@ -21,13 +21,21 @@ export default function CategoryFilters({
         color: true
     });
 
-    // Local state for price range to ensure smooth dragging
+    // Local state for price range
     const [localPrice, setLocalPrice] = useState(priceRange);
+    const sliderTrackRef = useRef(null);
+    const [activeThumb, setActiveThumb] = useState(null); // 'min' or 'max' or null
+    const localPriceRef = useRef(localPrice);
 
-    // Sync local state with prop when prop changes (e.g. clear filters)
+    // Sync local state with prop when prop changes
     useEffect(() => {
         setLocalPrice(priceRange);
     }, [priceRange]);
+
+    // Keep ref in sync for event handlers
+    useEffect(() => {
+        localPriceRef.current = localPrice;
+    }, [localPrice]);
 
     const toggleSection = (section) => {
         setExpandedSections(prev => ({
@@ -37,7 +45,7 @@ export default function CategoryFilters({
     };
 
     const handlePriceCommit = () => {
-        onPriceChange(localPrice);
+        onPriceChange(localPriceRef.current);
     };
 
     const handleMinChange = (e) => {
@@ -49,6 +57,59 @@ export default function CategoryFilters({
         const value = Number(e.target.value);
         setLocalPrice(prev => ({ ...prev, max: value }));
     };
+
+    // Custom Slider Logic
+    useEffect(() => {
+        if (activeThumb) {
+            document.body.style.userSelect = 'none';
+            document.body.style.webkitUserSelect = 'none';
+        } else {
+            document.body.style.userSelect = '';
+            document.body.style.webkitUserSelect = '';
+        }
+
+        if (!activeThumb) return;
+
+        const handleMove = (clientX) => {
+            if (!sliderTrackRef.current) return;
+            const rect = sliderTrackRef.current.getBoundingClientRect();
+            const percentage = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
+            const value = Math.round(percentage * 200000); // Max price is 200000
+
+            setLocalPrice(prev => {
+                if (activeThumb === 'min') {
+                    // Ensure min doesn't cross max (with 100 buffer)
+                    const newValue = Math.min(value, prev.max - 100);
+                    return { ...prev, min: newValue };
+                } else {
+                    // Ensure max doesn't cross min (with 100 buffer)
+                    const newValue = Math.max(value, prev.min + 100);
+                    return { ...prev, max: newValue };
+                }
+            });
+        };
+
+        const handleMouseMove = (e) => handleMove(e.clientX);
+        const handleTouchMove = (e) => handleMove(e.touches[0].clientX);
+
+        const handleUp = () => {
+            setActiveThumb(null);
+            handlePriceCommit();
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleUp);
+        document.addEventListener('touchmove', handleTouchMove);
+        document.addEventListener('touchend', handleUp);
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleUp);
+            document.removeEventListener('touchmove', handleTouchMove);
+            document.removeEventListener('touchend', handleUp);
+        };
+    }, [activeThumb]); // Dependencies: only activeThumb to attach/detach. handlePriceCommit uses ref.
+
 
     const FilterSection = ({ title, section, children }) => (
         <div className="border-b border-border pb-4">
@@ -102,8 +163,8 @@ export default function CategoryFilters({
                             type="number"
                             value={localPrice.min}
                             onChange={handleMinChange}
-                            onBlur={handlePriceCommit}
-                            onKeyDown={(e) => e.key === 'Enter' && handlePriceCommit()}
+                            onBlur={() => onPriceChange(localPrice)}
+                            onKeyDown={(e) => e.key === 'Enter' && onPriceChange(localPrice)}
                             className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                             placeholder="Min"
                         />
@@ -112,15 +173,39 @@ export default function CategoryFilters({
                             type="number"
                             value={localPrice.max}
                             onChange={handleMaxChange}
-                            onBlur={handlePriceCommit}
-                            onKeyDown={(e) => e.key === 'Enter' && handlePriceCommit()}
+                            onBlur={() => onPriceChange(localPrice)}
+                            onKeyDown={(e) => e.key === 'Enter' && onPriceChange(localPrice)}
                             className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                             placeholder="Max"
                         />
                     </div>
 
-                    {/* Dual Range Slider */}
-                    <div className="relative h-6 mb-4">
+                    {/* Custom Dual Range Slider */}
+                    <div
+                        className="relative h-6 mb-4 select-none touch-none cursor-pointer"
+                        ref={sliderTrackRef}
+                        onMouseDown={(e) => {
+                            e.preventDefault(); // Prevent text selection
+                            // Allow clicking on track to jump to position
+                            if (e.target === sliderTrackRef.current || e.target.classList.contains('bg-secondary') || e.target.classList.contains('bg-primary')) {
+                                const rect = sliderTrackRef.current.getBoundingClientRect();
+                                const percentage = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+                                const value = Math.round(percentage * 200000);
+
+                                // Determine which thumb is closer
+                                const distMin = Math.abs(value - localPrice.min);
+                                const distMax = Math.abs(value - localPrice.max);
+
+                                if (distMin < distMax) {
+                                    setLocalPrice(prev => ({ ...prev, min: Math.min(value, prev.max - 100) }));
+                                    setActiveThumb('min');
+                                } else {
+                                    setLocalPrice(prev => ({ ...prev, max: Math.max(value, prev.min + 100) }));
+                                    setActiveThumb('max');
+                                }
+                            }
+                        }}
+                    >
                         {/* Track Background */}
                         <div className="absolute top-1/2 left-0 right-0 h-1.5 bg-secondary rounded-full -translate-y-1/2"></div>
 
@@ -133,87 +218,35 @@ export default function CategoryFilters({
                             }}
                         ></div>
 
-                        {/* Min Slider */}
-                        <input
-                            type="range"
-                            min="0"
-                            max="200000"
-                            step="100"
-                            value={localPrice.min}
-                            onChange={(e) => {
-                                const val = Math.min(Number(e.target.value), localPrice.max - 100);
-                                setLocalPrice(prev => ({ ...prev, min: val }));
+                        {/* Min Thumb */}
+                        <div
+                            className={`absolute top-1/2 w-4 h-4 bg-primary rounded-full -translate-y-1/2 -translate-x-1/2 cursor-grab shadow-md hover:scale-110 transition-transform z-20 ${activeThumb === 'min' ? 'cursor-grabbing scale-110' : ''}`}
+                            style={{ left: `${(localPrice.min / 200000) * 100}%` }}
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setActiveThumb('min');
                             }}
-                            onMouseUp={handlePriceCommit}
-                            onTouchEnd={handlePriceCommit}
-                            className="absolute top-1/2 left-0 w-full -translate-y-1/2 appearance-none bg-transparent pointer-events-none
-                                [&::-webkit-slider-thumb]:appearance-none
-                                [&::-webkit-slider-thumb]:w-4
-                                [&::-webkit-slider-thumb]:h-4
-                                [&::-webkit-slider-thumb]:rounded-full
-                                [&::-webkit-slider-thumb]:bg-primary
-                                [&::-webkit-slider-thumb]:cursor-grab
-                                [&::-webkit-slider-thumb]:pointer-events-auto
-                                [&::-webkit-slider-thumb]:shadow-md
-                                [&::-webkit-slider-thumb]:hover:scale-110
-                                [&::-webkit-slider-thumb]:transition-transform
-                                [&::-webkit-slider-thumb]:relative
-                                [&::-webkit-slider-thumb]:z-20
-                                [&::-moz-range-thumb]:w-4
-                                [&::-moz-range-thumb]:h-4
-                                [&::-moz-range-thumb]:rounded-full
-                                [&::-moz-range-thumb]:bg-primary
-                                [&::-moz-range-thumb]:border-0
-                                [&::-moz-range-thumb]:cursor-grab
-                                [&::-moz-range-thumb]:pointer-events-auto
-                                [&::-moz-range-thumb]:shadow-md
-                                [&::-moz-range-thumb]:hover:scale-110
-                                [&::-moz-range-thumb]:transition-transform
-                                [&::-moz-range-thumb]:relative
-                                [&::-moz-range-thumb]:z-20"
-                            style={{ zIndex: localPrice.min > 100000 ? 20 : 10 }}
-                        />
+                            onTouchStart={(e) => {
+                                e.stopPropagation();
+                                setActiveThumb('min');
+                            }}
+                        ></div>
 
-                        {/* Max Slider */}
-                        <input
-                            type="range"
-                            min="0"
-                            max="200000"
-                            step="100"
-                            value={localPrice.max}
-                            onChange={(e) => {
-                                const val = Math.max(Number(e.target.value), localPrice.min + 100);
-                                setLocalPrice(prev => ({ ...prev, max: val }));
+                        {/* Max Thumb */}
+                        <div
+                            className={`absolute top-1/2 w-4 h-4 bg-primary rounded-full -translate-y-1/2 -translate-x-1/2 cursor-grab shadow-md hover:scale-110 transition-transform z-20 ${activeThumb === 'max' ? 'cursor-grabbing scale-110' : ''}`}
+                            style={{ left: `${(localPrice.max / 200000) * 100}%` }}
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setActiveThumb('max');
                             }}
-                            onMouseUp={handlePriceCommit}
-                            onTouchEnd={handlePriceCommit}
-                            className="absolute top-1/2 left-0 w-full -translate-y-1/2 appearance-none bg-transparent pointer-events-none
-                                [&::-webkit-slider-thumb]:appearance-none
-                                [&::-webkit-slider-thumb]:w-4
-                                [&::-webkit-slider-thumb]:h-4
-                                [&::-webkit-slider-thumb]:rounded-full
-                                [&::-webkit-slider-thumb]:bg-primary
-                                [&::-webkit-slider-thumb]:cursor-grab
-                                [&::-webkit-slider-thumb]:pointer-events-auto
-                                [&::-webkit-slider-thumb]:shadow-md
-                                [&::-webkit-slider-thumb]:hover:scale-110
-                                [&::-webkit-slider-thumb]:transition-transform
-                                [&::-webkit-slider-thumb]:relative
-                                [&::-webkit-slider-thumb]:z-20
-                                [&::-moz-range-thumb]:w-4
-                                [&::-moz-range-thumb]:h-4
-                                [&::-moz-range-thumb]:rounded-full
-                                [&::-moz-range-thumb]:bg-primary
-                                [&::-moz-range-thumb]:border-0
-                                [&::-moz-range-thumb]:cursor-grab
-                                [&::-moz-range-thumb]:pointer-events-auto
-                                [&::-moz-range-thumb]:shadow-md
-                                [&::-moz-range-thumb]:hover:scale-110
-                                [&::-moz-range-thumb]:transition-transform
-                                [&::-moz-range-thumb]:relative
-                                [&::-moz-range-thumb]:z-20"
-                            style={{ zIndex: localPrice.max < 100000 ? 20 : 10 }}
-                        />
+                            onTouchStart={(e) => {
+                                e.stopPropagation();
+                                setActiveThumb('max');
+                            }}
+                        ></div>
                     </div>
                 </div>
             </FilterSection>
