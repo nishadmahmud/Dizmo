@@ -196,13 +196,13 @@ export default function HeroSection() {
                         </div>
                     </div>
 
-                    {/* Side Banners - Right Side (Hidden on mobile) */}
-                    <div className="hidden lg:flex flex-col gap-4">
+                    {/* Side Banners - Right Side on desktop, Single row on mobile */}
+                    <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:flex lg:flex-col">
                         {banners.map((banner) => (
                             <Link
                                 key={banner.id}
                                 href={banner.link}
-                                className="relative rounded-2xl overflow-hidden group h-[192px] hover:shadow-xl transition-shadow"
+                                className="relative rounded-2xl overflow-hidden group h-[120px] lg:h-[192px] hover:shadow-xl transition-shadow"
                             >
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
@@ -216,15 +216,15 @@ export default function HeroSection() {
                 </div>
 
                 {/* Features Bar */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 md:p-6">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4">
                         {features.map((feature, index) => (
                             <div
                                 key={index}
-                                className="flex flex-col items-center justify-center gap-2 p-3 md:p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
+                                className="flex flex-row md:flex-col items-center justify-start md:justify-center gap-2 p-2 md:p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
                             >
-                                <feature.icon className={`h-6 w-6 md:h-7 md:w-7 ${feature.color}`} />
-                                <span className="text-xs md:text-sm font-semibold text-foreground text-center leading-tight">
+                                <feature.icon className={`h-5 w-5 md:h-7 md:w-7 flex-shrink-0 ${feature.color}`} />
+                                <span className="text-[10px] md:text-sm font-semibold text-foreground text-left md:text-center leading-tight">
                                     {feature.text}
                                 </span>
                             </div>

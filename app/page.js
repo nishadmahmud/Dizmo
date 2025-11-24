@@ -23,7 +23,7 @@ export default function Home() {
 
       <div className="flex-1 w-full">
         {/* Content wrapper with max-width */}
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-0 md:px-4">
           <HeroSection />
           <CategoryIcons />
           <div id="flash-sale" className="scroll-mt-24">
