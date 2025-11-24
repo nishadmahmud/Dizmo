@@ -17,6 +17,42 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
     const { addToCart } = useCart();
     const router = useRouter();
 
+    // Get available colors for the selected storage
+    const getAvailableColors = () => {
+        if (!selectedStorage || !product.imeis || product.imeis.length === 0) {
+            return product.variants?.colors || [];
+        }
+
+        // Find all IMEIs that match the selected storage
+        const matchingImeis = product.imeis.filter(i => i.storage === selectedStorage);
+
+        // Get unique colors from those IMEIs
+        const availableColorIds = [...new Set(matchingImeis.map(i => i.color).filter(Boolean))];
+
+        // Filter the color variants to only include available ones
+        return (product.variants?.colors || []).filter(c => availableColorIds.includes(c.id));
+    };
+
+    const availableColors = getAvailableColors();
+
+    // Handle storage change and auto-select appropriate color
+    const handleStorageChange = (storageId) => {
+        setSelectedStorage(storageId);
+
+        // Get colors available for this storage
+        const colorsForStorage = product.imeis
+            .filter(i => i.storage === storageId)
+            .map(i => i.color)
+            .filter(Boolean);
+
+        // If current color is not available for this storage, select the first available one
+        if (!colorsForStorage.includes(selectedColor)) {
+            const firstAvailableColor = colorsForStorage[0] || null;
+            setSelectedColor(firstAvailableColor);
+            if (onColorChange && firstAvailableColor) onColorChange(firstAvailableColor);
+        }
+    };
+
     // Calculate current price based on selected variants
     const getCurrentPrice = () => {
         // If we have IMEIs (API data), calculate price based on exact combination
@@ -125,7 +161,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
                         {product.variants.storage.map((storage) => (
                             <button
                                 key={storage.id}
-                                onClick={() => setSelectedStorage(storage.id)}
+                                onClick={() => handleStorageChange(storage.id)}
                                 className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${selectedStorage === storage.id
                                     ? "border-primary bg-primary text-white"
                                     : "border-border hover:border-primary/50"
@@ -144,7 +180,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
                 <div className="space-y-3">
                     <h3 className="font-semibold text-foreground">Color</h3>
                     <div className="flex flex-wrap gap-3">
-                        {product.variants.colors.map((color) => (
+                        {availableColors.map((color) => (
                             <button
                                 key={color.id}
                                 onClick={() => {
