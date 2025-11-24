@@ -17,7 +17,7 @@ export default function ProductCard({ product }) {
             )}
 
             {/* Clickable Card Link */}
-            <Link href={`/product/${id}`} className="block">
+            <Link href={`/products/${id}`} className="block">
                 {/* Image Container */}
                 <div className="relative aspect-square bg-secondary/50 overflow-hidden">
                     {image ? (

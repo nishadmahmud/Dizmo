@@ -5,9 +5,9 @@ import { ShieldCheck, MapPin, CreditCard, Truck, Star, Share2, Plus, Minus, Chec
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 
-export default function ProductInfo({ product }) {
+export default function ProductInfo({ product, onColorChange, selectedColorProp }) {
     const [selectedStorage, setSelectedStorage] = useState(product.variants?.storage?.[0]?.id || null);
-    const [selectedColor, setSelectedColor] = useState(product.variants?.colors?.[0]?.id || null);
+    const [selectedColor, setSelectedColor] = useState(selectedColorProp || product.variants?.colors?.[0]?.id || null);
     const [selectedRegion, setSelectedRegion] = useState(product.variants?.regions?.[0]?.id || null);
     const [selectedCarePlans, setSelectedCarePlans] = useState([]);
     const [deliveryMethod, setDeliveryMethod] = useState("delivery");
@@ -17,8 +17,27 @@ export default function ProductInfo({ product }) {
     const { addToCart } = useCart();
     const router = useRouter();
 
-    // Calculate current price based on selected storage
+    // Calculate current price based on selected variants
     const getCurrentPrice = () => {
+        // If we have IMEIs (API data), calculate price based on exact combination
+        if (product.imeis && product.imeis.length > 0) {
+            const match = product.imeis.find(i =>
+                (!selectedStorage || i.storage === selectedStorage) &&
+                (!selectedColor || i.color === selectedColor) &&
+                (!selectedRegion || i.region === selectedRegion)
+            );
+
+            if (match) return match.sale_price;
+
+            // Fallback: find any match with at least storage (primary price driver)
+            const storageMatch = product.imeis.find(i => i.storage === selectedStorage);
+            if (storageMatch) return storageMatch.sale_price;
+
+            // Final fallback
+            return product.price;
+        }
+
+        // Legacy/Static data fallback
         if (!product.variants?.storage) return product.price;
         const storage = product.variants.storage.find(s => s.id === selectedStorage);
         return storage?.price || product.price;
@@ -128,7 +147,10 @@ export default function ProductInfo({ product }) {
                         {product.variants.colors.map((color) => (
                             <button
                                 key={color.id}
-                                onClick={() => setSelectedColor(color.id)}
+                                onClick={() => {
+                                    setSelectedColor(color.id);
+                                    if (onColorChange) onColorChange(color.id);
+                                }}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${selectedColor === color.id
                                     ? "border-primary ring-2 ring-primary"
                                     : "border-border hover:border-primary/50"

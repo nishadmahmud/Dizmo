@@ -19,8 +19,8 @@ export default function ProductTabs({ product }) {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`pb-3 px-4 font-semibold transition-all relative ${activeTab === tab.id
-                                ? "text-primary"
-                                : "text-muted-foreground hover:text-foreground"
+                            ? "text-primary"
+                            : "text-muted-foreground hover:text-foreground"
                             }`}
                     >
                         {tab.label}
@@ -71,22 +71,29 @@ export default function ProductTabs({ product }) {
 
                 {activeTab === "specifications" && (
                     <div className="space-y-8">
-                        {Object.entries(product.specifications || {}).map(([key, category]) => (
-                            <div key={key} className="border-b border-border pb-6 last:border-0">
-                                <h3 className="text-lg font-bold text-primary mb-4">{category.title}</h3>
-                                <div className="grid grid-cols-1 gap-3">
-                                    {Object.entries(category.specs).map(([specKey, specValue]) => (
-                                        <div
-                                            key={specKey}
-                                            className="grid grid-cols-1 md:grid-cols-3 gap-2 py-2 border-b border-border/50 last:border-0"
-                                        >
-                                            <span className="font-medium text-foreground">{specKey}</span>
-                                            <span className="text-muted-foreground md:col-span-2">{specValue}</span>
+                        {(!product.specifications || (Array.isArray(product.specifications) && product.specifications.length === 0) || Object.keys(product.specifications).length === 0) ? (
+                            <p className="text-muted-foreground text-center py-8">No specifications available for this product.</p>
+                        ) : (
+                            Object.entries(product.specifications).map(([key, category]) => {
+                                if (!category || typeof category !== 'object' || !category.specs) return null;
+                                return (
+                                    <div key={key} className="border-b border-border pb-6 last:border-0">
+                                        <h3 className="text-lg font-bold text-primary mb-4">{category.title || key}</h3>
+                                        <div className="grid grid-cols-1 gap-3">
+                                            {category.specs && typeof category.specs === 'object' && Object.entries(category.specs).map(([specKey, specValue]) => (
+                                                <div
+                                                    key={specKey}
+                                                    className="grid grid-cols-1 md:grid-cols-3 gap-2 py-2 border-b border-border/50 last:border-0"
+                                                >
+                                                    <span className="font-medium text-foreground">{specKey}</span>
+                                                    <span className="text-muted-foreground md:col-span-2">{specValue}</span>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
+                                    </div>
+                                );
+                            })
+                        )}
                     </div>
                 )}
             </div>
