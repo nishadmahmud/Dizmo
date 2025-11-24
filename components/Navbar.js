@@ -188,8 +188,8 @@ export default function Navbar() {
                         </span>
                     </Link>
 
-                    {/* Search Bar (Hidden on mobile, visible on lg) */}
-                    <div className="hidden lg:flex flex-1 max-w-xl mx-6 relative" onClick={(e) => e.stopPropagation()}>
+                    {/* Search Bar (Visible on all screens) */}
+                    <div className="flex flex-1 max-w-xl mx-2 lg:mx-6 relative" onClick={(e) => e.stopPropagation()}>
                         <div className="relative w-full">
                             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                             <input
@@ -273,12 +273,7 @@ export default function Navbar() {
 
                     {/* Icons */}
                     <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setShowSearch(true)}
-                            className="lg:hidden p-2 hover:bg-white/10 rounded-full"
-                        >
-                            <Search className="h-5 w-5 text-white" />
-                        </button>
+
 
 
 
@@ -307,7 +302,7 @@ export default function Navbar() {
             {/* Category Bar - Slimmer (Hidden on products page) */}
             {/* Category Bar - Slimmer (Hidden on products page) */}
             {showCategoryBar && (
-                <div className="sticky top-16 z-40 w-full border-b border-border bg-white py-2 shadow-sm">
+                <div className="hidden md:block sticky top-16 z-40 w-full border-b border-border bg-white py-2 shadow-sm">
                     <div className="container flex items-center justify-between gap-4">
                         {/* Left: All Categories Hamburger (Icon Only) */}
                         <button
@@ -401,80 +396,7 @@ export default function Navbar() {
                 </div>
             )}
 
-            {/* Mobile Search Modal */}
-            {showSearch && (
-                <div className="fixed inset-0 z-[60] bg-background">
-                    <div className="container h-full flex flex-col">
-                        <div className="flex items-center gap-3 h-16 border-b border-border">
-                            <div className="relative flex-1">
-                                <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                                <input
-                                    type="search"
-                                    placeholder={isListening ? "Listening..." : "Search gadgets..."}
-                                    autoFocus
-                                    value={searchQuery}
-                                    onChange={handleSearch}
-                                    onKeyDown={handleSearchSubmit}
-                                    className={`w-full rounded-full border bg-secondary py-2 pl-11 pr-10 text-sm outline-none focus:ring-2 focus:ring-ring transition-all ${isListening ? 'border-red-500 ring-2 ring-red-500/20 placeholder:text-red-500' : 'border-input'}`}
-                                />
-                                <button
-                                    onClick={handleVoiceSearch}
-                                    className={`absolute right-3 top-2.5 transition-colors ${isListening ? 'text-red-500 animate-pulse' : 'text-muted-foreground hover:text-primary'}`}
-                                >
-                                    <Mic className="h-5 w-5" />
-                                </button>
-                            </div>
-                            <button
-                                onClick={() => setShowSearch(false)}
-                                className="p-2 hover:bg-accent/10 rounded-full"
-                            >
-                                <X className="h-5 w-5" />
-                            </button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto py-4">
-                            {searchQuery ? (
-                                searchResults.length > 0 ? (
-                                    <ul className="space-y-2">
-                                        {searchResults.map((product) => (
-                                            <li key={product.id}>
-                                                <button
-                                                    onClick={() => handleResultClick(product.id)}
-                                                    className="w-full flex items-center gap-3 p-3 hover:bg-secondary rounded-lg transition-colors text-left"
-                                                >
-                                                    <div className="h-12 w-12 rounded-md bg-secondary overflow-hidden flex-shrink-0">
-                                                        <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium line-clamp-1">{product.name}</p>
-                                                        <p className="text-xs text-muted-foreground">৳{product.price.toLocaleString()}</p>
-                                                    </div>
-                                                </button>
-                                            </li>
-                                        ))}
-                                        <li>
-                                            <button
-                                                onClick={() => {
-                                                    router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
-                                                    setShowSearch(false);
-                                                }}
-                                                className="w-full p-3 text-center text-sm text-primary font-medium bg-secondary/50 rounded-lg mt-2"
-                                            >
-                                                View all results
-                                            </button>
-                                        </li>
-                                    </ul>
-                                ) : (
-                                    <div className="text-center py-8 text-muted-foreground">
-                                        No products found
-                                    </div>
-                                )
-                            ) : (
-                                <p className="text-sm text-muted-foreground text-center">Start typing to search...</p>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
+
 
             {/* Mobile Side Menu */}
             {showMenu && (
@@ -573,7 +495,7 @@ export default function Navbar() {
 
                     {/* Products */}
                     <Link
-                        href="/products"
+                        href="/categories"
                         className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/products' ? 'text-[#FCB042]' : 'text-white hover:text-[#FCB042]'
                             }`}
                     >
