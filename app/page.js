@@ -26,7 +26,9 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4">
           <HeroSection />
           <CategoryIcons />
-          <FlashSale />
+          <div id="flash-sale" className="scroll-mt-24">
+            <FlashSale />
+          </div>
           <PromoBanners />
           <FeaturedProducts />
           <OfferTabs />

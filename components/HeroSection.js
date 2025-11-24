@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, ShieldCheck, Truck, CreditCard, RefreshCw, Tag } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShieldCheck, Truck, CreditCard, RefreshCw, Tag, Headphones } from "lucide-react";
 
 const defaultSlides = [
     {
@@ -40,7 +40,8 @@ const features = [
     { icon: Truck, text: "Super Fast Delivery", color: "text-blue-600" },
     { icon: CreditCard, text: "36 Months Installments", color: "text-orange-600" },
     { icon: RefreshCw, text: "2 Years Replacement", color: "text-purple-600" },
-    { icon: Tag, text: "Best Price in BD", color: "text-red-600" }
+    { icon: Tag, text: "Best Price in BD", color: "text-red-600" },
+    { icon: Headphones, text: "24/7 Customer Support", color: "text-cyan-600" }
 ];
 
 export default function HeroSection() {
@@ -216,7 +217,7 @@ export default function HeroSection() {
 
                 {/* Features Bar */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
                         {features.map((feature, index) => (
                             <div
                                 key={index}

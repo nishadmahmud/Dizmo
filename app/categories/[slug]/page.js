@@ -1,43 +1,335 @@
+"use client";
+
+import { useState, useEffect, useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { ArrowLeft } from "lucide-react";
+import CategoryFilters from "@/components/CategoryFilters";
+import BrandFilter from "@/components/BrandFilter";
+import { SlidersHorizontal, ChevronDown } from "lucide-react";
 import Link from "next/link";
 
-// Dummy Data (In real app, fetch based on slug)
-const categoryProducts = [
-    { id: 1, name: "iPhone 15 Pro Max", price: 145000, originalPrice: 160000, discount: 10 },
-    { id: 11, name: "OnePlus 12", price: 85000, originalPrice: 90000, discount: 5 },
-    { id: 12, name: "Pixel 8 Pro", price: 95000, originalPrice: 105000, discount: 10 },
-    { id: 13, name: "Xiaomi 14 Ultra", price: 110000, originalPrice: 120000, discount: 8 },
-    { id: 14, name: "Nothing Phone (2)", price: 65000, originalPrice: 70000, discount: 7 },
-    { id: 31, name: "iPhone 13", price: 65000, originalPrice: 75000, discount: 13 },
-    { id: 32, name: "Galaxy S23 FE", price: 55000, originalPrice: 65000, discount: 15 },
-    { id: 41, name: "iPhone 12", price: 45000, originalPrice: 60000, discount: 25 },
-];
+export default function CategoryDetailPage({ params }) {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
+    const [categoryName, setCategoryName] = useState('');
 
-export default async function CategoryDetailPage({ params }) {
-    const { slug } = await params;
-    const categoryName = slug.charAt(0).toUpperCase() + slug.slice(1);
+    // Filter States
+    const [priceRange, setPriceRange] = useState({ min: 0, max: 200000 });
+    const [availability, setAvailability] = useState('all');
+    const [selectedColors, setSelectedColors] = useState([]);
+    const [selectedBrand, setSelectedBrand] = useState(null);
+    const [sortBy, setSortBy] = useState('default');
+
+    // Unwrap params
+    const [slug, setSlug] = useState(null);
+
+    useEffect(() => {
+        params.then(p => setSlug(p.slug));
+    }, [params]);
+
+    // Fetch category products
+    useEffect(() => {
+        if (!slug) return;
+
+        const fetchCategoryProducts = async () => {
+            try {
+                setLoading(true);
+                const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+                const productsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
+                const categoriesEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORIES;
+                const storeId = process.env.NEXT_PUBLIC_STORE_ID;
+
+                // Fetch category info to get the name
+                const categoriesResponse = await fetch(`${apiBaseUrl}${categoriesEndpoint}/${storeId}`);
+                if (categoriesResponse.ok) {
+                    const categoriesData = await categoriesResponse.json();
+                    if (categoriesData.success && categoriesData.data) {
+                        const category = categoriesData.data.find(cat => cat.category_id.toString() === slug);
+                        if (category) {
+                            setCategoryName(category.name);
+                        } else {
+                            setCategoryName('Category');
+                        }
+                    }
+                }
+
+                // Fetch products for this category
+                const response = await fetch(`${apiBaseUrl}${productsEndpoint}/${slug}`);
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    // Process products similar to ProductContext
+                    const processedProducts = data.data.map(product => {
+                        // Get lowest price from imeis
+                        let lowestPrice = parseFloat(product.retails_price);
+                        if (product.imeis && product.imeis.length > 0) {
+                            const prices = product.imeis.map(imei => parseFloat(imei.sale_price));
+                            lowestPrice = Math.min(...prices);
+                        }
+
+                        return {
+                            id: product.id,
+                            name: product.name,
+                            price: lowestPrice,
+                            originalPrice: parseFloat(product.retails_price),
+                            discount: parseFloat(product.discount) || 0,
+                            inStock: product.status === "In stock",
+                            image: product.image_path,
+                            brand: product.brand_name,
+                            brandId: product.brand_id,
+                            stock: product.current_stock,
+                            rating: parseFloat(product.review_summary?.average_rating) || 0,
+                            reviews: product.review_summary?.total_reviews || 0,
+                            imeis: product.imeis || [],
+                            brands: product.brands
+                        };
+                    });
+
+                    setProducts(processedProducts);
+
+                    // Set initial price range based on products
+                    if (processedProducts.length > 0) {
+                        const prices = processedProducts.map(p => p.price);
+                        setPriceRange({
+                            min: Math.floor(Math.min(...prices)),
+                            max: Math.ceil(Math.max(...prices))
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching category products:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCategoryProducts();
+    }, [slug]);
+
+    // Extract unique brands from products
+    const uniqueBrands = useMemo(() => {
+        const brandMap = new Map();
+        products.forEach(product => {
+            if (product.brandId && product.brand && !brandMap.has(product.brandId)) {
+                brandMap.set(product.brandId, {
+                    id: product.brandId,
+                    name: product.brand
+                });
+            }
+        });
+        return Array.from(brandMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    }, [products]);
+
+    // Extract unique colors from all product variants
+    const availableColors = useMemo(() => {
+        const colorMap = new Map();
+        products.forEach(product => {
+            product.imeis.forEach(imei => {
+                if (imei.color && imei.color_code && !colorMap.has(imei.color)) {
+                    colorMap.set(imei.color, {
+                        name: imei.color,
+                        code: imei.color_code
+                    });
+                }
+            });
+        });
+        return Array.from(colorMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    }, [products]);
+
+    // Filter and sort products
+    const filteredProducts = useMemo(() => {
+        let filtered = [...products];
+
+        // Filter by price
+        filtered = filtered.filter(p => p.price >= priceRange.min && p.price <= priceRange.max);
+
+        // Filter by availability
+        if (availability === 'in-stock') {
+            filtered = filtered.filter(p => p.inStock);
+        } else if (availability === 'pre-order') {
+            filtered = filtered.filter(p => !p.inStock);
+        }
+
+        // Filter by brand
+        if (selectedBrand !== null) {
+            filtered = filtered.filter(p => p.brandId === selectedBrand);
+        }
+
+        // Filter by color
+        if (selectedColors.length > 0) {
+            filtered = filtered.filter(p =>
+                p.imeis.some(imei => selectedColors.includes(imei.color))
+            );
+        }
+
+        // Sort products
+        switch (sortBy) {
+            case 'price-low':
+                filtered.sort((a, b) => a.price - b.price);
+                break;
+            case 'price-high':
+                filtered.sort((a, b) => b.price - a.price);
+                break;
+            case 'discount':
+                filtered.sort((a, b) => b.discount - a.discount);
+                break;
+            case 'newest':
+                // Assuming products are already sorted by newest from API
+                break;
+            default:
+                // Keep default order
+                break;
+        }
+
+        return filtered;
+    }, [products, priceRange, availability, selectedBrand, selectedColors, sortBy]);
+
+    // Handle color selection toggle
+    const handleColorChange = (colorName) => {
+        setSelectedColors(prev =>
+            prev.includes(colorName)
+                ? prev.filter(c => c !== colorName)
+                : [...prev, colorName]
+        );
+    };
+
+    // Clear all filters
+    const handleClearFilters = () => {
+        if (products.length > 0) {
+            const prices = products.map(p => p.price);
+            setPriceRange({
+                min: Math.floor(Math.min(...prices)),
+                max: Math.ceil(Math.max(...prices))
+            });
+        }
+        setAvailability('all');
+        setSelectedColors([]);
+        setSelectedBrand(null);
+        setSortBy('default');
+    };
+
+    if (!slug) {
+        return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    }
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
             <Navbar />
 
-            <div className="container py-8">
-                <div className="flex items-center gap-4 mb-8">
-                    <Link href="/categories" className="p-2 hover:bg-secondary rounded-full transition-colors">
-                        <ArrowLeft className="h-5 w-5 text-muted-foreground" />
-                    </Link>
-                    <h1 className="text-3xl font-bold text-primary">{categoryName}</h1>
+            <div className="container py-6">
+                {/* Breadcrumb */}
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+                    <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+                    <span>/</span>
+                    <Link href="/categories" className="hover:text-primary transition-colors">Categories</Link>
+                    <span>/</span>
+                    <span className="text-foreground font-medium">{categoryName || 'Loading...'}</span>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {categoryProducts.map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Sidebar Filters - Desktop */}
+                    <div className="hidden lg:block">
+                        <CategoryFilters
+                            priceRange={priceRange}
+                            onPriceChange={setPriceRange}
+                            availability={availability}
+                            onAvailabilityChange={setAvailability}
+                            selectedColors={selectedColors}
+                            onColorChange={handleColorChange}
+                            availableColors={availableColors}
+                            onClearFilters={handleClearFilters}
+                        />
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="lg:col-span-3">
+                        {/* Brand Filter */}
+                        {uniqueBrands.length > 0 && (
+                            <BrandFilter
+                                brands={uniqueBrands}
+                                selectedBrand={selectedBrand}
+                                onBrandChange={setSelectedBrand}
+                            />
+                        )}
+
+                        {/* Header with count and sort */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                            <div className="flex items-center gap-3">
+                                <h1 className="text-2xl font-bold text-primary">Products of {categoryName || 'Category'}</h1>
+                                <button
+                                    onClick={() => setShowMobileFilters(true)}
+                                    className="lg:hidden p-2 border border-border rounded-lg hover:bg-secondary transition-colors"
+                                >
+                                    <SlidersHorizontal className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                                <p className="text-sm text-muted-foreground">
+                                    Showing 1 to {filteredProducts.length} from {products.length} Products
+                                </p>
+
+                                {/* Sort Dropdown */}
+                                <div className="relative">
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value)}
+                                        className="appearance-none px-4 py-2 pr-10 border border-border rounded-lg bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+                                    >
+                                        <option value="default">Default</option>
+                                        <option value="price-low">Price: Low to High</option>
+                                        <option value="price-high">Price: High to Low</option>
+                                        <option value="newest">Newest First</option>
+                                        <option value="discount">Discount: High to Low</option>
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none text-muted-foreground" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Products Grid */}
+                        {loading ? (
+                            <div className="text-center py-12">
+                                <p className="text-muted-foreground">Loading products...</p>
+                            </div>
+                        ) : filteredProducts.length > 0 ? (
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                {filteredProducts.map((product) => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-12 bg-card rounded-xl border border-border">
+                                <p className="text-muted-foreground">No products found matching your filters.</p>
+                                <button
+                                    onClick={handleClearFilters}
+                                    className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                                >
+                                    Clear Filters
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
+
+            {/* Mobile Filters Modal */}
+            {showMobileFilters && (
+                <CategoryFilters
+                    priceRange={priceRange}
+                    onPriceChange={setPriceRange}
+                    availability={availability}
+                    onAvailabilityChange={setAvailability}
+                    selectedColors={selectedColors}
+                    onColorChange={handleColorChange}
+                    availableColors={availableColors}
+                    onClearFilters={handleClearFilters}
+                    isMobile={true}
+                    onClose={() => setShowMobileFilters(false)}
+                />
+            )}
 
             <Footer />
         </main>

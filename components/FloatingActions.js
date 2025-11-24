@@ -6,11 +6,10 @@ import { GitCompare, X } from "lucide-react";
 
 export default function FloatingActions() {
     const [showGreeting, setShowGreeting] = useState(false);
-    const whatsappNumber = "1234567890"; // Replace with actual WhatsApp number
+    const whatsappNumber = "+8801710425454";
     const whatsappMessage = "Hi! I need help with my order.";
 
     useEffect(() => {
-        // Show greeting on first load
         const hasSeenGreeting = localStorage.getItem("hasSeenHelpGreeting");
         if (!hasSeenGreeting) {
             setTimeout(() => setShowGreeting(true), 2000);

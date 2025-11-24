@@ -42,6 +42,7 @@ export default function Navbar() {
     const pathname = usePathname();
     const [showSearch, setShowSearch] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
+    const [showAllCategories, setShowAllCategories] = useState(false);
     const [categories, setCategories] = useState(defaultCategories);
 
     // Search State
@@ -304,24 +305,98 @@ export default function Navbar() {
             </nav>
 
             {/* Category Bar - Slimmer (Hidden on products page) */}
+            {/* Category Bar - Slimmer (Hidden on products page) */}
             {showCategoryBar && (
-                <div className="sticky top-16 z-40 w-full border-b border-border bg-white py-2">
-                    <div className="container">
-                        <div className="flex items-center gap-2 overflow-x-auto py-1.5 scrollbar-hide">
-                            {categories.map((category) => {
-                                const IconComponent = category.Icon;
-                                return (
-                                    <Link
-                                        key={category.id}
-                                        href={`/products?category=${category.id}`}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-secondary hover:bg-[#103E34] hover:text-white transition-all whitespace-nowrap text-sm font-medium"
-                                    >
-                                        <IconComponent className="h-4 w-4" />
-                                        <span>{category.name}</span>
-                                    </Link>
-                                );
-                            })}
+                <div className="sticky top-16 z-40 w-full border-b border-border bg-white py-2 shadow-sm">
+                    <div className="container flex items-center justify-between gap-4">
+                        {/* Left: All Categories Hamburger (Icon Only) */}
+                        <button
+                            onClick={() => setShowAllCategories(true)}
+                            className="p-2 hover:bg-secondary rounded-full text-[#103E34] transition-colors flex-shrink-0"
+                            aria-label="All Categories"
+                        >
+                            <Menu className="h-6 w-6" />
+                        </button>
+
+                        {/* Center: Horizontal Category List */}
+                        <div className="flex-1 flex justify-center overflow-hidden">
+                            <div className="flex items-center gap-2 overflow-x-auto py-1.5 scrollbar-hide mask-linear-fade px-4">
+                                {categories.slice(0, 8).map((category) => {
+                                    const IconComponent = category.Icon;
+                                    return (
+                                        <Link
+                                            key={category.id}
+                                            href={`/categories/${category.id}`}
+                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-secondary hover:bg-[#103E34] hover:text-white transition-all whitespace-nowrap text-sm font-medium flex-shrink-0"
+                                        >
+                                            <IconComponent className="h-4 w-4" />
+                                            <span>{category.name}</span>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
                         </div>
+
+                        {/* Right: Flash Sale Button */}
+                        <button
+                            onClick={() => {
+                                if (pathname === '/') {
+                                    document.getElementById('flash-sale')?.scrollIntoView({ behavior: 'smooth' });
+                                } else {
+                                    router.push('/#flash-sale');
+                                }
+                            }}
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#103E34] text-white hover:bg-[#0c2e26] transition-colors text-sm font-bold shadow-sm flex-shrink-0"
+                        >
+                            <Zap className="h-4 w-4 fill-[#FCB042] text-[#FCB042] animate-pulse" />
+                            <span className="hidden sm:inline">Flash Sale</span>
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* All Categories Modal */}
+            {showAllCategories && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div
+                        className="fixed inset-0"
+                        onClick={() => setShowAllCategories(false)}
+                    />
+                    <div className="relative w-full max-w-2xl bg-background rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex items-center justify-between p-6 border-b border-border bg-[#103E34] text-white">
+                            <h2 className="text-xl font-bold flex items-center gap-2">
+                                <Menu className="h-6 w-6" />
+                                All Categories
+                            </h2>
+                            <button
+                                onClick={() => setShowAllCategories(false)}
+                                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                            >
+                                <X className="h-6 w-6" />
+                            </button>
+                        </div>
+                        <nav className="flex-1 overflow-y-auto p-6">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {categories.map((category) => {
+                                    const IconComponent = category.Icon;
+                                    return (
+                                        <Link
+                                            key={category.id}
+                                            href={`/categories/${category.id}`}
+                                            onClick={() => setShowAllCategories(false)}
+                                            className="flex flex-col items-center gap-3 p-4 rounded-xl hover:bg-secondary transition-all group border border-border hover:border-primary/20 hover:shadow-md text-center"
+                                        >
+                                            <div className="h-12 w-12 rounded-full bg-secondary flex items-center justify-center group-hover:bg-white group-hover:shadow-sm transition-all group-hover:scale-110 duration-300">
+                                                <IconComponent className="h-6 w-6 text-[#103E34]" />
+                                            </div>
+                                            <span className="font-medium text-foreground group-hover:text-primary transition-colors">
+                                                {category.name}
+                                            </span>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </nav>
                     </div>
                 </div>
             )}
@@ -474,7 +549,7 @@ export default function Navbar() {
                     {/* Home */}
                     <Link
                         href="/"
-                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/' ? 'text-[#FCB042]' : 'text-white hover:text-[#FCB042]'
                             }`}
                     >
                         <Home className="h-5 w-5" />
@@ -484,13 +559,13 @@ export default function Navbar() {
                     {/* Cart */}
                     <button
                         onClick={openDrawer}
-                        className={`flex flex-col items-center justify-center gap-1 transition-colors relative ${pathname === '/cart' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                        className={`flex flex-col items-center justify-center gap-1 transition-colors relative ${pathname === '/cart' ? 'text-[#FCB042]' : 'text-white hover:text-[#FCB042]'
                             }`}
                     >
                         <ShoppingCart className="h-5 w-5" />
                         <span className="text-[10px] font-medium">Cart</span>
                         {cartCount > 0 && (
-                            <span className="absolute top-2 right-1/2 translate-x-3 h-4 w-4 flex items-center justify-center text-[9px] font-bold rounded-full bg-accent text-accent-foreground">
+                            <span className="absolute top-2 right-1/2 translate-x-3 h-4 w-4 flex items-center justify-center text-[9px] font-bold rounded-full bg-[#FCB042] text-[#103E34]">
                                 {cartCount}
                             </span>
                         )}
@@ -499,7 +574,7 @@ export default function Navbar() {
                     {/* Products */}
                     <Link
                         href="/products"
-                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/products' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/products' ? 'text-[#FCB042]' : 'text-white hover:text-[#FCB042]'
                             }`}
                     >
                         <Package className="h-5 w-5" />
@@ -509,7 +584,7 @@ export default function Navbar() {
                     {/* Offers */}
                     <Link
                         href="/offers"
-                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/offers' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/offers' ? 'text-[#FCB042]' : 'text-white hover:text-[#FCB042]'
                             }`}
                     >
                         <Zap className="h-5 w-5" />
