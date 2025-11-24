@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
 
 export default function CategoryFilters({
@@ -21,11 +21,33 @@ export default function CategoryFilters({
         color: true
     });
 
+    // Local state for price range to ensure smooth dragging
+    const [localPrice, setLocalPrice] = useState(priceRange);
+
+    // Sync local state with prop when prop changes (e.g. clear filters)
+    useEffect(() => {
+        setLocalPrice(priceRange);
+    }, [priceRange]);
+
     const toggleSection = (section) => {
         setExpandedSections(prev => ({
             ...prev,
             [section]: !prev[section]
         }));
+    };
+
+    const handlePriceCommit = () => {
+        onPriceChange(localPrice);
+    };
+
+    const handleMinChange = (e) => {
+        const value = Number(e.target.value);
+        setLocalPrice(prev => ({ ...prev, min: value }));
+    };
+
+    const handleMaxChange = (e) => {
+        const value = Number(e.target.value);
+        setLocalPrice(prev => ({ ...prev, max: value }));
     };
 
     const FilterSection = ({ title, section, children }) => (
@@ -54,56 +76,143 @@ export default function CategoryFilters({
             {/* Header */}
             <div className="flex items-center justify-between pb-4 border-b border-border">
                 <h3 className="text-lg font-bold text-foreground">Filters</h3>
-                {isMobile && (
+                <div className="flex items-center gap-2">
                     <button
-                        onClick={onClose}
-                        className="p-2 hover:bg-secondary rounded-full transition-colors"
+                        onClick={onClearFilters}
+                        className="px-3 py-1.5 text-xs font-medium bg-secondary hover:bg-primary hover:text-white text-foreground rounded-lg transition-colors"
                     >
-                        <X className="h-5 w-5" />
+                        Reset
                     </button>
-                )}
+                    {isMobile && (
+                        <button
+                            onClick={onClose}
+                            className="p-2 hover:bg-secondary rounded-full transition-colors"
+                        >
+                            <X className="h-5 w-5" />
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Price Range Filter */}
             <FilterSection title="PRICE RANGE" section="price">
-                <div className="space-y-4">
+                <div className="space-y-6">
                     <div className="flex items-center gap-3">
                         <input
                             type="number"
-                            value={priceRange.min}
-                            onChange={(e) => onPriceChange({ ...priceRange, min: Number(e.target.value) })}
+                            value={localPrice.min}
+                            onChange={handleMinChange}
+                            onBlur={handlePriceCommit}
+                            onKeyDown={(e) => e.key === 'Enter' && handlePriceCommit()}
                             className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                             placeholder="Min"
                         />
                         <span className="text-muted-foreground">-</span>
                         <input
                             type="number"
-                            value={priceRange.max}
-                            onChange={(e) => onPriceChange({ ...priceRange, max: Number(e.target.value) })}
+                            value={localPrice.max}
+                            onChange={handleMaxChange}
+                            onBlur={handlePriceCommit}
+                            onKeyDown={(e) => e.key === 'Enter' && handlePriceCommit()}
                             className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                             placeholder="Max"
                         />
                     </div>
 
-                    {/* Range Slider */}
-                    <div className="px-2">
+                    {/* Dual Range Slider */}
+                    <div className="relative h-6 mb-4">
+                        {/* Track Background */}
+                        <div className="absolute top-1/2 left-0 right-0 h-1.5 bg-secondary rounded-full -translate-y-1/2"></div>
+
+                        {/* Active Track Range */}
+                        <div
+                            className="absolute top-1/2 h-1.5 bg-primary rounded-full -translate-y-1/2 pointer-events-none"
+                            style={{
+                                left: `${(localPrice.min / 200000) * 100}%`,
+                                right: `${100 - (localPrice.max / 200000) * 100}%`
+                            }}
+                        ></div>
+
+                        {/* Min Slider */}
                         <input
                             type="range"
                             min="0"
                             max="200000"
-                            step="1000"
-                            value={priceRange.min}
-                            onChange={(e) => onPriceChange({ ...priceRange, min: Number(e.target.value) })}
-                            className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer range-slider"
+                            step="100"
+                            value={localPrice.min}
+                            onChange={(e) => {
+                                const val = Math.min(Number(e.target.value), localPrice.max - 100);
+                                setLocalPrice(prev => ({ ...prev, min: val }));
+                            }}
+                            onMouseUp={handlePriceCommit}
+                            onTouchEnd={handlePriceCommit}
+                            className="absolute top-1/2 left-0 w-full -translate-y-1/2 appearance-none bg-transparent pointer-events-none
+                                [&::-webkit-slider-thumb]:appearance-none
+                                [&::-webkit-slider-thumb]:w-4
+                                [&::-webkit-slider-thumb]:h-4
+                                [&::-webkit-slider-thumb]:rounded-full
+                                [&::-webkit-slider-thumb]:bg-primary
+                                [&::-webkit-slider-thumb]:cursor-grab
+                                [&::-webkit-slider-thumb]:pointer-events-auto
+                                [&::-webkit-slider-thumb]:shadow-md
+                                [&::-webkit-slider-thumb]:hover:scale-110
+                                [&::-webkit-slider-thumb]:transition-transform
+                                [&::-webkit-slider-thumb]:relative
+                                [&::-webkit-slider-thumb]:z-20
+                                [&::-moz-range-thumb]:w-4
+                                [&::-moz-range-thumb]:h-4
+                                [&::-moz-range-thumb]:rounded-full
+                                [&::-moz-range-thumb]:bg-primary
+                                [&::-moz-range-thumb]:border-0
+                                [&::-moz-range-thumb]:cursor-grab
+                                [&::-moz-range-thumb]:pointer-events-auto
+                                [&::-moz-range-thumb]:shadow-md
+                                [&::-moz-range-thumb]:hover:scale-110
+                                [&::-moz-range-thumb]:transition-transform
+                                [&::-moz-range-thumb]:relative
+                                [&::-moz-range-thumb]:z-20"
+                            style={{ zIndex: localPrice.min > 100000 ? 20 : 10 }}
                         />
+
+                        {/* Max Slider */}
                         <input
                             type="range"
                             min="0"
                             max="200000"
-                            step="1000"
-                            value={priceRange.max}
-                            onChange={(e) => onPriceChange({ ...priceRange, max: Number(e.target.value) })}
-                            className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer range-slider mt-2"
+                            step="100"
+                            value={localPrice.max}
+                            onChange={(e) => {
+                                const val = Math.max(Number(e.target.value), localPrice.min + 100);
+                                setLocalPrice(prev => ({ ...prev, max: val }));
+                            }}
+                            onMouseUp={handlePriceCommit}
+                            onTouchEnd={handlePriceCommit}
+                            className="absolute top-1/2 left-0 w-full -translate-y-1/2 appearance-none bg-transparent pointer-events-none
+                                [&::-webkit-slider-thumb]:appearance-none
+                                [&::-webkit-slider-thumb]:w-4
+                                [&::-webkit-slider-thumb]:h-4
+                                [&::-webkit-slider-thumb]:rounded-full
+                                [&::-webkit-slider-thumb]:bg-primary
+                                [&::-webkit-slider-thumb]:cursor-grab
+                                [&::-webkit-slider-thumb]:pointer-events-auto
+                                [&::-webkit-slider-thumb]:shadow-md
+                                [&::-webkit-slider-thumb]:hover:scale-110
+                                [&::-webkit-slider-thumb]:transition-transform
+                                [&::-webkit-slider-thumb]:relative
+                                [&::-webkit-slider-thumb]:z-20
+                                [&::-moz-range-thumb]:w-4
+                                [&::-moz-range-thumb]:h-4
+                                [&::-moz-range-thumb]:rounded-full
+                                [&::-moz-range-thumb]:bg-primary
+                                [&::-moz-range-thumb]:border-0
+                                [&::-moz-range-thumb]:cursor-grab
+                                [&::-moz-range-thumb]:pointer-events-auto
+                                [&::-moz-range-thumb]:shadow-md
+                                [&::-moz-range-thumb]:hover:scale-110
+                                [&::-moz-range-thumb]:transition-transform
+                                [&::-moz-range-thumb]:relative
+                                [&::-moz-range-thumb]:z-20"
+                            style={{ zIndex: localPrice.max < 100000 ? 20 : 10 }}
                         />
                     </div>
                 </div>
@@ -139,8 +248,8 @@ export default function CategoryFilters({
                                 key={color.name}
                                 onClick={() => onColorChange(color.name)}
                                 className={`group relative flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all ${selectedColors.includes(color.name)
-                                        ? 'border-primary bg-primary/10'
-                                        : 'border-border hover:border-primary/50'
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-border hover:border-primary/50'
                                     }`}
                                 title={color.name}
                             >
@@ -155,13 +264,7 @@ export default function CategoryFilters({
                 </FilterSection>
             )}
 
-            {/* Clear Filters Button */}
-            <button
-                onClick={onClearFilters}
-                className="w-full px-4 py-2.5 bg-secondary hover:bg-primary hover:text-white text-foreground font-semibold rounded-lg transition-colors"
-            >
-                Clear Filters
-            </button>
+
         </div>
     );
 

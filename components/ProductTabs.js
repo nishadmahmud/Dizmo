@@ -70,28 +70,18 @@ export default function ProductTabs({ product }) {
                                 </p>
                             </div>
                         ) : Array.isArray(product.specifications) && product.specifications.length > 0 ? (
-                            // Handle array format from API
-                            product.specifications.map((spec, index) => (
-                                <div key={index} className="border-b border-border pb-6 last:border-0">
-                                    <h3 className="text-lg font-bold text-primary mb-4">{spec.title || spec.name || `Specification ${index + 1}`}</h3>
-                                    <div className="grid grid-cols-1 gap-3">
-                                        {spec.details && typeof spec.details === 'object' && Object.entries(spec.details).map(([key, value]) => (
-                                            <div
-                                                key={key}
-                                                className="grid grid-cols-1 md:grid-cols-3 gap-2 py-2 border-b border-border/50 last:border-0"
-                                            >
-                                                <span className="font-medium text-foreground">{key}</span>
-                                                <span className="text-muted-foreground md:col-span-2">{value}</span>
-                                            </div>
-                                        ))}
-                                        {spec.value && (
-                                            <div className="py-2">
-                                                <span className="text-muted-foreground">{spec.value}</span>
-                                            </div>
-                                        )}
+                            // Handle array format from API with name and description fields
+                            <div className="grid grid-cols-1 gap-3">
+                                {product.specifications.map((spec, index) => (
+                                    <div
+                                        key={index}
+                                        className="grid grid-cols-1 md:grid-cols-3 gap-2 py-3 border-b border-border/50 last:border-0"
+                                    >
+                                        <span className="font-medium text-foreground">{spec.name}</span>
+                                        <span className="text-muted-foreground md:col-span-2">{spec.description}</span>
                                     </div>
-                                </div>
-                            ))
+                                ))}
+                            </div>
                         ) : (
                             // Handle object format
                             Object.entries(product.specifications).map(([key, category]) => {
