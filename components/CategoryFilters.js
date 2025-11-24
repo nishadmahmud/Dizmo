@@ -11,6 +11,12 @@ export default function CategoryFilters({
     selectedColors,
     onColorChange,
     availableColors,
+    selectedStorage = [],
+    onStorageChange,
+    availableStorage = [],
+    selectedRegions = [],
+    onRegionChange,
+    availableRegions = [],
     onClearFilters,
     isMobile = false,
     onClose
@@ -20,6 +26,7 @@ export default function CategoryFilters({
         availability: true,
         color: true
     });
+    const [showAllColors, setShowAllColors] = useState(false);
 
     // Local state for price range
     const [localPrice, setLocalPrice] = useState(priceRange);
@@ -275,8 +282,8 @@ export default function CategoryFilters({
             {/* Color Filter */}
             {availableColors.length > 0 && (
                 <FilterSection title="COLOR" section="color">
-                    <div className="flex flex-wrap gap-2">
-                        {availableColors.map((color) => (
+                    <div className="grid grid-cols-2 gap-2">
+                        {(showAllColors ? availableColors : availableColors.slice(0, 10)).map((color) => (
                             <button
                                 key={color.name}
                                 onClick={() => onColorChange(color.name)}
@@ -291,6 +298,54 @@ export default function CategoryFilters({
                                     style={{ backgroundColor: color.code }}
                                 />
                                 <span className="text-xs font-medium">{color.name}</span>
+                            </button>
+                        ))}
+                    </div>
+                    {availableColors.length > 10 && (
+                        <button
+                            onClick={() => setShowAllColors(!showAllColors)}
+                            className="mt-3 w-full text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+                        >
+                            {showAllColors ? 'Show Less' : `Show All Colors (${availableColors.length})`}
+                        </button>
+                    )}
+                </FilterSection>
+            )}
+
+            {/* Storage Filter */}
+            {availableStorage.length > 0 && (
+                <FilterSection title="STORAGE" section="storage">
+                    <div className="grid grid-cols-2 gap-2">
+                        {availableStorage.map((storage) => (
+                            <button
+                                key={storage}
+                                onClick={() => onStorageChange(storage)}
+                                className={`px-3 py-2 rounded-lg border-2 text-xs font-medium transition-all ${selectedStorage.includes(storage)
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-border hover:border-primary/50'
+                                    }`}
+                            >
+                                {storage}GB
+                            </button>
+                        ))}
+                    </div>
+                </FilterSection>
+            )}
+
+            {/* Region Filter */}
+            {availableRegions.length > 0 && (
+                <FilterSection title="REGION" section="region">
+                    <div className="grid grid-cols-2 gap-2">
+                        {availableRegions.map((region) => (
+                            <button
+                                key={region}
+                                onClick={() => onRegionChange(region)}
+                                className={`px-3 py-2 rounded-lg border-2 text-xs font-medium transition-all ${selectedRegions.includes(region)
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-border hover:border-primary/50'
+                                    }`}
+                            >
+                                {region}
                             </button>
                         ))}
                     </div>

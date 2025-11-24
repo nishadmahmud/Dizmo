@@ -22,6 +22,8 @@ export default function CategoryDetailPage({ params }) {
     const [selectedBrand, setSelectedBrand] = useState(null);
     const [sortBy, setSortBy] = useState('default');
     const [selectedBatteryRange, setSelectedBatteryRange] = useState(null);
+    const [selectedStorage, setSelectedStorage] = useState([]);
+    const [selectedRegions, setSelectedRegions] = useState([]);
 
     const batteryRanges = [
         { label: '96-100%', min: 96, max: 100 },
@@ -149,6 +151,32 @@ export default function CategoryDetailPage({ params }) {
         return Array.from(colorMap.values()).sort((a, b) => a.name.localeCompare(b.name));
     }, [products]);
 
+    // Extract unique storage options
+    const availableStorage = useMemo(() => {
+        const storageSet = new Set();
+        products.forEach(product => {
+            product.imeis.forEach(imei => {
+                if (imei.storage) {
+                    storageSet.add(imei.storage);
+                }
+            });
+        });
+        return Array.from(storageSet).sort((a, b) => parseInt(a) - parseInt(b));
+    }, [products]);
+
+    // Extract unique regions
+    const availableRegions = useMemo(() => {
+        const regionSet = new Set();
+        products.forEach(product => {
+            product.imeis.forEach(imei => {
+                if (imei.region) {
+                    regionSet.add(imei.region);
+                }
+            });
+        });
+        return Array.from(regionSet).sort();
+    }, [products]);
+
     // Filter and sort products
     const filteredProducts = useMemo(() => {
         let filtered = [...products];
@@ -172,6 +200,20 @@ export default function CategoryDetailPage({ params }) {
         if (selectedColors.length > 0) {
             filtered = filtered.filter(p =>
                 p.imeis.some(imei => selectedColors.includes(imei.color))
+            );
+        }
+
+        // Filter by storage
+        if (selectedStorage.length > 0) {
+            filtered = filtered.filter(p =>
+                p.imeis.some(imei => selectedStorage.includes(imei.storage))
+            );
+        }
+
+        // Filter by region
+        if (selectedRegions.length > 0) {
+            filtered = filtered.filter(p =>
+                p.imeis.some(imei => selectedRegions.includes(imei.region))
             );
         }
 
@@ -213,7 +255,7 @@ export default function CategoryDetailPage({ params }) {
         }
 
         return filtered;
-    }, [products, priceRange, availability, selectedBrand, selectedColors, sortBy, selectedBatteryRange]);
+    }, [products, priceRange, availability, selectedBrand, selectedColors, sortBy, selectedBatteryRange, selectedStorage, selectedRegions]);
 
     // Handle color selection toggle
     const handleColorChange = (colorName) => {
@@ -221,6 +263,24 @@ export default function CategoryDetailPage({ params }) {
             prev.includes(colorName)
                 ? prev.filter(c => c !== colorName)
                 : [...prev, colorName]
+        );
+    };
+
+    // Handle storage selection toggle
+    const handleStorageChange = (storage) => {
+        setSelectedStorage(prev =>
+            prev.includes(storage)
+                ? prev.filter(s => s !== storage)
+                : [...prev, storage]
+        );
+    };
+
+    // Handle region selection toggle
+    const handleRegionChange = (region) => {
+        setSelectedRegions(prev =>
+            prev.includes(region)
+                ? prev.filter(r => r !== region)
+                : [...prev, region]
         );
     };
 
@@ -237,6 +297,8 @@ export default function CategoryDetailPage({ params }) {
         setSelectedColors([]);
         setSelectedBrand(null);
         setSelectedBatteryRange(null);
+        setSelectedStorage([]);
+        setSelectedRegions([]);
         setSortBy('default');
     };
 
@@ -269,6 +331,12 @@ export default function CategoryDetailPage({ params }) {
                             selectedColors={selectedColors}
                             onColorChange={handleColorChange}
                             availableColors={availableColors}
+                            selectedStorage={selectedStorage}
+                            onStorageChange={handleStorageChange}
+                            availableStorage={availableStorage}
+                            selectedRegions={selectedRegions}
+                            onRegionChange={handleRegionChange}
+                            availableRegions={availableRegions}
                             onClearFilters={handleClearFilters}
                         />
                     </div>
@@ -380,6 +448,12 @@ export default function CategoryDetailPage({ params }) {
                     selectedColors={selectedColors}
                     onColorChange={handleColorChange}
                     availableColors={availableColors}
+                    selectedStorage={selectedStorage}
+                    onStorageChange={handleStorageChange}
+                    availableStorage={availableStorage}
+                    selectedRegions={selectedRegions}
+                    onRegionChange={handleRegionChange}
+                    availableRegions={availableRegions}
                     onClearFilters={handleClearFilters}
                     isMobile={true}
                     onClose={() => setShowMobileFilters(false)}

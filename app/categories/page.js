@@ -26,7 +26,7 @@ export default function CategoriesPage() {
                         const fetchedCategories = data.data.map((cat) => ({
                             id: cat.category_id.toString(),
                             name: cat.name,
-                            image: cat.image,
+                            image: cat.image_url,
                         }));
                         setCategories(fetchedCategories);
                     }
