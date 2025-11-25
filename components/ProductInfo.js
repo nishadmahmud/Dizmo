@@ -10,9 +10,8 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
     const [selectedColor, setSelectedColor] = useState(selectedColorProp || product.variants?.colors?.[0]?.id || null);
     const [selectedRegion, setSelectedRegion] = useState(product.variants?.regions?.[0]?.id || null);
     const [selectedCarePlans, setSelectedCarePlans] = useState([]);
-    const [deliveryMethod, setDeliveryMethod] = useState("delivery");
-    const [emiModalOpen, setEmiModalOpen] = useState(false);
     const [quantity, setQuantity] = useState(1);
+    // const [emiModalOpen, setEmiModalOpen] = useState(false); // Moved to Extras
 
     const { addToCart } = useCart();
     const router = useRouter();
@@ -119,6 +118,18 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
     const currentPrice = getCurrentPrice();
     const totalPrice = getTotalPrice();
 
+    const [copied, setCopied] = useState(false);
+
+    const handleShare = async () => {
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -128,7 +139,13 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
                         {product.stock || "In Stock"}
                     </span>
                     <div className="flex gap-2 text-muted-foreground">
-                        <button className="hover:text-primary"><Share2 className="h-5 w-5" /></button>
+                        <button
+                            onClick={handleShare}
+                            className="hover:text-primary transition-colors p-2 rounded-full hover:bg-secondary"
+                            title="Copy Link"
+                        >
+                            {copied ? <Check className="h-5 w-5 text-green-500" /> : <Share2 className="h-5 w-5" />}
+                        </button>
                     </div>
                 </div>
                 <h1 className="text-xl md:text-2xl font-bold text-primary">{product.name}</h1>
@@ -146,7 +163,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
             <div className="space-y-1 border-t border-b border-border py-4">
                 <div className="flex items-baseline gap-3">
                     <span className="text-2xl font-bold text-primary">৳{totalPrice.toLocaleString()}</span>
-                    {product.originalPrice && (
+                    {product.discount > 0 && product.originalPrice && (
                         <span className="text-lg text-muted-foreground line-through">৳{product.originalPrice.toLocaleString()}</span>
                     )}
                 </div>
@@ -154,7 +171,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
             </div>
 
             {/* Storage Variant Selector */}
-            {product.variants?.storage && (
+            {product.variants?.storage?.length > 0 && (
                 <div className="space-y-3">
                     <h3 className="text-sm font-semibold text-foreground">Storage</h3>
                     <div className="flex flex-wrap gap-2">
@@ -176,7 +193,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
             )}
 
             {/* Color Variant Selector */}
-            {product.variants?.colors && (
+            {product.variants?.colors?.length > 0 && (
                 <div className="space-y-3">
                     <h3 className="text-sm font-semibold text-foreground">Color</h3>
                     <div className="flex flex-wrap gap-3">
@@ -197,7 +214,6 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
                                     style={{ backgroundColor: color.hex }}
                                 />
                                 <span className="text-sm font-medium">{color.label}</span>
-                                {selectedColor === color.id && <Check className="h-4 w-4 text-primary" />}
                             </button>
                         ))}
                     </div>
@@ -205,7 +221,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
             )}
 
             {/* Region Variant Selector */}
-            {product.variants?.regions && (
+            {product.variants?.regions?.length > 0 && (
                 <div className="space-y-3">
                     <h3 className="text-sm font-semibold text-foreground">Region</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -293,37 +309,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
                 </div>
             )}
 
-            {/* Delivery Method */}
-            <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-foreground">Delivery Method</h3>
-                <div className="flex gap-3">
-                    <button
-                        onClick={() => setDeliveryMethod("delivery")}
-                        className={`flex-1 py-3 px-4 rounded-lg border flex items-center justify-center gap-2 transition-all ${deliveryMethod === "delivery"
-                            ? "border-primary bg-primary text-white"
-                            : "border-border hover:border-primary/50"
-                            }`}
-                    >
-                        <Truck className="h-5 w-5" />
-                        <span className="text-sm font-medium">Home Delivery</span>
-                    </button>
-                    <button
-                        onClick={() => setDeliveryMethod("pickup")}
-                        className={`flex-1 py-3 px-4 rounded-lg border flex items-center justify-center gap-2 transition-all ${deliveryMethod === "pickup"
-                            ? "border-primary bg-primary text-white"
-                            : "border-border hover:border-primary/50"
-                            }`}
-                    >
-                        <MapPin className="h-5 w-5" />
-                        <span className="text-sm font-medium">Store Pickup</span>
-                    </button>
-                </div>
-                {deliveryMethod === "pickup" && (
-                    <div className="text-sm text-accent-foreground bg-accent/10 p-3 rounded-lg">
-                        Available at: <strong>Bashundhara City, Level 4</strong>. Ready in 2 hours.
-                    </div>
-                )}
-            </div>
+
 
             {/* Quantity & Actions */}
             <div className="flex items-center gap-3 pt-4">

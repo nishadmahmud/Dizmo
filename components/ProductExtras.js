@@ -198,8 +198,13 @@ export default function ProductExtras({ product }) {
         }
     };
 
+    const [deliveryMethod, setDeliveryMethod] = useState("delivery");
+
     return (
-        <>
+        <div className="space-y-4">
+            {/* Delivery Method */}
+
+
             <div className="space-y-3">
                 {extras.map((item) => (
                     <button
@@ -216,6 +221,37 @@ export default function ProductExtras({ product }) {
                         </div>
                     </button>
                 ))}
+            </div>
+
+            <div className="space-y-2">
+                <h3 className="text-sm font-semibold text-foreground">Delivery Method</h3>
+                <div className="flex flex-col gap-1">
+                    <button
+                        onClick={() => setDeliveryMethod("delivery")}
+                        className={`flex-1 py-2 px-4 rounded-lg border flex items-center justify-center gap-2 transition-all ${deliveryMethod === "delivery"
+                            ? "border-primary bg-primary text-white"
+                            : "border-border hover:border-primary/50"
+                            }`}
+                    >
+                        <Truck className="h-5 w-5" />
+                        <span className="text-sm font-medium">Home Delivery</span>
+                    </button>
+                    <button
+                        onClick={() => setDeliveryMethod("pickup")}
+                        className={`flex-1 py-3 px-4 rounded-lg border flex items-center justify-center gap-2 transition-all ${deliveryMethod === "pickup"
+                            ? "border-primary bg-primary text-white"
+                            : "border-border hover:border-primary/50"
+                            }`}
+                    >
+                        <MapPin className="h-5 w-5" />
+                        <span className="text-sm font-medium">Store Pickup</span>
+                    </button>
+                </div>
+                {deliveryMethod === "pickup" && (
+                    <div className="text-sm text-accent-foreground bg-accent/10 p-3 rounded-lg">
+                        Available at: <strong>Bashundhara City, Level 4</strong>. Ready in 2 hours.
+                    </div>
+                )}
             </div>
 
             {/* Drawer Overlay */}
@@ -242,6 +278,6 @@ export default function ProductExtras({ product }) {
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 }
