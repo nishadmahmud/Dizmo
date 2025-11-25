@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductDetailsClient from "@/components/ProductDetailsClient";
+import ProductVariantsGrid from "@/components/ProductVariantsGrid";
 import ProductTabs from "@/components/ProductTabs";
 import OfferTabs from "@/components/OfferTabs";
 
@@ -135,8 +136,13 @@ export default async function ProductPage({ params }) {
         <main className="min-h-screen flex flex-col bg-background">
             <Navbar />
 
-            <div className="container py-8 md:py-12">
+            <div className="w-full max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
                 <ProductDetailsClient product={product} />
+
+                {/* Variants Grid */}
+                <div className="mt-12">
+                    <ProductVariantsGrid imeis={product.imeis} product={product} />
+                </div>
 
                 {/* Specification Tabs */}
                 <ProductTabs product={product} />

@@ -131,7 +131,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
                         <button className="hover:text-primary"><Share2 className="h-5 w-5" /></button>
                     </div>
                 </div>
-                <h1 className="text-2xl md:text-3xl font-bold text-primary">{product.name}</h1>
+                <h1 className="text-xl md:text-2xl font-bold text-primary">{product.name}</h1>
                 <div className="flex items-center gap-2 text-sm">
                     <div className="flex text-accent">
                         {[...Array(5)].map((_, i) => (
@@ -145,7 +145,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
             {/* Price */}
             <div className="space-y-1 border-t border-b border-border py-4">
                 <div className="flex items-baseline gap-3">
-                    <span className="text-3xl font-bold text-primary">৳{totalPrice.toLocaleString()}</span>
+                    <span className="text-2xl font-bold text-primary">৳{totalPrice.toLocaleString()}</span>
                     {product.originalPrice && (
                         <span className="text-lg text-muted-foreground line-through">৳{product.originalPrice.toLocaleString()}</span>
                     )}
@@ -156,7 +156,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
             {/* Storage Variant Selector */}
             {product.variants?.storage && (
                 <div className="space-y-3">
-                    <h3 className="font-semibold text-foreground">Storage</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Storage</h3>
                     <div className="flex flex-wrap gap-2">
                         {product.variants.storage.map((storage) => (
                             <button
@@ -178,7 +178,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
             {/* Color Variant Selector */}
             {product.variants?.colors && (
                 <div className="space-y-3">
-                    <h3 className="font-semibold text-foreground">Color</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Color</h3>
                     <div className="flex flex-wrap gap-3">
                         {availableColors.map((color) => (
                             <button
@@ -207,7 +207,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
             {/* Region Variant Selector */}
             {product.variants?.regions && (
                 <div className="space-y-3">
-                    <h3 className="font-semibold text-foreground">Region</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Region</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         {product.variants.regions.map((region) => (
                             <button
@@ -227,7 +227,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
             )}
 
             {/* EMI Option */}
-            <div className="bg-secondary/50 p-4 rounded-lg border border-border">
+            {/* <div className="bg-secondary/50 p-4 rounded-lg border border-border">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="bg-white p-2 rounded-full shadow-sm">
@@ -256,12 +256,12 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
                         </ul>
                     </div>
                 )}
-            </div>
+            </div> */}
 
             {/* Dizmo Care Plans */}
             {product.carePlans && product.carePlans.length > 0 && (
                 <div className="space-y-3">
-                    <h3 className="font-semibold text-primary flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
                         <ShieldCheck className="h-5 w-5 text-accent" />
                         Dizmo Care+ Protection
                     </h3>
@@ -295,7 +295,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
 
             {/* Delivery Method */}
             <div className="space-y-3">
-                <h3 className="font-semibold text-foreground">Delivery Method</h3>
+                <h3 className="text-sm font-semibold text-foreground">Delivery Method</h3>
                 <div className="flex gap-3">
                     <button
                         onClick={() => setDeliveryMethod("delivery")}

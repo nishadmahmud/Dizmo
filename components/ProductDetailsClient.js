@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import ProductGallery from "@/components/ProductGallery";
 import ProductInfo from "@/components/ProductInfo";
+import ProductExtras from "@/components/ProductExtras";
 
 export default function ProductDetailsClient({ product }) {
     const [selectedColor, setSelectedColor] = useState(
@@ -26,16 +27,25 @@ export default function ProductDetailsClient({ product }) {
     const filteredImages = getFilteredImages();
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Left: Image Gallery */}
-            <ProductGallery images={filteredImages} />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left: Image Gallery (4 cols) */}
+            <div className="lg:col-span-4">
+                <ProductGallery images={filteredImages} />
+            </div>
 
-            {/* Right: Product Info & Actions */}
-            <ProductInfo
-                product={product}
-                onColorChange={setSelectedColor}
-                selectedColorProp={selectedColor}
-            />
+            {/* Middle: Product Info (5 cols) */}
+            <div className="lg:col-span-5">
+                <ProductInfo
+                    product={product}
+                    onColorChange={setSelectedColor}
+                    selectedColorProp={selectedColor}
+                />
+            </div>
+
+            {/* Right: Product Extras (3 cols) */}
+            <div className="lg:col-span-3">
+                <ProductExtras product={product} />
+            </div>
         </div>
     );
 }

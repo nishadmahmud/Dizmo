@@ -305,13 +305,44 @@ export default function Navbar() {
                 <div className="hidden md:block sticky top-16 z-40 w-full border-b border-border bg-white py-2 shadow-sm">
                     <div className="container flex items-center justify-between gap-4">
                         {/* Left: All Categories Hamburger (Icon Only) */}
-                        <button
-                            onClick={() => setShowAllCategories(true)}
-                            className="p-2 hover:bg-secondary rounded-full text-[#103E34] transition-colors flex-shrink-0"
-                            aria-label="All Categories"
-                        >
-                            <Menu className="h-6 w-6" />
-                        </button>
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowAllCategories(!showAllCategories)}
+                                className="p-2 hover:bg-secondary rounded-full text-[#103E34] transition-colors flex-shrink-0"
+                                aria-label="All Categories"
+                            >
+                                <Menu className="h-6 w-6" />
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            {showAllCategories && (
+                                <>
+                                    {/* Backdrop for click-outside */}
+                                    <div
+                                        className="fixed inset-0 z-40"
+                                        onClick={() => setShowAllCategories(false)}
+                                    />
+
+                                    {/* Dropdown */}
+                                    <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-border z-50 max-h-96 overflow-y-auto">
+                                        {categories.map((category) => {
+                                            const IconComponent = category.Icon;
+                                            return (
+                                                <Link
+                                                    key={category.id}
+                                                    href={`/categories/${category.id}`}
+                                                    onClick={() => setShowAllCategories(false)}
+                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-secondary transition-colors border-b border-border last:border-0"
+                                                >
+                                                    <IconComponent className="h-5 w-5 text-[#103E34]" />
+                                                    <span className="text-sm font-medium">{category.name}</span>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </>
+                            )}
+                        </div>
 
                         {/* Center: Horizontal Category List */}
                         <div className="flex-1 flex justify-center overflow-hidden">
@@ -350,51 +381,7 @@ export default function Navbar() {
                 </div>
             )}
 
-            {/* All Categories Modal */}
-            {showAllCategories && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div
-                        className="fixed inset-0"
-                        onClick={() => setShowAllCategories(false)}
-                    />
-                    <div className="relative w-full max-w-2xl bg-background rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
-                        <div className="flex items-center justify-between p-6 border-b border-border bg-[#103E34] text-white">
-                            <h2 className="text-xl font-bold flex items-center gap-2">
-                                <Menu className="h-6 w-6" />
-                                All Categories
-                            </h2>
-                            <button
-                                onClick={() => setShowAllCategories(false)}
-                                className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                            >
-                                <X className="h-6 w-6" />
-                            </button>
-                        </div>
-                        <nav className="flex-1 overflow-y-auto p-6">
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                {categories.map((category) => {
-                                    const IconComponent = category.Icon;
-                                    return (
-                                        <Link
-                                            key={category.id}
-                                            href={`/categories/${category.id}`}
-                                            onClick={() => setShowAllCategories(false)}
-                                            className="flex flex-col items-center gap-3 p-4 rounded-xl hover:bg-secondary transition-all group border border-border hover:border-primary/20 hover:shadow-md text-center"
-                                        >
-                                            <div className="h-12 w-12 rounded-full bg-secondary flex items-center justify-center group-hover:bg-white group-hover:shadow-sm transition-all group-hover:scale-110 duration-300">
-                                                <IconComponent className="h-6 w-6 text-[#103E34]" />
-                                            </div>
-                                            <span className="font-medium text-foreground group-hover:text-primary transition-colors">
-                                                {category.name}
-                                            </span>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-                        </nav>
-                    </div>
-                </div>
-            )}
+
 
 
 
