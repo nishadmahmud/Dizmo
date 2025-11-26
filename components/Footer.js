@@ -50,10 +50,12 @@ export default function Footer() {
                     <div>
                         <h3 className="text-lg font-bold mb-4 text-[#FCB042]">Company</h3>
                         <ul className="space-y-2 text-primary-foreground/80 text-sm">
+                            <li><Link href="/categories" className="hover:text-[#FCB042] transition-colors">Products</Link></li>
                             <li><Link href="/about" className="hover:text-[#FCB042] transition-colors">About Us</Link></li>
-                            <li><Link href="/careers" className="hover:text-[#FCB042] transition-colors">Careers</Link></li>
-                            <li><Link href="/brands" className="hover:text-[#FCB042] transition-colors">Our Brands</Link></li>
                             <li><Link href="/blog" className="hover:text-[#FCB042] transition-colors">Blog</Link></li>
+                            <li><Link href="/offers" className="hover:text-[#FCB042] transition-colors">Offers</Link></li>
+                            <li><Link href="/track-order" className="hover:text-[#FCB042] transition-colors">Track Order</Link></li>
+                            <li><Link href="/compare" className="hover:text-[#FCB042] transition-colors">Compare Products</Link></li>
                         </ul>
                     </div>
 
@@ -63,9 +65,10 @@ export default function Footer() {
                         <ul className="space-y-2 text-primary-foreground/80 text-sm">
                             <li><Link href="/privacy" className="hover:text-[#FCB042] transition-colors">Privacy Policy</Link></li>
                             <li><Link href="/terms" className="hover:text-[#FCB042] transition-colors">Terms & Conditions</Link></li>
-                            <li><Link href="/cookies" className="hover:text-[#FCB042] transition-colors">Cookie Policy</Link></li>
                             <li><Link href="/warranty" className="hover:text-[#FCB042] transition-colors">Warranty Policy</Link></li>
                             <li><Link href="/emi" className="hover:text-[#FCB042] transition-colors">EMI Policy</Link></li>
+                            <li><Link href="/shipping" className="hover:text-[#FCB042] transition-colors">Shipping Policy</Link></li>
+                            <li><Link href="/returns" className="hover:text-[#FCB042] transition-colors">Return Policy</Link></li>
                         </ul>
                     </div>
 
@@ -89,14 +92,19 @@ export default function Footer() {
                         <div>
                             <h4 className="font-bold mb-3 text-[#FCB042]">Follow Us</h4>
                             <div className="flex gap-3 mb-4">
-                                <Link href="https://facebook.com" className="bg-primary-foreground/10 p-2 rounded-full hover:bg-[#FCB042] transition-colors">
+                                <Link href="https://www.facebook.com/Dizmo.bd/" target="_blank" rel="noopener noreferrer" className="bg-primary-foreground/10 p-2 rounded-full hover:bg-[#FCB042] transition-colors">
                                     <Facebook className="h-4 w-4" />
                                 </Link>
-                                <Link href="https://instagram.com" className="bg-primary-foreground/10 p-2 rounded-full hover:bg-[#FCB042] transition-colors">
+                                <Link href="https://www.instagram.com/dizmo.bd/" target="_blank" rel="noopener noreferrer" className="bg-primary-foreground/10 p-2 rounded-full hover:bg-[#FCB042] transition-colors">
                                     <Instagram className="h-4 w-4" />
                                 </Link>
-                                <Link href="https://youtube.com" className="bg-primary-foreground/10 p-2 rounded-full hover:bg-[#FCB042] transition-colors">
+                                <Link href="https://www.youtube.com/@Dizmo-bd" target="_blank" rel="noopener noreferrer" className="bg-primary-foreground/10 p-2 rounded-full hover:bg-[#FCB042] transition-colors">
                                     <Youtube className="h-4 w-4" />
+                                </Link>
+                                <Link href="https://www.tiktok.com/@dizmo.bd" target="_blank" rel="noopener noreferrer" className="bg-primary-foreground/10 p-2 rounded-full hover:bg-[#FCB042] transition-colors">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                                        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93v6.16c0 2.52-1.12 4.84-2.9 6.24-1.72 1.36-3.96 1.84-6.13 1.31-2.23-.53-4.1-2.18-4.93-4.33-.86-2.2-.58-4.78.77-6.73 1.36-1.96 3.66-3.14 6.03-3.08v3.99c-1.28.03-2.52.62-3.28 1.66-.79 1.09-.93 2.56-.37 3.78.58 1.26 1.95 2.1 3.32 2.11 1.41.01 2.72-.9 3.23-2.24.52-1.37.23-2.94-.74-4.01-.25-.28-.55-.51-.87-.71V.02z" />
+                                    </svg>
                                 </Link>
                             </div>
                         </div>

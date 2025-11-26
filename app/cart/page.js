@@ -13,7 +13,7 @@ export default function CartPage() {
         <main className="min-h-screen flex flex-col bg-background">
             <Navbar />
 
-            <div className="container py-12">
+            <div className="max-w-6xl mx-auto px-4 py-12">
                 <h1 className="text-3xl font-bold text-primary mb-8">Shopping Cart</h1>
 
                 {cart.length === 0 ? (
@@ -24,14 +24,18 @@ export default function CartPage() {
                         </Link>
                     </div>
                 ) : (
-                    <div className="flex flex-col lg:flex-row gap-8">
+                    <div className="flex flex-col lg:flex-row gap-12">
                         {/* Cart Items */}
                         <div className="flex-1 space-y-4">
                             {cart.map((item) => (
                                 <div key={item.id} className="flex gap-4 p-4 bg-card border border-border rounded-xl">
                                     {/* Image */}
-                                    <div className="w-24 h-24 bg-secondary rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <span className="text-xs text-muted-foreground">Img</span>
+                                    <div className="w-24 h-24 bg-secondary rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                        {item.image ? (
+                                            <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                                        ) : (
+                                            <span className="text-xs text-muted-foreground">Img</span>
+                                        )}
                                     </div>
 
                                     <div className="flex-1 flex flex-col justify-between">

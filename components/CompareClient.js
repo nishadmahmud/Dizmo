@@ -149,39 +149,39 @@ export default function CompareClient() {
             </div>
 
             {/* Product Selection Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12">
                 {selectedProducts.map((product, index) => (
-                    <div key={index} className="relative">
+                    <div key={index} className={`relative ${index === 2 ? 'hidden md:block' : ''}`}>
                         {product ? (
-                            <div className="border border-border rounded-xl p-6 flex flex-col items-center text-center h-full bg-card shadow-sm">
+                            <div className="border border-border rounded-xl p-3 md:p-6 flex flex-col items-center text-center h-full bg-card shadow-sm">
                                 <button
                                     onClick={() => handleRemoveProduct(index)}
-                                    className="absolute top-4 right-4 p-2 hover:bg-red-50 text-muted-foreground hover:text-red-500 rounded-full transition-colors"
+                                    className="absolute top-2 right-2 md:top-4 md:right-4 p-1.5 md:p-2 hover:bg-red-50 text-muted-foreground hover:text-red-500 rounded-full transition-colors"
                                 >
-                                    <Trash2 className="h-5 w-5" />
+                                    <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
                                 </button>
-                                <div className="h-48 w-full mb-6 flex items-center justify-center">
+                                <div className="h-24 md:h-48 w-full mb-2 md:mb-6 flex items-center justify-center">
                                     <img src={product.image} alt={product.name} className="max-h-full max-w-full object-contain" />
                                 </div>
-                                <h3 className="font-bold text-lg mb-2 line-clamp-2">{product.name}</h3>
-                                <p className="text-primary font-bold text-xl mb-4">৳{product.price.toLocaleString()}</p>
+                                <h3 className="font-bold text-sm md:text-lg mb-1 md:mb-2 line-clamp-2 leading-tight">{product.name}</h3>
+                                <p className="text-primary font-bold text-sm md:text-xl mb-2 md:mb-4">৳{product.price.toLocaleString()}</p>
                                 <Link
                                     href={`/products/${product.id}`}
-                                    className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+                                    className="px-3 py-1.5 md:px-6 md:py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-xs md:text-sm font-medium w-full md:w-auto"
                                 >
-                                    View Details
+                                    View
                                 </Link>
                             </div>
                         ) : (
                             <div
                                 onClick={() => handleAddClick(index)}
-                                className="border-2 border-dashed border-border rounded-xl p-12 flex flex-col items-center justify-center text-center hover:border-primary hover:bg-primary/5 transition-all cursor-pointer h-full min-h-[300px]"
+                                className="border-2 border-dashed border-border rounded-xl p-4 md:p-12 flex flex-col items-center justify-center text-center hover:border-primary hover:bg-primary/5 transition-all cursor-pointer h-full min-h-[180px] md:min-h-[300px]"
                             >
-                                <div className="bg-secondary rounded-full p-6 mb-4 group-hover:scale-110 transition-transform">
-                                    <Plus className="h-12 w-12 text-muted-foreground" />
+                                <div className="bg-secondary rounded-full p-3 md:p-6 mb-2 md:mb-4 group-hover:scale-110 transition-transform">
+                                    <Plus className="h-6 w-6 md:h-12 md:w-12 text-muted-foreground" />
                                 </div>
-                                <h3 className="font-semibold text-foreground mb-2">Add Product</h3>
-                                <p className="text-sm text-muted-foreground">
+                                <h3 className="font-semibold text-foreground mb-1 md:mb-2 text-sm md:text-base">Add Product</h3>
+                                <p className="text-xs md:text-sm text-muted-foreground hidden md:block">
                                     Click to select a product
                                 </p>
                             </div>
@@ -196,9 +196,9 @@ export default function CompareClient() {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-secondary/50">
-                                <th className="p-4 border-b border-border font-bold text-muted-foreground w-1/4">Feature</th>
+                                <th className="p-4 border-b border-border font-bold text-muted-foreground w-1/3 md:w-1/4">Feature</th>
                                 {selectedProducts.map((product, index) => (
-                                    <th key={index} className="p-4 border-b border-border font-bold w-1/4">
+                                    <th key={index} className={`p-4 border-b border-border font-bold w-1/3 md:w-1/4 ${index === 2 ? 'hidden md:table-cell' : ''}`}>
                                         {product ? product.name : `Product ${index + 1}`}
                                     </th>
                                 ))}
@@ -217,7 +217,7 @@ export default function CompareClient() {
                                         <tr key={key}>
                                             <td className="p-4 font-medium text-muted-foreground">{key}</td>
                                             {selectedProducts.map((p, i) => (
-                                                <td key={i} className="p-4 text-sm">{getSpecValue(p, key)}</td>
+                                                <td key={i} className={`p-4 text-sm ${i === 2 ? 'hidden md:table-cell' : ''}`}>{getSpecValue(p, key)}</td>
                                             ))}
                                         </tr>
                                     ))}

@@ -44,7 +44,7 @@ export default function CheckoutPage() {
         <main className="min-h-screen flex flex-col bg-background">
             <Navbar />
 
-            <div className="container py-12">
+            <div className="max-w-6xl mx-auto px-4 py-12">
                 <h1 className="text-3xl font-bold text-primary mb-8">Fill Gadget & Go</h1>
 
                 <div className="flex flex-col lg:flex-row gap-12">
@@ -125,8 +125,12 @@ export default function CheckoutPage() {
                         <div className="space-y-4 mb-6 max-h-96 overflow-y-auto pr-2">
                             {cart.map((item) => (
                                 <div key={item.id} className="flex gap-3 text-sm">
-                                    <div className="w-12 h-12 bg-white rounded border border-border flex items-center justify-center flex-shrink-0">
-                                        <span className="text-[10px] text-muted-foreground">Img</span>
+                                    <div className="w-12 h-12 bg-white rounded border border-border flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                        {item.image ? (
+                                            <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                                        ) : (
+                                            <span className="text-[10px] text-muted-foreground">Img</span>
+                                        )}
                                     </div>
                                     <div className="flex-1">
                                         <p className="font-medium line-clamp-2">{item.name}</p>
