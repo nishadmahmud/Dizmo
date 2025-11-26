@@ -260,7 +260,7 @@ export default function Navbar() {
 
                             <span><span className="animate-pulse">🔥</span> Offers</span>
                         </Link>
-                        <Link href="/products" className="flex items-center gap-2 text-white hover:text-[#FCB042] transition-colors px-3 py-2 rounded-lg hover:bg-white/10">
+                        <Link href="/categories" className="flex items-center gap-2 text-white hover:text-[#FCB042] transition-colors px-3 py-2 rounded-lg hover:bg-white/10">
                             <Package className="h-5 w-5" />
                             All Products
                         </Link>
@@ -406,7 +406,7 @@ export default function Navbar() {
                             <nav className="flex-1 overflow-y-auto p-4">
                                 <div className="space-y-2">
                                     <Link
-                                        href="/products"
+                                        href="/categories"
                                         onClick={() => setShowMenu(false)}
                                         className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
                                     >

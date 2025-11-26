@@ -11,7 +11,6 @@ import TrendingProducts from "@/components/TrendingProducts";
 import TopRated from "@/components/TopRated";
 import SpecialBanner from "@/components/SpecialBanner";
 import BlogSection from "@/components/BlogSection";
-import FloatingActions from "@/components/FloatingActions";
 import PromoBanners from "@/components/PromoBanners";
 import FullWidthBanner from "@/components/FullWidthBanner";
 import SEOContent from "@/components/SEOContent";
@@ -45,8 +44,7 @@ export default function Home() {
 
       <Footer />
 
-      {/* Floating Widgets */}
-      <FloatingActions />
+
     </main>
   );
 }

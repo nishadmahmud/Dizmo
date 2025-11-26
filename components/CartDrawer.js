@@ -56,8 +56,13 @@ export default function CartDrawer() {
                         cart.map((item) => (
                             <div key={item.id} className="flex gap-4 bg-card p-3 rounded-lg border border-border">
                                 {/* Image Placeholder */}
-                                <div className="h-20 w-20 bg-secondary rounded-md flex items-center justify-center flex-shrink-0">
-                                    <span className="text-xs text-muted-foreground">Img</span>
+                                {/* Image */}
+                                <div className="h-20 w-20 bg-secondary rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                    {item.image ? (
+                                        <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                                    ) : (
+                                        <span className="text-xs text-muted-foreground">Img</span>
+                                    )}
                                 </div>
 
                                 <div className="flex-1 flex flex-col justify-between">

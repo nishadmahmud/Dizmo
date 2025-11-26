@@ -106,6 +106,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
             },
             carePlans: selectedCarePlans.map(id => product.carePlans?.find(p => p.id === id)?.name),
             price: getTotalPrice(),
+            image: product.images?.[0] || product.image,
         };
         addToCart(productWithVariants, quantity);
     };

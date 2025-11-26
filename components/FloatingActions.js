@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { GitCompare, X } from "lucide-react";
 
 export default function FloatingActions() {
+    const pathname = usePathname();
     const [showGreeting, setShowGreeting] = useState(false);
     const whatsappNumber = "+8801710425454";
     const whatsappMessage = "Hi! I need help with my order.";
@@ -28,17 +30,19 @@ export default function FloatingActions() {
 
     return (
         <div className="fixed right-4 md:right-6 bottom-24 md:bottom-6 z-40 flex flex-col items-end gap-3">
-            {/* Compare Button */}
-            <Link
-                href="/compare"
-                className="group relative flex items-center justify-center w-12 h-12 bg-[#103E34] hover:bg-[#FCB042] text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-                aria-label="Compare Products"
-            >
-                <GitCompare className="h-5 w-5" />
-                <span className="absolute right-14 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                    Compare
-                </span>
-            </Link>
+            {/* Compare Button - Hide on compare page */}
+            {pathname !== '/compare' && (
+                <Link
+                    href="/compare"
+                    className="group relative flex items-center justify-center w-12 h-12 bg-[#103E34] hover:bg-[#FCB042] text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                    aria-label="Compare Products"
+                >
+                    <GitCompare className="h-5 w-5" />
+                    <span className="absolute right-14 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                        Compare
+                    </span>
+                </Link>
+            )}
 
             {/* Help Button with Avatar and Greeting */}
             <div className="relative flex items-center gap-3">

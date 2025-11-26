@@ -4,6 +4,8 @@ import { CartProvider } from "@/context/CartContext";
 import { ProductProvider } from "@/context/ProductContext";
 import CartDrawer from "@/components/CartDrawer";
 
+import FloatingActions from "@/components/FloatingActions";
+
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -23,6 +25,7 @@ export default function RootLayout({ children }) {
           <ProductProvider>
             {children}
             <CartDrawer />
+            <FloatingActions />
           </ProductProvider>
         </CartProvider>
       </body>
