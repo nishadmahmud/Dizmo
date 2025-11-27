@@ -316,10 +316,10 @@ export default function Navbar() {
                         {/* Offers Link - visible on desktop beside search */}
                         <Link
                             href="/offers"
-                            className="hidden lg:flex items-center gap-2 text-[#FCB042] hover:text-white hover:bg-[#FCB042] transition-all px-4 py-2 rounded-full bg-white/10 font-bold text-base shadow-md hover:shadow-lg"
+                            className="hidden lg:flex items-center gap-2 text-[#FCB042] hover:text-white hover:bg-[#FCB042] transition-all px-4 py-2 rounded-full bg-white/10 font-bold text-base shadow-[0_0_15px_rgba(252,176,66,0.5)] hover:shadow-[0_0_25px_rgba(252,176,66,0.8)] border border-[#FCB042]/50 animate-pulse hover:animate-none"
                         >
 
-                            <span><span className="animate-pulse">🔥</span> Offers</span>
+                            <span><span className="animate-bounce inline-block">🔥</span> Offers</span>
                         </Link>
                         <Link href="/categories" className="flex items-center gap-2 text-white hover:text-[#FCB042] transition-colors px-3 py-2 rounded-lg hover:bg-white/10">
                             <Package className="h-5 w-5" />
