@@ -74,50 +74,103 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                 );
             case "perks":
                 return (
-                    <div className="space-y-4">
-                        <h3 className="text-xl font-bold">Perks & Benefits</h3>
-                        <ul className="list-disc pl-5 space-y-2">
-                            <li>Free shipping on orders over BDT 5000</li>
-                            <li>7-day replacement guarantee</li>
-                            <li>Official warranty support</li>
-                            <li>Earn loyalty points with every purchase</li>
-                        </ul>
+                    <div className="space-y-6">
+                        <h3 className="font-bold text-lg">Perks & benefits included</h3>
+
+                        <div className="space-y-4">
+                            <div className="flex gap-4">
+                                <div className="bg-green-100 p-3 rounded-full h-fit">
+                                    <ShieldCheck className="h-6 w-6 text-green-600" />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold">7-Days Replacement</h4>
+                                    <p className="text-sm text-muted-foreground">Get 7-Days Replacement of your device</p>
+                                    <p className="text-xs text-muted-foreground mt-1">*Condition apply</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <div className="bg-yellow-100 p-3 rounded-full h-fit">
+                                    <Truck className="h-6 w-6 text-yellow-600" />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold">Free Shipping</h4>
+                                    <p className="text-sm text-muted-foreground">Get your order delivered inside Dhaka for free</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <div className="bg-blue-100 p-3 rounded-full h-fit">
+                                    <CheckCircle2 className="h-6 w-6 text-blue-600" />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold">Authentic device</h4>
+                                    <p className="text-sm text-muted-foreground">Get genuine, unaltered, authentic device from Dizmo</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4">
+                                <div className="bg-red-100 p-3 rounded-full h-fit">
+                                    <Clock className="h-6 w-6 text-red-600" />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold">Repair history</h4>
+                                    <p className="text-sm text-muted-foreground">Acknowledge repair histories of devices from now if there is ANY</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 );
             case "delivery":
                 return (
-                    <div className="space-y-4">
-                        <h3 className="text-xl font-bold">Delivery Information</h3>
-                        <div className="space-y-4">
-                            <div className="flex gap-3">
-                                <Truck className="h-6 w-6 text-primary" />
-                                <div>
-                                    <h4 className="font-semibold">Home Delivery</h4>
-                                    <p className="text-sm text-muted-foreground">2-3 business days within Dhaka</p>
-                                    <p className="text-sm text-muted-foreground">3-5 business days outside Dhaka</p>
-                                </div>
+                    <div className="space-y-6">
+                        <h3 className="font-bold text-lg">Shipping Information</h3>
+                        <p className="text-sm text-muted-foreground">
+                            We are committed to delivering your orders quickly and reliably. Our standard and express delivery options are designed to meet your needs:
+                        </p>
+
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg border border-border">
+                                <span className="font-medium">Inside Dhaka</span>
+                                <span className="font-bold bg-secondary px-3 py-1 rounded-full text-sm">48–72 hours</span>
                             </div>
-                            <div className="flex gap-3">
-                                <MapPin className="h-6 w-6 text-primary" />
-                                <div>
-                                    <h4 className="font-semibold">Store Pickup</h4>
-                                    <p className="text-sm text-muted-foreground">Available at our Bashundhara City outlet</p>
-                                </div>
+                            <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg border border-border">
+                                <span className="font-medium">Outside Dhaka</span>
+                                <span className="font-bold bg-secondary px-3 py-1 rounded-full text-sm">48–72 hours</span>
+                            </div>
+                            <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg border border-border">
+                                <span className="font-medium">Express Delivery</span>
+                                <span className="font-bold bg-cyan-500 text-white px-3 py-1 rounded-full text-sm">24 hours</span>
                             </div>
                         </div>
+
+                        <p className="text-xs text-muted-foreground mt-4">
+                            With these options, you can always count on us for timely and secure delivery.
+                        </p>
                     </div>
                 );
             case "emi":
+                const currentPrice = product.price || 0;
                 return (
-                    <div className="space-y-4">
-                        <h3 className="text-xl font-bold">EMI Availability</h3>
-                        <p>Enjoy 0% EMI for up to 6 months with selected bank credit cards.</p>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div className="border p-2 rounded text-center">City Bank</div>
-                            <div className="border p-2 rounded text-center">BRAC Bank</div>
-                            <div className="border p-2 rounded text-center">EBL</div>
-                            <div className="border p-2 rounded text-center">SCB</div>
+                    <div className="space-y-6">
+                        <h3 className="font-bold text-lg">EMI Availability</h3>
+                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                            <div className="flex items-center gap-3 mb-3">
+                                <CreditCard className="h-6 w-6 text-purple-600" />
+                                <h4 className="font-bold text-purple-900">Starting from ৳4,000/mo</h4>
+                            </div>
+                            <p className="text-sm text-purple-800 mb-4">
+                                Enjoy 0% interest EMI for up to 12 months with selected bank credit cards.
+                            </p>
+                            <ul className="space-y-2 text-sm text-purple-800">
+                                <li className="flex justify-between border-b border-purple-200 pb-1"><span>3 Months</span> <span>৳{Math.round(currentPrice / 3).toLocaleString()}/mo</span></li>
+                                <li className="flex justify-between border-b border-purple-200 pb-1"><span>6 Months</span> <span>৳{Math.round(currentPrice / 6).toLocaleString()}/mo</span></li>
+                                <li className="flex justify-between"><span>12 Months</span> <span>৳{Math.round(currentPrice / 12).toLocaleString()}/mo</span></li>
+                            </ul>
                         </div>
+                        <p className="text-xs text-muted-foreground">
+                            * EMI facility is available for purchase over ৳5,000. Terms and conditions apply.
+                        </p>
                     </div>
                 );
             default:
