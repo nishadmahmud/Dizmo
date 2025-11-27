@@ -5,12 +5,13 @@ import { ShieldCheck, MapPin, CreditCard, Truck, Star, Share2, Plus, Minus, Chec
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 
-export default function ProductInfo({ product, onColorChange, selectedColorProp }) {
+export default function ProductInfo({ product, onColorChange, selectedColorProp, selectedCarePlans }) {
     const [selectedStorage, setSelectedStorage] = useState(product.variants?.storage?.[0]?.id || null);
     const [selectedColor, setSelectedColor] = useState(selectedColorProp || product.variants?.colors?.[0]?.id || null);
     const [selectedRegion, setSelectedRegion] = useState(product.variants?.regions?.[0]?.id || null);
-    const [selectedCarePlans, setSelectedCarePlans] = useState([]);
+    // const [selectedCarePlans, setSelectedCarePlans] = useState([]); // Lifted up
     const [quantity, setQuantity] = useState(1);
+    const [deliveryMethod, setDeliveryMethod] = useState("delivery");
     // const [emiModalOpen, setEmiModalOpen] = useState(false); // Moved to Extras
 
     const { addToCart } = useCart();
@@ -88,13 +89,13 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
         return total;
     };
 
-    const toggleCarePlan = (planId) => {
-        setSelectedCarePlans(prev =>
-            prev.includes(planId)
-                ? prev.filter(id => id !== planId)
-                : [...prev, planId]
-        );
-    };
+    // const toggleCarePlan = (planId) => {
+    //     setSelectedCarePlans(prev =>
+    //         prev.includes(planId)
+    //             ? prev.filter(id => id !== planId)
+    //             : [...prev, planId]
+    //     );
+    // };
 
     const handleAddToCart = () => {
         const productWithVariants = {
@@ -171,6 +172,75 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
                 <p className="text-xs text-muted-foreground">Price includes VAT</p>
             </div>
 
+            {/* Core Specifications */}
+            {/* Core Specifications */}
+            {(() => {
+                // Helper to find spec value by name (case-insensitive)
+                const getSpec = (name) => {
+                    if (Array.isArray(product.specifications)) {
+                        return product.specifications.find(s => s.name.toLowerCase() === name.toLowerCase())?.description;
+                    }
+                    return product.specifications?.[name];
+                };
+
+                // Extract core specs
+                const displaySize = getSpec('Display Size');
+                const displayType = getSpec('Display Type');
+                const displayRes = getSpec('Display Resolution');
+                const screenDisplay = getSpec('Screen display');
+                const display = [displaySize, displayType, displayRes].filter(Boolean).join(', ') || screenDisplay || getSpec('Display');
+
+                const processor = getSpec('Chipset') || getSpec('Processor') || getSpec('CPU');
+
+                const mainCamera = getSpec('Main Camera') || getSpec('Rear Camera');
+                const selfieCamera = getSpec('Selfie Camera') || getSpec('Front Camera');
+                const camera = [mainCamera ? `${mainCamera} main` : null, selfieCamera ? `${selfieCamera} selfie` : null].filter(Boolean).join(', ');
+
+                const battery = getSpec('Battery Info') || getSpec('Battery') || getSpec('Battery capacity');
+                const durability = getSpec('Durability');
+                // const features = getSpec('Sensors') || getSpec('Features');
+
+                // Check if we have any core specs to show
+                const hasCoreSpecs = display || processor || camera || battery || durability;
+
+                if (!hasCoreSpecs) return null;
+
+                return (
+                    <div className="bg-secondary/20 p-4 rounded-lg space-y-2 text-sm">
+                        {display && (
+                            <div className="flex gap-2">
+                                <span className="font-bold min-w-[80px]">Display:</span>
+                                <span className="text-muted-foreground">{display}</span>
+                            </div>
+                        )}
+                        {processor && (
+                            <div className="flex gap-2">
+                                <span className="font-bold min-w-[80px]">Processor:</span>
+                                <span className="text-muted-foreground">{processor}</span>
+                            </div>
+                        )}
+                        {camera && (
+                            <div className="flex gap-2">
+                                <span className="font-bold min-w-[80px]">Camera:</span>
+                                <span className="text-muted-foreground">{camera}</span>
+                            </div>
+                        )}
+                        {battery && (
+                            <div className="flex gap-2">
+                                <span className="font-bold min-w-[80px]">Battery:</span>
+                                <span className="text-muted-foreground">{battery}</span>
+                            </div>
+                        )}
+                        {durability && (
+                            <div className="flex gap-2">
+                                <span className="font-bold min-w-[80px]">Durability:</span>
+                                <span className="text-muted-foreground">{durability}</span>
+                            </div>
+                        )}
+                    </div>
+                );
+            })()}
+
             {/* Storage Variant Selector */}
             {product.variants?.storage?.length > 0 && (
                 <div className="space-y-3">
@@ -242,75 +312,6 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp 
                     </div>
                 </div>
             )}
-
-            {/* EMI Option */}
-            {/* <div className="bg-secondary/50 p-4 rounded-lg border border-border">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-white p-2 rounded-full shadow-sm">
-                            <CreditCard className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                            <p className="font-semibold text-primary">EMI Available</p>
-                            <p className="text-xs text-muted-foreground">Starting from ৳{Math.round(currentPrice / 12).toLocaleString()}/mo</p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => setEmiModalOpen(!emiModalOpen)}
-                        className="text-sm font-medium text-primary underline hover:text-primary/80"
-                    >
-                        View Plans
-                    </button>
-                </div>
-
-                {emiModalOpen && (
-                    <div className="mt-4 pt-4 border-t border-border text-sm">
-                        <h4 className="font-bold mb-2">EMI Plans (0% Interest)</h4>
-                        <ul className="space-y-1 text-muted-foreground">
-                            <li className="flex justify-between"><span>3 Months</span> <span>৳{Math.round(currentPrice / 3).toLocaleString()}/mo</span></li>
-                            <li className="flex justify-between"><span>6 Months</span> <span>৳{Math.round(currentPrice / 6).toLocaleString()}/mo</span></li>
-                            <li className="flex justify-between"><span>12 Months</span> <span>৳{Math.round(currentPrice / 12).toLocaleString()}/mo</span></li>
-                        </ul>
-                    </div>
-                )}
-            </div> */}
-
-            {/* Dizmo Care Plans */}
-            {product.carePlans && product.carePlans.length > 0 && (
-                <div className="space-y-3">
-                    <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
-                        <ShieldCheck className="h-5 w-5 text-accent" />
-                        Dizmo Care+ Protection
-                    </h3>
-                    <div className="space-y-2">
-                        {product.carePlans.map((plan) => (
-                            <label
-                                key={plan.id}
-                                className={`cursor-pointer border p-3 rounded-lg flex items-start gap-3 transition-all ${selectedCarePlans.includes(plan.id)
-                                    ? "border-primary bg-primary/5 ring-1 ring-primary"
-                                    : "border-border hover:border-primary/50"
-                                    }`}
-                            >
-                                <input
-                                    type="checkbox"
-                                    checked={selectedCarePlans.includes(plan.id)}
-                                    onChange={() => toggleCarePlan(plan.id)}
-                                    className="mt-1"
-                                />
-                                <div className="flex-1">
-                                    <div className="flex justify-between items-start">
-                                        <span className="font-medium block">{plan.name}</span>
-                                        <span className="text-sm font-bold text-primary">+৳{plan.price.toLocaleString()}</span>
-                                    </div>
-                                    <span className="text-xs text-muted-foreground block mt-1">{plan.description}</span>
-                                </div>
-                            </label>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-
 
             {/* Quantity & Actions */}
             <div className="flex items-center gap-3 pt-4">

@@ -26,10 +26,20 @@ export default function ProductDetailsClient({ product }) {
 
     const filteredImages = getFilteredImages();
 
+    const [selectedCarePlans, setSelectedCarePlans] = useState([]);
+
+    const toggleCarePlan = (planId) => {
+        setSelectedCarePlans(prev =>
+            prev.includes(planId)
+                ? prev.filter(id => id !== planId)
+                : [...prev, planId]
+        );
+    };
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left: Image Gallery (4 cols) */}
-            <div className="lg:col-span-4">
+            <div className="lg:col-span-4 lg:sticky lg:top-24 lg:self-start lg:h-fit">
                 <ProductGallery images={filteredImages} />
             </div>
 
@@ -39,12 +49,17 @@ export default function ProductDetailsClient({ product }) {
                     product={product}
                     onColorChange={setSelectedColor}
                     selectedColorProp={selectedColor}
+                    selectedCarePlans={selectedCarePlans}
                 />
             </div>
 
             {/* Right: Product Extras (3 cols) */}
             <div className="lg:col-span-3">
-                <ProductExtras product={product} />
+                <ProductExtras
+                    product={product}
+                    selectedCarePlans={selectedCarePlans}
+                    toggleCarePlan={toggleCarePlan}
+                />
             </div>
         </div>
     );

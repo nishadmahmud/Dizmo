@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FileText, Gift, Truck, CreditCard, X, ShieldCheck, CheckCircle2, Clock, MapPin } from "lucide-react";
 
-export default function ProductExtras({ product }) {
+export default function ProductExtras({ product, selectedCarePlans, toggleCarePlan }) {
     const [activeDrawer, setActiveDrawer] = useState(null);
 
     const closeDrawer = () => setActiveDrawer(null);
@@ -12,34 +12,34 @@ export default function ProductExtras({ product }) {
         {
             id: "specs",
             label: "Technical Specifications",
-            icon: FileText,
             description: "Detailed product specs",
-            color: "text-blue-500",
+            icon: FileText,
+            color: "text-blue-600",
             bgColor: "bg-blue-50"
         },
         {
             id: "perks",
             label: "Perks & Benefits",
+            description: "Exclusive rewards & offers",
             icon: Gift,
-            description: "Services included",
-            color: "text-green-500",
-            bgColor: "bg-green-50"
+            color: "text-purple-600",
+            bgColor: "bg-purple-50"
         },
         {
             id: "delivery",
             label: "Delivery Information",
+            description: "Shipping methods & times",
             icon: Truck,
-            description: "Shipping options & times",
-            color: "text-orange-500",
-            bgColor: "bg-orange-50"
+            color: "text-green-600",
+            bgColor: "bg-green-50"
         },
         {
             id: "emi",
             label: "EMI Availability",
+            description: "Easy monthly installments",
             icon: CreditCard,
-            description: "Starting from ৳4,000/mo",
-            color: "text-purple-500",
-            bgColor: "bg-purple-50"
+            color: "text-orange-600",
+            bgColor: "bg-orange-50"
         }
     ];
 
@@ -47,150 +47,77 @@ export default function ProductExtras({ product }) {
         switch (activeDrawer) {
             case "specs":
                 return (
-                    <div className="space-y-4">
-                        <h3 className="font-bold text-lg mb-4">Technical Specifications</h3>
-                        {(!product.specifications ||
-                            (Array.isArray(product.specifications) && product.specifications.length === 0) ||
-                            (typeof product.specifications === 'object' && Object.keys(product.specifications).length === 0)) ? (
-                            <div className="text-center py-8">
-                                <p className="text-muted-foreground mb-2">No specifications available for this product.</p>
-                            </div>
-                        ) : Array.isArray(product.specifications) && product.specifications.length > 0 ? (
-                            // Handle array format from API with name and description fields
-                            <div className="grid grid-cols-1 gap-3">
-                                {product.specifications.map((spec, index) => (
-                                    <div
-                                        key={index}
-                                        className="grid grid-cols-1 md:grid-cols-3 gap-2 py-3 border-b border-border/50 last:border-0"
-                                    >
-                                        <span className="font-medium text-foreground">{spec.name}</span>
-                                        <span className="text-muted-foreground md:col-span-2">{spec.description}</span>
+                    <div className="space-y-6">
+                        <h3 className="text-xl font-bold text-[#103E34]">Technical Specifications</h3>
+                        <div className="divide-y divide-gray-100">
+                            {Array.isArray(product.specifications) ? (
+                                product.specifications.map((spec, index) => (
+                                    <div key={index} className="flex flex-col sm:flex-row gap-4 py-4">
+                                        <span className="font-bold text-[#103E34] sm:w-1/3 text-base">{spec.name}</span>
+                                        <span className="text-gray-600 sm:w-2/3 text-sm leading-relaxed">
+                                            {spec.description}
+                                        </span>
                                     </div>
-                                ))}
-                            </div>
-                        ) : (
-                            // Handle object format
-                            Object.entries(product.specifications).map(([key, category]) => {
-                                if (!category || typeof category !== 'object') return null;
-                                return (
-                                    <div key={key} className="border-b border-border pb-6 last:border-0">
-                                        <h3 className="text-lg font-bold text-primary mb-4">{category.title || key}</h3>
-                                        <div className="grid grid-cols-1 gap-3">
-                                            {category.specs && typeof category.specs === 'object' && Object.entries(category.specs).map(([specKey, specValue]) => (
-                                                <div
-                                                    key={specKey}
-                                                    className="grid grid-cols-1 md:grid-cols-3 gap-2 py-2 border-b border-border/50 last:border-0"
-                                                >
-                                                    <span className="font-medium text-foreground">{specKey}</span>
-                                                    <span className="text-muted-foreground md:col-span-2">{specValue}</span>
-                                                </div>
-                                            ))}
-                                        </div>
+                                ))
+                            ) : (
+                                product.specifications && Object.entries(product.specifications).map(([key, value]) => (
+                                    <div key={key} className="flex flex-col sm:flex-row gap-4 py-4">
+                                        <span className="font-bold text-[#103E34] sm:w-1/3 text-base">{key}</span>
+                                        <span className="text-gray-600 sm:w-2/3 text-sm leading-relaxed">
+                                            {typeof value === 'object' && value !== null ? value.name || JSON.stringify(value) : value}
+                                        </span>
                                     </div>
-                                );
-                            })
-                        )}
+                                ))
+                            )}
+                        </div>
                     </div>
                 );
             case "perks":
                 return (
-                    <div className="space-y-6">
-                        <h3 className="font-bold text-lg">Perks & benefits included</h3>
-
-                        <div className="space-y-4">
-                            <div className="flex gap-4">
-                                <div className="bg-green-100 p-3 rounded-full h-fit">
-                                    <ShieldCheck className="h-6 w-6 text-green-600" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold">7-Days Replacement</h4>
-                                    <p className="text-sm text-muted-foreground">Get 7-Days Replacement of your device</p>
-                                    <p className="text-xs text-muted-foreground mt-1">*Condition apply</p>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-4">
-                                <div className="bg-yellow-100 p-3 rounded-full h-fit">
-                                    <Truck className="h-6 w-6 text-yellow-600" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold">Free Shipping</h4>
-                                    <p className="text-sm text-muted-foreground">Get your order delivered inside Dhaka for free</p>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-4">
-                                <div className="bg-blue-100 p-3 rounded-full h-fit">
-                                    <CheckCircle2 className="h-6 w-6 text-blue-600" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold">Authentic device</h4>
-                                    <p className="text-sm text-muted-foreground">Get genuine, unaltered, authentic device from Dizmo</p>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-4">
-                                <div className="bg-red-100 p-3 rounded-full h-fit">
-                                    <Clock className="h-6 w-6 text-red-600" />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold">Repair history</h4>
-                                    <p className="text-sm text-muted-foreground">Acknowledge repair histories of devices from now if there is ANY</p>
-                                </div>
-                            </div>
-                        </div>
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-bold">Perks & Benefits</h3>
+                        <ul className="list-disc pl-5 space-y-2">
+                            <li>Free shipping on orders over BDT 5000</li>
+                            <li>7-day replacement guarantee</li>
+                            <li>Official warranty support</li>
+                            <li>Earn loyalty points with every purchase</li>
+                        </ul>
                     </div>
                 );
             case "delivery":
                 return (
-                    <div className="space-y-6">
-                        <h3 className="font-bold text-lg">Shipping Information</h3>
-                        <p className="text-sm text-muted-foreground">
-                            We are committed to delivering your orders quickly and reliably. Our standard and express delivery options are designed to meet your needs:
-                        </p>
-
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg border border-border">
-                                <span className="font-medium">Inside Dhaka</span>
-                                <span className="font-bold bg-secondary px-3 py-1 rounded-full text-sm">48–72 hours</span>
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-bold">Delivery Information</h3>
+                        <div className="space-y-4">
+                            <div className="flex gap-3">
+                                <Truck className="h-6 w-6 text-primary" />
+                                <div>
+                                    <h4 className="font-semibold">Home Delivery</h4>
+                                    <p className="text-sm text-muted-foreground">2-3 business days within Dhaka</p>
+                                    <p className="text-sm text-muted-foreground">3-5 business days outside Dhaka</p>
+                                </div>
                             </div>
-                            <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg border border-border">
-                                <span className="font-medium">Outside Dhaka</span>
-                                <span className="font-bold bg-secondary px-3 py-1 rounded-full text-sm">48–72 hours</span>
-                            </div>
-                            <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg border border-border">
-                                <span className="font-medium">Express Delivery</span>
-                                <span className="font-bold bg-cyan-500 text-white px-3 py-1 rounded-full text-sm">24 hours</span>
+                            <div className="flex gap-3">
+                                <MapPin className="h-6 w-6 text-primary" />
+                                <div>
+                                    <h4 className="font-semibold">Store Pickup</h4>
+                                    <p className="text-sm text-muted-foreground">Available at our Bashundhara City outlet</p>
+                                </div>
                             </div>
                         </div>
-
-                        <p className="text-xs text-muted-foreground mt-4">
-                            With these options, you can always count on us for timely and secure delivery.
-                        </p>
                     </div>
                 );
             case "emi":
-                const currentPrice = product.price || 0;
                 return (
-                    <div className="space-y-6">
-                        <h3 className="font-bold text-lg">EMI Availability</h3>
-                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                            <div className="flex items-center gap-3 mb-3">
-                                <CreditCard className="h-6 w-6 text-purple-600" />
-                                <h4 className="font-bold text-purple-900">Starting from ৳4,000/mo</h4>
-                            </div>
-                            <p className="text-sm text-purple-800 mb-4">
-                                Enjoy 0% interest EMI for up to 12 months with selected bank credit cards.
-                            </p>
-                            <ul className="space-y-2 text-sm text-purple-800">
-                                <li className="flex justify-between border-b border-purple-200 pb-1"><span>3 Months</span> <span>৳{Math.round(currentPrice / 3).toLocaleString()}/mo</span></li>
-                                <li className="flex justify-between border-b border-purple-200 pb-1"><span>6 Months</span> <span>৳{Math.round(currentPrice / 6).toLocaleString()}/mo</span></li>
-                                <li className="flex justify-between"><span>12 Months</span> <span>৳{Math.round(currentPrice / 12).toLocaleString()}/mo</span></li>
-                            </ul>
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-bold">EMI Availability</h3>
+                        <p>Enjoy 0% EMI for up to 6 months with selected bank credit cards.</p>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="border p-2 rounded text-center">City Bank</div>
+                            <div className="border p-2 rounded text-center">BRAC Bank</div>
+                            <div className="border p-2 rounded text-center">EBL</div>
+                            <div className="border p-2 rounded text-center">SCB</div>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                            * EMI facility is available for purchase over ৳5,000. Terms and conditions apply.
-                        </p>
                     </div>
                 );
             default:
@@ -198,11 +125,9 @@ export default function ProductExtras({ product }) {
         }
     };
 
-    const [deliveryMethod, setDeliveryMethod] = useState("delivery");
-
     return (
         <div className="space-y-4">
-            {/* Delivery Method */}
+            {/* Dizmo Care Plans - Moved from ProductInfo */}
 
 
             <div className="space-y-3">
@@ -223,35 +148,56 @@ export default function ProductExtras({ product }) {
                 ))}
             </div>
 
-            <div className="space-y-2">
-                <h3 className="text-sm font-semibold text-foreground">Delivery Method</h3>
-                <div className="flex flex-col gap-1">
-                    <button
-                        onClick={() => setDeliveryMethod("delivery")}
-                        className={`flex-1 py-2 px-4 rounded-lg border flex items-center justify-center gap-2 transition-all ${deliveryMethod === "delivery"
-                            ? "border-primary bg-primary text-white"
-                            : "border-border hover:border-primary/50"
-                            }`}
-                    >
-                        <Truck className="h-5 w-5" />
-                        <span className="text-sm font-medium">Home Delivery</span>
-                    </button>
-                    <button
-                        onClick={() => setDeliveryMethod("pickup")}
-                        className={`flex-1 py-3 px-4 rounded-lg border flex items-center justify-center gap-2 transition-all ${deliveryMethod === "pickup"
-                            ? "border-primary bg-primary text-white"
-                            : "border-border hover:border-primary/50"
-                            }`}
-                    >
-                        <MapPin className="h-5 w-5" />
-                        <span className="text-sm font-medium">Store Pickup</span>
-                    </button>
+            <div className="bg-secondary/10 rounded-xl overflow-hidden border border-border">
+                <div className="bg-black text-white p-2.5 flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-accent" />
+                    <span className="font-bold text-sm">Dizmo Care</span>
                 </div>
-                {deliveryMethod === "pickup" && (
-                    <div className="text-sm text-accent-foreground bg-accent/10 p-3 rounded-lg">
-                        Available at: <strong>Bashundhara City, Level 4</strong>. Ready in 2 hours.
+
+                <div className="p-2 space-y-2">
+                    {/* Mock Care Plans if none provided */}
+                    {(product.carePlans && product.carePlans.length > 0 ? product.carePlans : [
+                        { id: 'care_plus', name: 'Dizmo Ultimate Care+ 1 year', description: 'New replacement for hardware issues & free parts for accidental damage', price: 2471 },
+                        { id: 'screen_care', name: 'Dizmo Screen Care+ : 730 days', description: 'One time display replacements (excluding physical damage)', price: 987 },
+                        { id: 'bundle', name: 'DC+ & DSC+ Bundle for android', description: '1 year brand-new replacement for hardware issue + 730 days display replacement', price: 1977 },
+                        { id: 'parts', name: '1 Year Parts Warranty', description: '', price: 700 },
+                        { id: 'care_android', name: 'Dizmo Care+ 1 Year for Android', description: 'Brand New Replacement Guarantee', price: 1152 }
+                    ]).map((plan) => (
+                        <label
+                            key={plan.id}
+                            className={`cursor-pointer bg-white border p-2.5 rounded-lg flex items-start gap-2 transition-all hover:shadow-sm ${selectedCarePlans.includes(plan.id)
+                                ? "border-primary ring-1 ring-primary"
+                                : "border-border"
+                                }`}
+                        >
+                            <div className={`mt-0.5 w-4 h-4 border-2 rounded flex items-center justify-center transition-colors ${selectedCarePlans.includes(plan.id) ? "bg-black border-black" : "border-gray-300"}`}>
+                                {selectedCarePlans.includes(plan.id) && <CheckCircle2 className="h-2.5 w-2.5 text-white" />}
+                            </div>
+                            <input
+                                type="checkbox"
+                                checked={selectedCarePlans.includes(plan.id)}
+                                onChange={() => toggleCarePlan(plan.id)}
+                                className="hidden"
+                            />
+                            <div className="flex-1 min-w-0">
+                                <div className="flex justify-between items-start gap-2">
+                                    <span className="font-semibold text-xs text-foreground leading-tight">{plan.name}</span>
+                                    <span className="font-bold text-xs text-foreground whitespace-nowrap">BDT {plan.price.toLocaleString()}</span>
+                                </div>
+                                {plan.description && (
+                                    <span className="text-[10px] text-muted-foreground block mt-0.5 leading-tight line-clamp-2">{plan.description}</span>
+                                )}
+                            </div>
+                        </label>
+                    ))}
+
+                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/50">
+                        <div className="w-3.5 h-3.5 bg-green-500 rounded flex items-center justify-center shrink-0">
+                            <CheckCircle2 className="h-2.5 w-2.5 text-white" />
+                        </div>
+                        <span className="text-[10px] text-muted-foreground leading-tight">I agree to Dizmo's <a href="#" className="text-primary hover:underline">terms & conditions</a></span>
                     </div>
-                )}
+                </div>
             </div>
 
             {/* Drawer Overlay */}
