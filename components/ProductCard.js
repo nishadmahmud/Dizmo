@@ -4,8 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { Eye } from "lucide-react";
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, category }) {
     const { id, name, price, originalPrice, image, discount } = product;
+
+    // Construct URL with category query param if available
+    const productUrl = category
+        ? `/products/${id}?category=${encodeURIComponent(category)}`
+        : `/products/${id}`;
 
     return (
         <div className="group relative bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300">
@@ -17,7 +22,7 @@ export default function ProductCard({ product }) {
             )}
 
             {/* Clickable Card Link */}
-            <Link href={`/products/${id}`} className="block">
+            <Link href={productUrl} className="block">
                 {/* Image Container */}
                 <div className="relative aspect-square bg-secondary/50 overflow-hidden">
                     {image ? (

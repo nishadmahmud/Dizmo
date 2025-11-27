@@ -10,6 +10,8 @@ async function getProduct(id) {
         const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
         const endpoint = process.env.NEXT_PUBLIC_ENDPOINT_PRODUCT_DETAIL;
         const url = `${apiBaseUrl}${endpoint}/${id}`;
+        console.log("Fetching Product URL:", url);
+        console.log("Product ID:", id);
 
         const res = await fetch(url, { cache: 'no-store' });
 
@@ -24,8 +26,14 @@ async function getProduct(id) {
     }
 }
 
-export default async function ProductPage({ params }) {
+export default async function ProductPage({ params, searchParams }) {
     const { id } = await params;
+    const resolvedSearchParams = await searchParams; // Await searchParams in Next.js 15+ if needed, or just use it.
+    // Note: In Next.js 13/14 searchParams is an object, in 15 it's a promise. 
+    // Assuming 14 based on usage, but let's just destructure it from props if it's not async.
+    // Actually, let's keep it simple.
+
+    const categoryParam = resolvedSearchParams?.category;
     const data = await getProduct(id);
 
     if (!data || !data.success || !data.data) {
@@ -139,10 +147,12 @@ export default async function ProductPage({ params }) {
             <div className="w-full max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
                 <ProductDetailsClient product={product} />
 
-                {/* Variants Grid */}
-                <div className="mt-12">
-                    <ProductVariantsGrid imeis={product.imeis} product={product} />
-                </div>
+                {/* Variants Grid - Only for Used Phones */}
+                {((productData.category_name || productData.category?.name || categoryParam || "").toLowerCase().includes("used phone")) && (
+                    <div className="mt-12">
+                        <ProductVariantsGrid imeis={product.imeis} product={product} />
+                    </div>
+                )}
 
                 {/* Specification Tabs */}
                 <ProductTabs product={product} />
