@@ -124,6 +124,15 @@ export default function ProductVariantsGrid({ imeis, product }) {
                                     <span className="text-sm font-medium">Cycle Count: <span className="text-foreground">{item.cycle_count}</span></span>
                                 </div>
                             )}
+
+                            {/* Comes with Original Box */}
+                            <div className="flex items-center gap-3 mt-1 pt-1">
+                                <span className="text-sm font-bold text-[#103E34]">Comes with:</span>
+                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-white shadow-sm">
+                                    <Box className="h-4 w-4 text-[#FCB042] fill-[#FCB042]/20" />
+                                    <span className="text-sm font-bold text-[#103E34]">Original Box</span>
+                                </div>
+                            </div>
                         </div>
 
 
