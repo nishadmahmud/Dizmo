@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import {
     Search, ShoppingCart, Menu, Zap, FileText, GitCompare, Package, Home,
-    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic
+    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useProduct } from "@/context/ProductContext";
@@ -37,20 +37,81 @@ const iconMap = {
 
 export default function Navbar() {
     const { openDrawer, cartCount } = useCart();
-    const { searchProducts, loading: productsLoading } = useProduct();
-    const router = useRouter();
     const pathname = usePathname();
+    const recognitionRef = useRef(null);
+
     const [showSearch, setShowSearch] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const [showAllCategories, setShowAllCategories] = useState(false);
     const [categories, setCategories] = useState(defaultCategories);
+    const [categoryBrands, setCategoryBrands] = useState({});
+    const [hoveredCategory, setHoveredCategory] = useState(null);
+    const [hoveredSidebarCategory, setHoveredSidebarCategory] = useState(null);
+    const [loadingBrands, setLoadingBrands] = useState({});
 
     // Search State
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [showResults, setShowResults] = useState(false);
     const [isListening, setIsListening] = useState(false);
-    const recognitionRef = useRef(null);
+
+    const fetchCategoryBrands = async (categoryId) => {
+        // If brands already loaded, don't fetch again
+        if (categoryBrands[categoryId]) return;
+
+        setLoadingBrands(prev => ({ ...prev, [categoryId]: true }));
+
+        try {
+            const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+            const productsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
+
+            // Fetch products for this category to extract brands
+            const response = await fetch(`${apiBaseUrl}${productsEndpoint}/${categoryId}`);
+            const data = await response.json();
+
+            if (data.success && data.data) {
+                const uniqueBrands = [];
+                const brandIds = new Set();
+
+                data.data.forEach(product => {
+                    // Check both brand_id/brand_name and brands object structure
+                    let brandId, brandName;
+
+                    if (product.brand_id && product.brand_name) {
+                        brandId = product.brand_id;
+                        brandName = product.brand_name;
+                    } else if (product.brands && product.brands.id) {
+                        brandId = product.brands.id;
+                        brandName = product.brands.name;
+                    }
+
+                    if (brandId && brandName && !brandIds.has(brandId)) {
+                        brandIds.add(brandId);
+                        uniqueBrands.push({ id: brandId, name: brandName });
+                    }
+                });
+
+                // Sort brands alphabetically
+                uniqueBrands.sort((a, b) => a.name.localeCompare(b.name));
+
+                setCategoryBrands(prev => ({ ...prev, [categoryId]: uniqueBrands }));
+            }
+        } catch (error) {
+            console.error("Error fetching category brands:", error);
+        } finally {
+            setLoadingBrands(prev => ({ ...prev, [categoryId]: false }));
+        }
+    };
+
+    const handleTopCategoryHover = (categoryId) => {
+        setHoveredCategory(categoryId);
+        fetchCategoryBrands(categoryId);
+    };
+
+    const handleSidebarCategoryHover = (categoryId) => {
+        setHoveredSidebarCategory(categoryId);
+        fetchCategoryBrands(categoryId);
+    };
 
     // Handle Voice Search
     const handleVoiceSearch = () => {
@@ -301,6 +362,7 @@ export default function Navbar() {
 
             {/* Category Bar - Slimmer (Hidden on products page) */}
             {/* Category Bar - Slimmer (Hidden on products page) */}
+            {/* Category Bar - Slimmer (Hidden on products page) */}
             {showCategoryBar && (
                 <div className="hidden md:block sticky top-16 z-40 w-full border-b border-border bg-white py-2 shadow-sm">
                     <div className="container flex items-center justify-between gap-4">
@@ -324,19 +386,67 @@ export default function Navbar() {
                                     />
 
                                     {/* Dropdown */}
-                                    <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-border z-50 max-h-96 overflow-y-auto">
+                                    <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-border z-50">
                                         {categories.map((category) => {
                                             const IconComponent = category.Icon;
+                                            const isHovered = hoveredSidebarCategory === category.id;
+                                            const brands = categoryBrands[category.id] || [];
+
                                             return (
-                                                <Link
+                                                <div
                                                     key={category.id}
-                                                    href={`/categories/${category.id}`}
-                                                    onClick={() => setShowAllCategories(false)}
-                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-secondary transition-colors border-b border-border last:border-0"
+                                                    className="relative"
+                                                    onMouseEnter={() => handleSidebarCategoryHover(category.id)}
+                                                    onMouseLeave={() => setHoveredSidebarCategory(null)}
                                                 >
-                                                    <IconComponent className="h-5 w-5 text-[#103E34]" />
-                                                    <span className="text-sm font-medium">{category.name}</span>
-                                                </Link>
+                                                    <Link
+                                                        href={`/categories/${category.id}`}
+                                                        onClick={() => setShowAllCategories(false)}
+                                                        className={`flex items-center gap-3 px-4 py-3 transition-colors border-b border-border last:border-0 ${isHovered ? 'bg-secondary text-primary' : 'hover:bg-secondary'}`}
+                                                    >
+                                                        <IconComponent className={`h-5 w-5 ${isHovered ? 'text-primary' : 'text-[#103E34]'}`} />
+                                                        <span className="text-sm font-medium">{category.name}</span>
+                                                    </Link>
+
+                                                    {/* Brand Dropdown (Side) */}
+                                                    {isHovered && (
+                                                        <div className="absolute top-0 left-full ml-2 w-[300px] bg-background rounded-xl shadow-xl border border-border z-50 p-4 animate-in fade-in slide-in-from-left-2 min-h-[200px]">
+                                                            <div className="flex items-center justify-between mb-3 border-b border-border pb-2">
+                                                                <h3 className="font-bold text-base text-primary">{category.name} Brands</h3>
+                                                                <Link
+                                                                    href={`/categories/${category.id}`}
+                                                                    onClick={() => setShowAllCategories(false)}
+                                                                    className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-1"
+                                                                >
+                                                                    View All <ArrowRight className="h-3 w-3" />
+                                                                </Link>
+                                                            </div>
+
+                                                            {loadingBrands[category.id] ? (
+                                                                <div className="py-8 text-center text-muted-foreground text-xs">
+                                                                    Loading...
+                                                                </div>
+                                                            ) : brands.length > 0 ? (
+                                                                <div className="grid grid-cols-2 gap-2">
+                                                                    {brands.map((brand) => (
+                                                                        <Link
+                                                                            key={brand.id}
+                                                                            href={`/categories/${category.id}?brand=${brand.id}`}
+                                                                            onClick={() => setShowAllCategories(false)}
+                                                                            className="text-xs text-muted-foreground hover:text-primary hover:font-medium transition-colors py-1 truncate"
+                                                                        >
+                                                                            {brand.name}
+                                                                        </Link>
+                                                                    ))}
+                                                                </div>
+                                                            ) : (
+                                                                <div className="py-8 text-center text-muted-foreground text-xs">
+                                                                    No brands
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             );
                                         })}
                                     </div>
@@ -345,19 +455,69 @@ export default function Navbar() {
                         </div>
 
                         {/* Center: Horizontal Category List */}
-                        <div className="flex-1 flex justify-center overflow-hidden">
-                            <div className="flex items-center gap-2 overflow-x-auto py-1.5 scrollbar-hide mask-linear-fade px-4">
-                                {categories.slice(0, 8).map((category) => {
+                        <div className="flex-1 flex justify-center">
+                            <div className="flex items-center gap-2 overflow-x-auto md:overflow-visible py-1.5 scrollbar-hide mask-linear-fade px-4">
+                                {categories.slice(0, 8).map((category, index) => {
                                     const IconComponent = category.Icon;
+                                    const isHovered = hoveredCategory === category.id;
+                                    const brands = categoryBrands[category.id] || [];
+                                    const isRightAligned = index > 4; // Right align for last 3 items
+
                                     return (
-                                        <Link
+                                        <div
                                             key={category.id}
-                                            href={`/categories/${category.id}`}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-secondary hover:bg-[#103E34] hover:text-white transition-all whitespace-nowrap text-sm font-medium flex-shrink-0"
+                                            className="relative"
+                                            onMouseEnter={() => handleTopCategoryHover(category.id)}
+                                            onMouseLeave={() => setHoveredCategory(null)}
                                         >
-                                            <IconComponent className="h-4 w-4" />
-                                            <span>{category.name}</span>
-                                        </Link>
+                                            <Link
+                                                href={`/categories/${category.id}`}
+                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all whitespace-nowrap text-sm font-medium flex-shrink-0 ${isHovered
+                                                    ? 'bg-[#103E34] text-white'
+                                                    : 'bg-secondary hover:bg-[#103E34] hover:text-white'
+                                                    }`}
+                                            >
+                                                <IconComponent className="h-4 w-4" />
+                                                <span>{category.name}</span>
+                                            </Link>
+
+                                            {/* Brand Dropdown */}
+                                            {isHovered && (
+                                                <div className={`absolute top-full mt-2 w-[600px] bg-background rounded-xl shadow-xl border border-border z-50 p-6 animate-in fade-in slide-in-from-top-2 ${isRightAligned ? 'right-0' : 'left-0'}`}>
+                                                    <div className="flex items-center justify-between mb-4 border-b border-border pb-2">
+                                                        <h3 className="font-bold text-lg text-primary">{category.name} Brands</h3>
+                                                        <Link
+                                                            href={`/categories/${category.id}`}
+                                                            className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
+                                                        >
+                                                            View All <ArrowRight className="h-3 w-3" />
+                                                        </Link>
+                                                    </div>
+
+                                                    {loadingBrands[category.id] ? (
+                                                        <div className="py-8 text-center text-muted-foreground text-sm">
+                                                            Loading brands...
+                                                        </div>
+                                                    ) : brands.length > 0 ? (
+                                                        <div className="grid grid-cols-3 gap-x-4 gap-y-2">
+                                                            {brands.map((brand) => (
+                                                                <Link
+                                                                    key={brand.id}
+                                                                    href={`/categories/${category.id}?brand=${brand.id}`}
+                                                                    className="text-sm text-muted-foreground hover:text-primary hover:font-medium transition-colors py-1 block truncate"
+                                                                >
+                                                                    {brand.name}
+                                                                </Link>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="py-8 text-center text-muted-foreground text-sm">
+                                                            No brands available
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     );
                                 })}
                             </div>
@@ -380,10 +540,6 @@ export default function Navbar() {
                     </div>
                 </div>
             )}
-
-
-
-
 
             {/* Mobile Side Menu */}
             {showMenu && (
