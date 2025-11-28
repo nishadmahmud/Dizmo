@@ -66,7 +66,7 @@ export default function NewArrivals() {
     if (products.length === 0) return null;
 
     return (
-        <section className="py-8 bg-[#103E34] rounded-3xl mx-4 lg:mx-auto max-w-[1400px] my-8">
+        <section className="py-8 px-4 bg-[#103E34] rounded-3xl mx-4 lg:mx-auto max-w-7xl my-8">
             <div className="container px-6">
                 <div className="flex flex-col lg:flex-row gap-8 items-center">
                     {/* Left Side - Text Content */}
