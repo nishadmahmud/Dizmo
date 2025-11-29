@@ -37,6 +37,7 @@ const iconMap = {
 
 export default function Navbar() {
     const { openDrawer, cartCount } = useCart();
+    const { searchProducts } = useProduct();
     const pathname = usePathname();
     const recognitionRef = useRef(null);
 
