@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { Package, Search, MapPin, Clock, CheckCircle2, Truck } from "lucide-react";
+import { Package, Search, Clock, CheckCircle2, Truck } from "lucide-react";
 
 export default function TrackOrderPage() {
     const [orderId, setOrderId] = useState("");
@@ -29,7 +27,6 @@ export default function TrackOrderPage() {
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
-            <Navbar />
 
             <div className="container py-12">
                 {/* Header */}
@@ -99,8 +96,8 @@ export default function TrackOrderPage() {
                                         <div className="flex flex-col items-center">
                                             <div
                                                 className={`w-10 h-10 rounded-full flex items-center justify-center ${item.completed
-                                                        ? "bg-accent text-white"
-                                                        : "bg-secondary text-muted-foreground"
+                                                    ? "bg-accent text-white"
+                                                    : "bg-secondary text-muted-foreground"
                                                     }`}
                                             >
                                                 {item.completed ? (
@@ -143,7 +140,6 @@ export default function TrackOrderPage() {
                 )}
             </div>
 
-            <Footer />
         </main>
     );
 }

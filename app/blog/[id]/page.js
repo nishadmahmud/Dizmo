@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { Calendar, User, ArrowLeft, Share2 } from "lucide-react";
 
 export default function BlogPostPage() {
@@ -59,7 +57,6 @@ export default function BlogPostPage() {
     if (loading) {
         return (
             <main className="min-h-screen flex flex-col bg-background">
-                <Navbar />
                 <div className="container py-12 max-w-4xl">
                     <div className="h-8 w-32 bg-secondary/50 rounded animate-pulse mb-8" />
                     <div className="h-12 w-3/4 bg-secondary/50 rounded animate-pulse mb-6" />
@@ -70,7 +67,6 @@ export default function BlogPostPage() {
                         <div className="h-4 bg-secondary/50 rounded w-2/3" />
                     </div>
                 </div>
-                <Footer />
             </main>
         );
     }
@@ -78,7 +74,6 @@ export default function BlogPostPage() {
     if (!post) {
         return (
             <main className="min-h-screen flex flex-col bg-background">
-                <Navbar />
                 <div className="container py-20 text-center">
                     <h1 className="text-3xl font-bold mb-4">Post Not Found</h1>
                     <p className="text-muted-foreground mb-8">The blog post you are looking for does not exist.</p>
@@ -86,14 +81,12 @@ export default function BlogPostPage() {
                         Back to Blog
                     </Link>
                 </div>
-                <Footer />
             </main>
         );
     }
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
-            <Navbar />
 
             <article className="flex-1">
                 {/* Hero Image */}
@@ -150,7 +143,6 @@ export default function BlogPostPage() {
                 </div>
             </article>
 
-            <Footer />
         </main>
     );
 }

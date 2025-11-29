@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import CategoryFilters from "@/components/CategoryFilters";
 import BrandFilter from "@/components/BrandFilter";
@@ -308,7 +306,6 @@ export default function CategoryDetailPage({ params }) {
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
-            <Navbar />
 
             <div className="container py-6">
                 {/* Breadcrumb */}
@@ -460,7 +457,6 @@ export default function CategoryDetailPage({ params }) {
                 />
             )}
 
-            <Footer />
         </main>
     );
 }

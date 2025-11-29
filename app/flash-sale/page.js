@@ -1,7 +1,5 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import { Timer } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -35,7 +33,6 @@ export default function FlashSalePage() {
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
-            <Navbar />
 
             {/* Flash Sale Header */}
             <div className="bg-primary text-white py-12">
@@ -73,7 +70,6 @@ export default function FlashSalePage() {
                 </div>
             </div>
 
-            <Footer />
         </main>
     );
 }

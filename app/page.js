@@ -1,5 +1,3 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
 import CategoryIcons from "@/components/CategoryIcons";
 import FlashSale from "@/components/FlashSale";
@@ -18,7 +16,6 @@ import SEOContent from "@/components/SEOContent";
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col bg-background">
-      <Navbar />
 
       <div className="flex-1 w-full">
         {/* Content wrapper with max-width */}
@@ -41,8 +38,6 @@ export default function Home() {
           <SEOContent />
         </div>
       </div>
-
-      <Footer />
 
 
     </main>

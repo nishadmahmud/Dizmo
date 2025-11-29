@@ -1,9 +1,7 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { Zap, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export default function OffersPage() {
@@ -58,7 +56,6 @@ export default function OffersPage() {
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
-            <Navbar />
 
             <div className="container py-12">
                 {/* Header */}
@@ -110,7 +107,6 @@ export default function OffersPage() {
                 )}
             </div>
 
-            <Footer />
         </main>
     );
 }

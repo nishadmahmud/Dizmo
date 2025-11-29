@@ -1,12 +1,9 @@
 import { Suspense } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import ProductsContent from "@/components/ProductsContent";
 
 export default function ProductsPage() {
     return (
         <main className="min-h-screen flex flex-col bg-background">
-            <Navbar />
             <div className="flex-1">
                 <Suspense fallback={
                     <div className="container py-8">
@@ -21,7 +18,6 @@ export default function ProductsPage() {
                     <ProductsContent />
                 </Suspense>
             </div>
-            <Footer />
         </main>
     );
 }

@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { Calendar, User, ArrowRight } from "lucide-react";
 
 const blogPosts = [
@@ -71,7 +69,6 @@ const blogPosts = [
 export default function BlogPage() {
     return (
         <main className="min-h-screen flex flex-col bg-background">
-            <Navbar />
 
             <div className="container py-12">
                 {/* Header */}
@@ -136,7 +133,6 @@ export default function BlogPage() {
                 </div>
             </div>
 
-            <Footer />
         </main>
     );
 }

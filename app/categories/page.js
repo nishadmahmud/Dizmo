@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import Link from "next/link";
 
 export default function CategoriesPage() {
@@ -43,7 +41,6 @@ export default function CategoriesPage() {
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
-            <Navbar />
 
             <div className="container py-12">
                 <h1 className="text-3xl font-bold text-primary mb-8 text-center">Browse Categories</h1>
@@ -80,7 +77,6 @@ export default function CategoriesPage() {
                 )}
             </div>
 
-            <Footer />
         </main>
     );
 }

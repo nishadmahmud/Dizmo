@@ -1,7 +1,5 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { useCart } from "@/context/CartContext";
 import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -11,7 +9,6 @@ export default function CartPage() {
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
-            <Navbar />
 
             <div className="max-w-6xl mx-auto px-4 py-12">
                 <h1 className="text-3xl font-bold text-primary mb-8">Shopping Cart</h1>
@@ -108,7 +105,6 @@ export default function CartPage() {
                 )}
             </div>
 
-            <Footer />
         </main>
     );
 }

@@ -1,5 +1,3 @@
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import ProductDetailsClient from "@/components/ProductDetailsClient";
 import ProductVariantsGrid from "@/components/ProductVariantsGrid";
 import ProductTabs from "@/components/ProductTabs";
@@ -28,10 +26,7 @@ async function getProduct(id) {
 
 export default async function ProductPage({ params, searchParams }) {
     const { id } = await params;
-    const resolvedSearchParams = await searchParams; // Await searchParams in Next.js 15+ if needed, or just use it.
-    // Note: In Next.js 13/14 searchParams is an object, in 15 it's a promise. 
-    // Assuming 14 based on usage, but let's just destructure it from props if it's not async.
-    // Actually, let's keep it simple.
+    const resolvedSearchParams = await searchParams;
 
     const categoryParam = resolvedSearchParams?.category;
     const data = await getProduct(id);
@@ -39,12 +34,10 @@ export default async function ProductPage({ params, searchParams }) {
     if (!data || !data.success || !data.data) {
         return (
             <main className="min-h-screen flex flex-col bg-background">
-                <Navbar />
                 <div className="container py-20 text-center">
                     <h1 className="text-2xl font-bold mb-4">Product not found</h1>
                     <p className="text-muted-foreground">The product you are looking for does not exist or has been removed.</p>
                 </div>
-                <Footer />
             </main>
         );
     }
@@ -95,7 +88,7 @@ export default async function ProductPage({ params, searchParams }) {
         price: productData.retails_price || 0, // Base price
         originalPrice: productData.retails_price, // Assuming retail is original
         stock: productData.status || "In Stock",
-        warranty: productData.warranty || "Official Warranty", // API doesn't seem to have warranty field in example, using default
+        warranty: productData.warranty || "Official Warranty",
         description: productData.description || productData.short_description || "No description available.",
         images: allImages.length > 0 ? allImages : productData.images || [],
         brand: productData.brand_name,
@@ -142,7 +135,6 @@ export default async function ProductPage({ params, searchParams }) {
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
-            <Navbar />
 
             <div className="w-full max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
                 <ProductDetailsClient product={product} />
@@ -164,7 +156,6 @@ export default async function ProductPage({ params, searchParams }) {
                 </div>
             </div>
 
-            <Footer />
         </main>
     );
 }

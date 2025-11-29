@@ -3,6 +3,8 @@ import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { ProductProvider } from "@/context/ProductContext";
 import CartDrawer from "@/components/CartDrawer";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 import FloatingActions from "@/components/FloatingActions";
 
@@ -23,7 +25,9 @@ export default function RootLayout({ children }) {
       <body className={`${outfit.variable} antialiased`}>
         <CartProvider>
           <ProductProvider>
+            <Navbar />
             {children}
+            <Footer />
             <CartDrawer />
             <FloatingActions />
           </ProductProvider>
