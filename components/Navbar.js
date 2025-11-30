@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import {
     Search, ShoppingCart, Menu, Zap, FileText, GitCompare, Package, Home,
-    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight
+    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight, User
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useProduct } from "@/context/ProductContext";
@@ -351,6 +351,13 @@ export default function Navbar() {
                             )}
                         </button>
 
+                        <Link
+                            href="/login"
+                            className="hidden md:block p-2 hover:bg-white/10 rounded-full transition-colors"
+                        >
+                            <User className="h-5 w-5 text-white" />
+                        </Link>
+
                         <button
                             onClick={() => setShowMenu(true)}
                             className="md:hidden p-2 hover:bg-white/10 rounded-full"
@@ -602,12 +609,22 @@ export default function Navbar() {
                                         <Package className="h-5 w-5" />
                                         <span className="font-medium">Track Order</span>
                                     </Link>
+                                    <Link
+                                        href="/login"
+                                        onClick={() => setShowMenu(false)}
+                                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
+                                    >
+                                        <User className="h-5 w-5" />
+                                        <span className="font-medium">Profile</span>
+                                    </Link>
+
                                 </div>
                             </nav>
                         </div>
-                    </div>
+                    </div >
                 </>
-            )}
+            )
+            }
 
             {/* Mobile Bottom Navigation */}
             <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#103E34] border-t border-[#103E34]/20 shadow-lg">
@@ -647,17 +664,17 @@ export default function Navbar() {
                         <span className="text-[10px] font-medium">Products</span>
                     </Link>
 
-                    {/* Offers */}
+                    {/* Profile (Mobile) */}
                     <Link
-                        href="/offers"
-                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/offers' ? 'text-[#FCB042]' : 'text-white hover:text-[#FCB042]'
+                        href="/login"
+                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/login' ? 'text-[#FCB042]' : 'text-white hover:text-[#FCB042]'
                             }`}
                     >
-                        <Zap className="h-5 w-5" />
-                        <span className="text-[10px] font-medium">Offers</span>
+                        <User className="h-5 w-5" />
+                        <span className="text-[10px] font-medium">Profile</span>
                     </Link>
                 </div>
-            </nav>
+            </nav >
 
             <style jsx global>{`
         .scrollbar-hide::-webkit-scrollbar {
