@@ -201,57 +201,61 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                 ))}
             </div>
 
-            <div className="bg-secondary/10 rounded-xl overflow-hidden border border-border">
-                <div className="bg-black text-white p-2.5 flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-accent" />
-                    <span className="font-bold text-sm">Dizmo Care</span>
-                </div>
+            {/* Dizmo Care Plans - Moved from ProductInfo */}
+            {/* Only show Dizmo Care if NOT a used phone */}
+            {(!product.category || !product.category.toLowerCase().includes("used phone")) && (
+                <div className="bg-secondary/10 rounded-xl overflow-hidden border border-border">
+                    <div className="bg-black text-white p-2.5 flex items-center gap-2">
+                        <ShieldCheck className="h-4 w-4 text-accent" />
+                        <span className="font-bold text-sm">Dizmo Care</span>
+                    </div>
 
-                <div className="p-2 space-y-2">
-                    {/* Mock Care Plans if none provided */}
-                    {(product.carePlans && product.carePlans.length > 0 ? product.carePlans : [
-                        { id: 'care_plus', name: 'Dizmo Ultimate Care+ 1 year', description: 'New replacement for hardware issues & free parts for accidental damage', price: 2471 },
-                        { id: 'screen_care', name: 'Dizmo Screen Care+ : 730 days', description: 'One time display replacements (excluding physical damage)', price: 987 },
-                        { id: 'bundle', name: 'DC+ & DSC+ Bundle for android', description: '1 year brand-new replacement for hardware issue + 730 days display replacement', price: 1977 },
-                        { id: 'parts', name: '1 Year Parts Warranty', description: '', price: 700 },
-                        { id: 'care_android', name: 'Dizmo Care+ 1 Year for Android', description: 'Brand New Replacement Guarantee', price: 1152 }
-                    ]).map((plan) => (
-                        <label
-                            key={plan.id}
-                            className={`cursor-pointer bg-white border p-2.5 rounded-lg flex items-start gap-2 transition-all hover:shadow-sm ${selectedCarePlans.includes(plan.id)
-                                ? "border-primary ring-1 ring-primary"
-                                : "border-border"
-                                }`}
-                        >
-                            <div className={`mt-0.5 w-4 h-4 border-2 rounded flex items-center justify-center transition-colors ${selectedCarePlans.includes(plan.id) ? "bg-black border-black" : "border-gray-300"}`}>
-                                {selectedCarePlans.includes(plan.id) && <CheckCircle2 className="h-2.5 w-2.5 text-white" />}
-                            </div>
-                            <input
-                                type="checkbox"
-                                checked={selectedCarePlans.includes(plan.id)}
-                                onChange={() => toggleCarePlan(plan.id)}
-                                className="hidden"
-                            />
-                            <div className="flex-1 min-w-0">
-                                <div className="flex justify-between items-start gap-2">
-                                    <span className="font-semibold text-xs text-foreground leading-tight">{plan.name}</span>
-                                    <span className="font-bold text-xs text-foreground whitespace-nowrap">BDT {plan.price.toLocaleString()}</span>
+                    <div className="p-2 space-y-2">
+                        {/* Mock Care Plans if none provided */}
+                        {(product.carePlans && product.carePlans.length > 0 ? product.carePlans : [
+                            { id: 'care_plus', name: 'Dizmo Ultimate Care+ 1 year', description: 'New replacement for hardware issues & free parts for accidental damage', price: 2471 },
+                            { id: 'screen_care', name: 'Dizmo Screen Care+ : 730 days', description: 'One time display replacements (excluding physical damage)', price: 987 },
+                            { id: 'bundle', name: 'DC+ & DSC+ Bundle for android', description: '1 year brand-new replacement for hardware issue + 730 days display replacement', price: 1977 },
+                            { id: 'parts', name: '1 Year Parts Warranty', description: '', price: 700 },
+                            { id: 'care_android', name: 'Dizmo Care+ 1 Year for Android', description: 'Brand New Replacement Guarantee', price: 1152 }
+                        ]).map((plan) => (
+                            <label
+                                key={plan.id}
+                                className={`cursor-pointer bg-white border p-2.5 rounded-lg flex items-start gap-2 transition-all hover:shadow-sm ${selectedCarePlans.includes(plan.id)
+                                    ? "border-primary ring-1 ring-primary"
+                                    : "border-border"
+                                    }`}
+                            >
+                                <div className={`mt-0.5 w-4 h-4 border-2 rounded flex items-center justify-center transition-colors ${selectedCarePlans.includes(plan.id) ? "bg-black border-black" : "border-gray-300"}`}>
+                                    {selectedCarePlans.includes(plan.id) && <CheckCircle2 className="h-2.5 w-2.5 text-white" />}
                                 </div>
-                                {plan.description && (
-                                    <span className="text-[10px] text-muted-foreground block mt-0.5 leading-tight line-clamp-2">{plan.description}</span>
-                                )}
-                            </div>
-                        </label>
-                    ))}
+                                <input
+                                    type="checkbox"
+                                    checked={selectedCarePlans.includes(plan.id)}
+                                    onChange={() => toggleCarePlan(plan.id)}
+                                    className="hidden"
+                                />
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex justify-between items-start gap-2">
+                                        <span className="font-semibold text-xs text-foreground leading-tight">{plan.name}</span>
+                                        <span className="font-bold text-xs text-foreground whitespace-nowrap">BDT {plan.price.toLocaleString()}</span>
+                                    </div>
+                                    {plan.description && (
+                                        <span className="text-[10px] text-muted-foreground block mt-0.5 leading-tight line-clamp-2">{plan.description}</span>
+                                    )}
+                                </div>
+                            </label>
+                        ))}
 
-                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/50">
-                        <div className="w-3.5 h-3.5 bg-green-500 rounded flex items-center justify-center shrink-0">
-                            <CheckCircle2 className="h-2.5 w-2.5 text-white" />
+                        <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/50">
+                            <div className="w-3.5 h-3.5 bg-green-500 rounded flex items-center justify-center shrink-0">
+                                <CheckCircle2 className="h-2.5 w-2.5 text-white" />
+                            </div>
+                            <span className="text-[10px] text-muted-foreground leading-tight">I agree to Dizmo's <a href="#" className="text-primary hover:underline">terms & conditions</a></span>
                         </div>
-                        <span className="text-[10px] text-muted-foreground leading-tight">I agree to Dizmo's <a href="#" className="text-primary hover:underline">terms & conditions</a></span>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Drawer Overlay */}
             {activeDrawer && (

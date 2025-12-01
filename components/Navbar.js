@@ -39,6 +39,7 @@ export default function Navbar() {
     const { openDrawer, cartCount } = useCart();
     const { searchProducts } = useProduct();
     const pathname = usePathname();
+    const router = useRouter();
     const recognitionRef = useRef(null);
 
     const [showSearch, setShowSearch] = useState(false);
@@ -260,7 +261,7 @@ export default function Navbar() {
                                 value={searchQuery}
                                 onChange={handleSearch}
                                 onKeyDown={handleSearchSubmit}
-                                className={`w-full rounded-full border bg-secondary py-2 pl-10 pr-10 text-sm outline-none focus:ring-2 focus:ring-ring transition-all ${isListening ? 'border-red-500 ring-2 ring-red-500/20 placeholder:text-red-500' : 'border-input'}`}
+                                className={`w-full rounded-full border bg-secondary py-2 pl-10 pr-10 text-base md:text-sm outline-none focus:ring-2 focus:ring-ring transition-all ${isListening ? 'border-red-500 ring-2 ring-red-500/20 placeholder:text-red-500' : 'border-input'}`}
                             />
                             <button
                                 onClick={handleVoiceSearch}

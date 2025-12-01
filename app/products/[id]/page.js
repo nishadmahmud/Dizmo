@@ -130,7 +130,10 @@ export default async function ProductPage({ params, searchParams }) {
         specifications: productData.specifications || {},
 
         // Care plans (API doesn't have this, using empty or static)
-        carePlans: []
+        carePlans: [],
+
+        // Category for conditional rendering
+        category: productData.category_name || productData.category?.name || categoryParam || ""
     };
 
     return (
