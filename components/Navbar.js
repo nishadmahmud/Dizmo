@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import {
     Search, ShoppingCart, Menu, Zap, FileText, GitCompare, Package, Home,
-    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight, User
+    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight, User, Battery, LayoutGrid
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useProduct } from "@/context/ProductContext";
@@ -32,7 +32,17 @@ const iconMap = {
     "Accessories": Cable,
     "Adapter": Cable,
     "Used Phone": Smartphone,
-    "Powerbank": Cable,
+    "Powerbank": Battery,
+    "iPhone": Smartphone,
+    "iPhone Brands": Smartphone,
+    "View All": LayoutGrid,
+    "Apple": Smartphone,
+    "Andriod": Smartphone,
+    "Macbook": Laptop,
+    "iPad": Tablet,
+    "Tab": Tablet,
+    "Earbuds": Headphones,
+    "Power Bank": Battery,
 };
 
 export default function Navbar() {
