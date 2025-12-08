@@ -112,24 +112,22 @@ export default function CategoryIcons() {
                         ))}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
                         {categories.map((cat) => (
                             <Link
                                 key={cat.slug}
                                 href={`/categories/${cat.slug}`}
-                                className="flex flex-col items-center group"
+                                className="group flex flex-col items-center justify-center bg-secondary/90 hover:bg-secondary/50 rounded-xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md border border-transparent hover:border-black/5"
                             >
-                                <div className="w-full aspect-square bg-secondary rounded-xl  flex items-center justify-center group-hover:shadow-lg transition-all duration-300 border border-border group-hover:border-primary/30">
-                                    <div className="relative w-full h-full">
-                                        <Image
-                                            src={cat.image}
-                                            alt={cat.name}
-                                            fill
-                                            className="object-contain group-hover:scale-110 transition-transform duration-300"
-                                        />
-                                    </div>
+                                <div className="relative w-20 h-20 mb-3 group-hover:scale-110 transition-transform duration-300">
+                                    <Image
+                                        src={cat.image}
+                                        alt={cat.name}
+                                        fill
+                                        className="object-contain"
+                                    />
                                 </div>
-                                <span className="text-sm font-medium text-foreground mt-3 text-center group-hover:text-primary transition-colors">
+                                <span className="text-sm font-medium text-foreground text-center line-clamp-2">
                                     {cat.name}
                                 </span>
                             </Link>
