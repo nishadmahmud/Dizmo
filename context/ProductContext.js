@@ -193,6 +193,82 @@ export function ProductProvider({ children }) {
                     console.log('Products endpoint not configured, skipping enhanced brand data fetch');
                 }
 
+                // 5. Fetch from Offer Endpoints (New Arrivals, Best Deals, Best Sellers)
+                const offerEndpoints = [
+                    { name: 'New Arrivals', endpoint: process.env.NEXT_PUBLIC_ENDPOINT_NEW_ARRIVALS },
+                    { name: 'Best Deals', endpoint: process.env.NEXT_PUBLIC_ENDPOINT_BEST_DEALS },
+                    { name: 'Best Sellers', endpoint: process.env.NEXT_PUBLIC_ENDPOINT_BEST_SELLERS }
+                ];
+
+                for (const { name, endpoint } of offerEndpoints) {
+                    if (!endpoint) {
+                        console.log(`${name} endpoint not configured, skipping`);
+                        continue;
+                    }
+
+                    try {
+                        console.log(`Fetching from ${name} endpoint...`);
+                        const offerRes = await fetch(`${apiBaseUrl}${endpoint}/${storeId}`);
+
+                        if (offerRes.ok) {
+                            const offerData = await offerRes.json();
+
+                            if (offerData.success && offerData.data) {
+                                // Handle different response structures (array or nested data.data)
+                                const productsData = Array.isArray(offerData.data)
+                                    ? offerData.data
+                                    : (offerData.data?.data || []);
+
+                                const offerProducts = productsData.map(item => {
+                                    // Get the lowest price from imeis if available
+                                    let lowestPrice = parseFloat(item.discounted_price || item.retails_price);
+                                    if (item.imeis && item.imeis.length > 0) {
+                                        const prices = item.imeis.map(imei => parseFloat(imei.sale_price));
+                                        lowestPrice = Math.min(...prices);
+                                    }
+
+                                    return {
+                                        id: item.id,
+                                        name: item.name,
+                                        price: lowestPrice,
+                                        originalPrice: parseFloat(item.retails_price),
+                                        discount: parseFloat(item.discount || item.discount_rate) || 0,
+                                        category: item.category_id,
+                                        inStock: item.status === "In stock",
+                                        image: item.image_path,
+                                        brand: item.brands?.name || item.brand_name,
+                                        brandId: item.brands?.id,
+                                        stock: item.current_stock,
+                                        rating: parseFloat(item.review_summary?.average_rating) || 0,
+                                        reviews: item.review_summary?.total_reviews || 0,
+                                        slug: item.slug || item.id
+                                    };
+                                }).filter(product => product.price >= 100);
+
+                                // Merge with existing products
+                                setProducts(prev => {
+                                    const productMap = new Map(prev.map(p => [p.id, p]));
+
+                                    offerProducts.forEach(offer => {
+                                        if (!productMap.has(offer.id)) {
+                                            // Add new product only if not already present
+                                            productMap.set(offer.id, offer);
+                                        }
+                                        // If product exists, keep the existing one (category data is more complete)
+                                    });
+
+                                    return Array.from(productMap.values());
+                                });
+
+                                console.log(`${name} products loaded: ${offerProducts.length} items`);
+                            }
+                        }
+                    } catch (error) {
+                        console.warn(`${name} endpoint failed:`, error.message);
+                        // Continue with next endpoint
+                    }
+                }
+
                 setIsFullyLoaded(true);
 
             } catch (error) {
