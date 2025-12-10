@@ -51,6 +51,7 @@ export function ProductProvider({ children }) {
                 const storeId = process.env.NEXT_PUBLIC_STORE_ID;
                 const categoriesEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORIES;
                 const productsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
+                const allProductsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_PRODUCTS;
 
                 // 1. Fetch Categories
                 const categoriesResponse = await fetch(`${apiBaseUrl}${categoriesEndpoint}/${storeId}`);
@@ -118,6 +119,78 @@ export function ProductProvider({ children }) {
                             return [...prev, ...uniqueNew];
                         });
                     }
+                }
+
+                // 4. Fetch from Products Endpoint for Enhanced Brand Data (Optional)
+                // Only fetch if the endpoint is configured
+                if (allProductsEndpoint) {
+                    try {
+                        console.log('Fetching from products endpoint for enhanced brand data...');
+                        const productsRes = await fetch(`${apiBaseUrl}${allProductsEndpoint}/${storeId}`);
+
+                        if (productsRes.ok) {
+                            const productsData = await productsRes.json();
+
+                            if (productsData.success && productsData.data) {
+                                // Process products endpoint data (has product.brands object)
+                                const enhancedProducts = productsData.data.map(product => {
+                                    // Get the lowest price from imeis if available
+                                    let lowestPrice = parseFloat(product.retails_price);
+                                    if (product.imeis && product.imeis.length > 0) {
+                                        const prices = product.imeis.map(imei => parseFloat(imei.sale_price));
+                                        lowestPrice = Math.min(...prices);
+                                    }
+
+                                    return {
+                                        id: product.id,
+                                        name: product.name,
+                                        price: lowestPrice,
+                                        originalPrice: parseFloat(product.retails_price),
+                                        discount: parseFloat(product.discount) || 0,
+                                        category: product.category_id,
+                                        inStock: product.status === "In stock",
+                                        image: product.image_path,
+                                        brand: product.brands?.name || product.brand_name, // Use brands object if available
+                                        brandId: product.brands?.id, // Store brand ID for filtering
+                                        stock: product.current_stock,
+                                        rating: parseFloat(product.review_summary?.average_rating) || 0,
+                                        reviews: product.review_summary?.total_reviews || 0,
+                                        slug: product.slug || product.id
+                                    };
+                                }).filter(product => product.price >= 100);
+
+                                // Merge with existing products, preferring enhanced data
+                                setProducts(prev => {
+                                    const productMap = new Map(prev.map(p => [p.id, p]));
+
+                                    // Update existing products with enhanced brand data
+                                    enhancedProducts.forEach(enhanced => {
+                                        if (productMap.has(enhanced.id)) {
+                                            // Merge, preferring enhanced brand data
+                                            const existing = productMap.get(enhanced.id);
+                                            productMap.set(enhanced.id, {
+                                                ...existing,
+                                                brand: enhanced.brand || existing.brand,
+                                                brandId: enhanced.brandId || existing.brandId
+                                            });
+                                        } else {
+                                            // Add new product
+                                            productMap.set(enhanced.id, enhanced);
+                                        }
+                                    });
+
+                                    return Array.from(productMap.values());
+                                });
+
+                                console.log('Enhanced brand data loaded from products endpoint');
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('Products endpoint not available or failed:', error.message);
+                        // Continue even if products endpoint fails - category data is sufficient
+                    }
+                } else {
+                    console.log('Products endpoint not configured, skipping enhanced brand data fetch');
                 }
 
                 setIsFullyLoaded(true);
