@@ -68,16 +68,33 @@ export function ProductProvider({ children }) {
                     return;
                 }
 
-                // 2. Fetch First Category Immediately (for fast initial load)
+                // 2. Fetch First Category Immediately with Pagination (for fast initial load)
                 const firstCategoryId = categoryIds[0];
                 try {
-                    const firstRes = await fetch(`${apiBaseUrl}${productsEndpoint}/${firstCategoryId}`);
-                    if (firstRes.ok) {
+                    let allFirstCategoryProducts = [];
+                    let page = 1;
+                    const limit = 20;
+
+                    // Fetch all pages for first category
+                    while (true) {
+                        const url = `${apiBaseUrl}${productsEndpoint}/${firstCategoryId}?page=${page}&limit=${limit}`;
+                        const firstRes = await fetch(url);
+                        if (!firstRes.ok) break;
+
                         const firstData = await firstRes.json();
-                        if (firstData.success && firstData.data) {
-                            const processed = processProducts(firstData.data, firstCategoryId);
-                            setProducts(prev => [...prev, ...processed]);
-                        }
+                        if (!firstData.success || !firstData.data || firstData.data.length === 0) break;
+
+                        allFirstCategoryProducts.push(...firstData.data);
+
+                        // If we got fewer items than limit, we've reached the end
+                        if (firstData.data.length < limit) break;
+
+                        page++;
+                    }
+
+                    if (allFirstCategoryProducts.length > 0) {
+                        const processed = processProducts(allFirstCategoryProducts, firstCategoryId);
+                        setProducts(prev => [...prev, ...processed]);
                     }
                 } catch (err) {
                     console.error(`Error fetching first category ${firstCategoryId}:`, err);
@@ -85,8 +102,38 @@ export function ProductProvider({ children }) {
                     setLoading(false); // Search is usable after first batch
                 }
 
-                // 3. Fetch Remaining Categories in Background
+                // 3. Fetch Remaining Categories in Background with Pagination
                 const remainingIds = categoryIds.slice(1);
+
+                // Helper function to fetch all pages for a category
+                const fetchCategoryWithPagination = async (catId) => {
+                    let allProducts = [];
+                    let page = 1;
+                    const limit = 20;
+
+                    while (true) {
+                        try {
+                            const url = `${apiBaseUrl}${productsEndpoint}/${catId}?page=${page}&limit=${limit}`;
+                            const res = await fetch(url);
+                            if (!res.ok) break;
+
+                            const data = await res.json();
+                            if (!data.success || !data.data || data.data.length === 0) break;
+
+                            allProducts.push(...data.data);
+
+                            // If we got fewer items than limit, we've reached the end
+                            if (data.data.length < limit) break;
+
+                            page++;
+                        } catch (e) {
+                            console.error(`Error fetching category ${catId} page ${page}:`, e);
+                            break;
+                        }
+                    }
+
+                    return allProducts;
+                };
 
                 // Fetch in chunks of 3 to avoid overwhelming the network/browser
                 const chunkSize = 3;
@@ -95,11 +142,9 @@ export function ProductProvider({ children }) {
 
                     const chunkPromises = chunk.map(async (catId) => {
                         try {
-                            const res = await fetch(`${apiBaseUrl}${productsEndpoint}/${catId}`);
-                            if (!res.ok) return [];
-                            const data = await res.json();
-                            if (data.success && data.data) {
-                                return processProducts(data.data, catId);
+                            const productsData = await fetchCategoryWithPagination(catId);
+                            if (productsData.length > 0) {
+                                return processProducts(productsData, catId);
                             }
                             return [];
                         } catch (e) {

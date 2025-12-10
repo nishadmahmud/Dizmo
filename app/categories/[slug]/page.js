@@ -8,10 +8,13 @@ import { SlidersHorizontal, ChevronDown } from "lucide-react";
 import Link from "next/link";
 
 export default function CategoryDetailPage({ params }) {
-    const [products, setProducts] = useState([]);
+    const [allPages, setAllPages] = useState({}); // Store all fetched pages {1: [...products], 2: [...products]}
     const [loading, setLoading] = useState(true);
     const [showMobileFilters, setShowMobileFilters] = useState(false);
     const [categoryName, setCategoryName] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPagesKnown, setTotalPagesKnown] = useState(1);
+    const [isFetchingBackground, setIsFetchingBackground] = useState(false);
 
     // Filter States
     const [priceRange, setPriceRange] = useState({ min: 0, max: 200000 });
@@ -40,84 +43,170 @@ export default function CategoryDetailPage({ params }) {
         params.then(p => setSlug(p.slug));
     }, [params]);
 
-    // Fetch category products
+    // Fetch category name
     useEffect(() => {
         if (!slug) return;
 
-        const fetchCategoryProducts = async () => {
+        const fetchCategoryName = async () => {
             try {
-                setLoading(true);
                 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-                const productsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
                 const categoriesEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORIES;
                 const storeId = process.env.NEXT_PUBLIC_STORE_ID;
 
-                // Fetch category info to get the name
                 const categoriesResponse = await fetch(`${apiBaseUrl}${categoriesEndpoint}/${storeId}`);
                 if (categoriesResponse.ok) {
                     const categoriesData = await categoriesResponse.json();
                     if (categoriesData.success && categoriesData.data) {
                         const category = categoriesData.data.find(cat => cat.category_id.toString() === slug);
-                        if (category) {
-                            setCategoryName(category.name);
-                        } else {
-                            setCategoryName('Category');
-                        }
-                    }
-                }
-
-                // Fetch products for this category
-                const response = await fetch(`${apiBaseUrl}${productsEndpoint}/${slug}`);
-                const data = await response.json();
-
-                if (data.success && data.data) {
-                    // Process products similar to ProductContext
-                    const processedProducts = data.data.map(product => {
-                        // Get lowest price from imeis
-                        let lowestPrice = parseFloat(product.retails_price);
-                        if (product.imeis && product.imeis.length > 0) {
-                            const prices = product.imeis.map(imei => parseFloat(imei.sale_price));
-                            lowestPrice = Math.min(...prices);
-                        }
-
-                        return {
-                            id: product.id,
-                            name: product.name,
-                            price: lowestPrice,
-                            originalPrice: parseFloat(product.retails_price),
-                            discount: parseFloat(product.discount) || 0,
-                            inStock: product.status === "In stock",
-                            image: product.image_path,
-                            brand: product.brand_name,
-                            brandId: product.brand_id,
-                            stock: product.current_stock,
-                            rating: parseFloat(product.review_summary?.average_rating) || 0,
-                            reviews: product.review_summary?.total_reviews || 0,
-                            imeis: product.imeis || [],
-                            brands: product.brands
-                        };
-                    });
-
-                    setProducts(processedProducts);
-
-                    // Set initial price range based on products
-                    if (processedProducts.length > 0) {
-                        const prices = processedProducts.map(p => p.price);
-                        setPriceRange({
-                            min: Math.floor(Math.min(...prices)),
-                            max: Math.ceil(Math.max(...prices))
-                        });
+                        setCategoryName(category ? category.name : 'Category');
                     }
                 }
             } catch (error) {
-                console.error("Error fetching category products:", error);
-            } finally {
-                setLoading(false);
+                console.error("Error fetching category name:", error);
             }
         };
 
-        fetchCategoryProducts();
+        fetchCategoryName();
     }, [slug]);
+
+    // Helper function to fetch and process a single page
+    const fetchProductsPage = async (page) => {
+        try {
+            const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+            const productsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
+            const limit = 20;
+
+            const url = `${apiBaseUrl}${productsEndpoint}/${slug}?page=${page}&limit=${limit}`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                return [];
+            }
+
+            const data = await response.json();
+
+            if (!data.success || !data.data || data.data.length === 0) {
+                return [];
+            }
+
+
+
+            // Process products
+            return data.data.map(product => {
+                let lowestPrice = parseFloat(product.retails_price);
+                if (product.imeis && product.imeis.length > 0) {
+                    const prices = product.imeis.map(imei => parseFloat(imei.sale_price));
+                    lowestPrice = Math.min(...prices);
+                }
+
+                return {
+                    id: product.id,
+                    name: product.name,
+                    price: lowestPrice,
+                    originalPrice: parseFloat(product.retails_price),
+                    discount: parseFloat(product.discount) || 0,
+                    inStock: product.status === "In stock",
+                    image: product.image_path,
+                    brand: product.brand_name,
+                    brandId: product.brand_id,
+                    stock: product.current_stock,
+                    rating: parseFloat(product.review_summary?.average_rating) || 0,
+                    reviews: product.review_summary?.total_reviews || 0,
+                    imeis: product.imeis || [],
+                    brands: product.brands
+                };
+            });
+        } catch (error) {
+            console.error(`Error fetching page ${page}:`, error);
+            return [];
+        }
+    };
+
+    // Initial load - fetch first page and then background fetch remaining
+    useEffect(() => {
+        if (!slug) return;
+
+        const loadInitialAndBackground = async () => {
+            setLoading(true);
+            setCurrentPage(1);
+            setTotalPagesKnown(1);
+            setAllPages({});
+
+            // Fetch first page immediately
+            const firstPageProducts = await fetchProductsPage(1);
+
+            if (firstPageProducts.length > 0) {
+                setAllPages({ 1: firstPageProducts });
+
+                // Set initial price range
+                const prices = firstPageProducts.map(p => p.price);
+                setPriceRange({
+                    min: Math.floor(Math.min(...prices)),
+                    max: Math.ceil(Math.max(...prices))
+                });
+            }
+
+            setLoading(false);
+
+            // Start background fetching of remaining pages
+            if (firstPageProducts.length === 20) {
+                fetchRemainingPagesInBackground();
+            }
+        };
+
+        const fetchRemainingPagesInBackground = async () => {
+            setIsFetchingBackground(true);
+            let page = 2;
+
+            while (true) {
+                const pageProducts = await fetchProductsPage(page);
+
+                if (pageProducts.length === 0) {
+                    setIsFetchingBackground(false);
+                    break;
+                }
+
+                // Store this page
+                setAllPages(prev => ({ ...prev, [page]: pageProducts }));
+                setTotalPagesKnown(page);
+
+                // Update price range with all products so far
+                setAllPages(current => {
+                    const allProducts = Object.values(current).flat();
+                    if (allProducts.length > 0) {
+                        const prices = allProducts.map(p => p.price);
+                        setPriceRange(prev => ({
+                            min: Math.min(prev.min, Math.floor(Math.min(...prices))),
+                            max: Math.max(prev.max, Math.ceil(Math.max(...prices)))
+                        }));
+                    }
+                    return current;
+                });
+
+                // If we got fewer than 20, this is the last page
+                if (pageProducts.length < 20) {
+                    setIsFetchingBackground(false);
+                    break;
+                }
+
+                page++;
+            }
+        };
+
+        loadInitialAndBackground();
+    }, [slug]);
+
+    // Navigate to specific page (instant since data is already fetched)
+    const goToPage = (page) => {
+        if (page === currentPage || page < 1 || page > totalPagesKnown) return;
+
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+
+    // Get products for current page
+    const products = allPages[currentPage] || [];
 
     // Extract unique brands from products
     const uniqueBrands = useMemo(() => {
@@ -388,7 +477,7 @@ export default function CategoryDetailPage({ params }) {
 
                             <div className="flex items-center gap-4">
                                 <p className="text-sm text-muted-foreground">
-                                    Showing 1 to {filteredProducts.length} from {products.length} Products
+                                    Showing {((currentPage - 1) * 20) + 1} to {Math.min(currentPage * 20, Object.values(allPages).flat().length)} from {Object.values(allPages).flat().length} Products
                                 </p>
 
                                 {/* Sort Dropdown */}
@@ -415,11 +504,68 @@ export default function CategoryDetailPage({ params }) {
                                 <p className="text-muted-foreground">Loading products...</p>
                             </div>
                         ) : filteredProducts.length > 0 ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                {filteredProducts.map((product) => (
-                                    <ProductCard key={product.id} product={product} category={categoryName} />
-                                ))}
-                            </div>
+                            <>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    {filteredProducts.map((product) => (
+                                        <ProductCard key={product.id} product={product} category={categoryName} />
+                                    ))}
+                                </div>
+
+
+                                {/* Pagination */}
+                                {totalPagesKnown > 1 && (
+                                    <div className="flex justify-center items-center gap-2 mt-8">
+                                        {/* Previous Button */}
+                                        <button
+                                            onClick={() => goToPage(currentPage - 1)}
+                                            disabled={currentPage === 1}
+                                            className="p-2 rounded-lg border border-border hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+
+                                        {/* Page Numbers */}
+                                        {[...Array(totalPagesKnown)].map((_, idx) => {
+                                            const pageNum = idx + 1;
+
+                                            return (
+                                                <button
+                                                    key={pageNum}
+                                                    onClick={() => goToPage(pageNum)}
+                                                    className={`min-w-[40px] h-10 rounded-lg font-medium transition-all ${pageNum === currentPage
+                                                        ? 'bg-primary text-white'
+                                                        : 'border border-border hover:bg-secondary'
+                                                        }`}
+                                                >
+                                                    {pageNum}
+                                                </button>
+                                            );
+                                        })}
+
+                                        {/* Loading indicator for background fetch */}
+                                        {isFetchingBackground && (
+                                            <div className="flex items-center gap-2 px-3 text-sm text-muted-foreground">
+                                                <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                                                Loading...
+                                            </div>
+                                        )}
+
+
+                                        {/* Next Button */}
+                                        <button
+                                            onClick={() => goToPage(currentPage + 1)}
+                                            disabled={currentPage >= totalPagesKnown}
+                                            className="p-2 rounded-lg border border-border hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                )}
+                            </>
                         ) : (
                             <div className="text-center py-12 bg-card rounded-xl border border-border">
                                 <p className="text-muted-foreground">No products found matching your filters.</p>

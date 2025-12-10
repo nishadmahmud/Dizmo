@@ -77,15 +77,35 @@ export default function Navbar() {
             const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
             const productsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
 
-            // Fetch products for this category to extract brands
-            const response = await fetch(`${apiBaseUrl}${productsEndpoint}/${categoryId}`);
-            const data = await response.json();
+            // Fetch products for this category to extract brands (limit to first 2 pages for performance)
+            let allProducts = [];
+            const limit = 20;
+            const maxPages = 2; // Limit to 40 products for brand extraction in dropdown
 
-            if (data.success && data.data) {
+            for (let page = 1; page <= maxPages; page++) {
+                try {
+                    const url = `${apiBaseUrl}${productsEndpoint}/${categoryId}?page=${page}&limit=${limit}`;
+                    const response = await fetch(url);
+                    if (!response.ok) break;
+
+                    const data = await response.json();
+                    if (!data.success || !data.data || data.data.length === 0) break;
+
+                    allProducts.push(...data.data);
+
+                    // If we got fewer items than limit, we've reached the end
+                    if (data.data.length < limit) break;
+                } catch (e) {
+                    console.error(`Error fetching category ${categoryId} page ${page}:`, e);
+                    break;
+                }
+            }
+
+            if (allProducts.length > 0) {
                 const uniqueBrands = [];
                 const brandIds = new Set();
 
-                data.data.forEach(product => {
+                allProducts.forEach(product => {
                     // Check both brand_id/brand_name and brands object structure
                     let brandId, brandName;
 
