@@ -1,112 +1,142 @@
 "use client";
 
-import ProductCard from "@/components/ProductCard";
-import { Clock } from "lucide-react";
 import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Calendar, AlertCircle } from "lucide-react";
 
 export default function OffersPage() {
-    const [products, setProducts] = useState([]);
+    const [offers, setOffers] = useState([]);
     const [loading, setLoading] = useState(true);
-    // Simple Countdown Timer Logic
-    const [timeLeft, setTimeLeft] = useState({ hours: 23, minutes: 45, seconds: 12 });
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchDeals = async () => {
+        const fetchOffers = async () => {
             try {
-                const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-                const endpoint = process.env.NEXT_PUBLIC_ENDPOINT_BEST_DEALS;
-                const storeId = process.env.NEXT_PUBLIC_STORE_ID;
-
-                const response = await fetch(`${baseUrl}${endpoint}/${storeId}`);
+                setLoading(true);
+                const response = await fetch('https://www.outletexpense.xyz/api/latest-ecommerce-offer-list/265');
                 const data = await response.json();
 
                 if (data.success && data.data) {
-                    const mappedProducts = data.data.map(item => ({
-                        id: item.id,
-                        name: item.name,
-                        price: parseFloat(item.discounted_price),
-                        originalPrice: parseFloat(item.retails_price),
-                        discount: parseFloat(item.discount) || 0,
-                        image: item.image_path,
-                        inStock: item.status === "In stock",
-                        rating: parseFloat(item.review_summary?.average_rating) || 0,
-                        reviews: item.review_summary?.total_reviews || 0
-                    }));
-                    setProducts(mappedProducts);
+                    setOffers(data.data);
+                } else {
+                    setError('Failed to load offers');
                 }
-            } catch (error) {
-                console.error("Error fetching deals:", error);
+            } catch (err) {
+                console.error('Error fetching offers:', err);
+                setError('Failed to load offers. Please try again later.');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchDeals();
-
-        const timer = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
-                if (prev.minutes > 0) return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-                if (prev.hours > 0) return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
-                return prev; // Timer finished
-            });
-        }, 1000);
-        return () => clearInterval(timer);
+        fetchOffers();
     }, []);
 
-    return (
-        <main className="min-h-screen flex flex-col bg-background">
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
 
+    return (
+        <main className="min-h-screen bg-background">
             <div className="container py-12">
                 {/* Header */}
-                <div className="text-center mb-10">
-
-                    <h1 className="text-4xl font-bold text-primary mb-4">Limited Time Deals</h1>
-                    <p className="text-muted-foreground max-w-2xl mx-auto">
-                        Grab the best deals on top gadgets before they're gone!
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+                        Exclusive Offers
+                    </h1>
+                    <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                        Discover our latest deals and special promotions on premium gadgets
                     </p>
                 </div>
 
-                {/* Countdown Timer */}
-                <div className="bg-gradient-to-r from-primary to-accent text-white rounded-xl p-6 mb-12 text-center shadow-lg">
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                        <Clock className="h-5 w-5" />
-                        <span className="font-semibold">Offer Ends In</span>
-                    </div>
-                    <div className="flex items-center justify-center gap-4 text-3xl font-bold">
-                        <div className="flex flex-col">
-                            <span>{String(timeLeft.hours).padStart(2, '0')}</span>
-                            <span className="text-xs font-normal opacity-80">Hours</span>
-                        </div>
-                        <span>:</span>
-                        <div className="flex flex-col">
-                            <span>{String(timeLeft.minutes).padStart(2, '0')}</span>
-                            <span className="text-xs font-normal opacity-80">Minutes</span>
-                        </div>
-                        <span>:</span>
-                        <div className="flex flex-col">
-                            <span>{String(timeLeft.seconds).padStart(2, '0')}</span>
-                            <span className="text-xs font-normal opacity-80">Seconds</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Products Grid */}
-                {loading ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                        {[...Array(10)].map((_, i) => (
-                            <div key={i} className="aspect-[3/4] bg-secondary/50 rounded-xl animate-pulse" />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                        {products.map((product) => (
-                            <ProductCard key={product.id} product={product} />
+                {/* Loading State */}
+                {loading && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[...Array(6)].map((_, i) => (
+                            <div key={i} className="bg-card rounded-2xl overflow-hidden border border-border">
+                                <div className="aspect-[16/9] bg-secondary/50 animate-pulse" />
+                                <div className="p-6 space-y-3">
+                                    <div className="h-6 bg-secondary/50 rounded animate-pulse" />
+                                    <div className="h-4 bg-secondary/50 rounded animate-pulse w-3/4" />
+                                    <div className="h-4 bg-secondary/50 rounded animate-pulse w-1/2" />
+                                </div>
+                            </div>
                         ))}
                     </div>
                 )}
-            </div>
 
+                {/* Error State */}
+                {error && !loading && (
+                    <div className="text-center py-12">
+                        <div className="inline-flex items-center gap-2 text-red-500 bg-red-50 px-6 py-3 rounded-lg">
+                            <AlertCircle className="h-5 w-5" />
+                            <span>{error}</span>
+                        </div>
+                    </div>
+                )}
+
+                {/* Offers Grid */}
+                {!loading && !error && offers.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {offers.map((offer) => (
+                            <Link
+                                key={offer.id}
+                                href={`/offers/${offer.id}`}
+                                className="bg-card rounded-2xl overflow-hidden border border-border hover:shadow-xl transition-all duration-300 group"
+                            >
+                                {/* Image */}
+                                <div className="relative aspect-[16/9] overflow-hidden bg-secondary">
+                                    <Image
+                                        src={offer.image}
+                                        alt={offer.title}
+                                        fill
+                                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                    />
+                                </div>
+
+                                {/* Content */}
+                                <div className="p-6">
+                                    {/* Title */}
+                                    <h2 className="text-xl font-bold text-foreground mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                                        {offer.title}
+                                    </h2>
+
+                                    {/* Description */}
+                                    <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                                        {offer.description}
+                                    </p>
+
+                                    {/* Date */}
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                        <Calendar className="h-4 w-4" />
+                                        <span>{formatDate(offer.created_at)}</span>
+                                    </div>
+
+                                    {/* Click to view products hint */}
+                                    <div className="mt-4 text-sm text-primary font-medium">
+                                        View Products →
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+
+                {/* No Offers */}
+                {!loading && !error && offers.length === 0 && (
+                    <div className="text-center py-12">
+                        <p className="text-muted-foreground text-lg">
+                            No offers available at the moment. Check back soon!
+                        </p>
+                    </div>
+                )}
+            </div>
         </main>
     );
 }
