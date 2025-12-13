@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import {
     Search, ShoppingCart, Menu, Zap, FileText, GitCompare, Package, Home,
     Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight, User, Battery, LayoutGrid, Speaker,
-    MonitorSmartphone, TabletSmartphone, MonitorPlay, Volume2, RefreshCcw, Plug2
+    MonitorSmartphone, TabletSmartphone, MonitorPlay, Volume2, RefreshCcw, Plug2, ChevronDown, ChevronRight
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useProduct } from "@/context/ProductContext";
@@ -34,7 +34,7 @@ const iconMap = {
     "Airpods": Headphones,              // Headphones icon for Airpods
     "Gadget": Zap,
     "Accessories": Plug2,               // Plug icon for accessories
-    "Sounds": Volume2,                  // Volume/speaker icon
+    "Sounds": Speaker,                  // Speaker icon for sound products
     "Used Phone": RefreshCcw,           // Refresh/recycle icon for used phones
 };
 
@@ -66,6 +66,7 @@ export default function Navbar() {
     const [hoveredCategory, setHoveredCategory] = useState(null);
     const [hoveredSidebarCategory, setHoveredSidebarCategory] = useState(null);
     const [loadingBrands, setLoadingBrands] = useState({});
+    const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
 
     // Search State
     const [searchQuery, setSearchQuery] = useState("");
@@ -540,7 +541,7 @@ export default function Navbar() {
                                                     : 'bg-secondary hover:bg-[#103E34] hover:text-white'
                                                     }`}
                                             >
-                                                <IconComponent className="h-4 w-4" />
+                                                <IconComponent className="h-6 w-6" />
                                                 <span>{category.name}</span>
                                             </Link>
 
@@ -617,72 +618,139 @@ export default function Navbar() {
                         className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm"
                         onClick={() => setShowMenu(false)}
                     />
-                    <div className="fixed top-0 right-0 bottom-0 z-[70] w-72 bg-background border-l border-border shadow-xl">
+                    <div className="fixed top-0 left-0 bottom-0 z-[70] w-72 bg-white shadow-xl">
                         <div className="flex flex-col h-full">
-                            <div className="flex items-center justify-between p-4 border-b border-border">
-                                <h2 className="text-lg font-bold">Menu</h2>
+                            {/* Header */}
+                            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                                <Link href="/" onClick={() => setShowMenu(false)} className="flex items-center gap-2">
+                                    <span className="text-2xl font-bold text-[#103E34] tracking-tight">
+                                        DIZMO<span className="text-[#FCB042]">™</span>
+                                    </span>
+                                </Link>
                                 <button
                                     onClick={() => setShowMenu(false)}
-                                    className="p-2 hover:bg-accent/10 rounded-full"
+                                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
                                 >
-                                    <X className="h-5 w-5" />
+                                    <X className="h-5 w-5 text-gray-600" />
                                 </button>
                             </div>
-                            <nav className="flex-1 overflow-y-auto p-4">
-                                <div className="space-y-2">
-                                    <Link
-                                        href="/categories"
-                                        onClick={() => setShowMenu(false)}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
-                                    >
-                                        <Package className="h-5 w-5" />
-                                        <span className="font-medium">All Products</span>
-                                    </Link>
-                                    <Link
-                                        href="/blog"
-                                        onClick={() => setShowMenu(false)}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
-                                    >
-                                        <FileText className="h-5 w-5" />
-                                        <span className="font-medium">Blog</span>
-                                    </Link>
-                                    <Link
-                                        href="/offers"
-                                        onClick={() => setShowMenu(false)}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
-                                    >
-                                        <Zap className="h-5 w-5" />
-                                        <span className="font-medium">Offers</span>
-                                    </Link>
-                                    <Link
-                                        href="/compare"
-                                        onClick={() => setShowMenu(false)}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
-                                    >
-                                        <GitCompare className="h-5 w-5" />
-                                        <span className="font-medium">Compare</span>
-                                    </Link>
-                                    <Link
-                                        href="/track-order"
-                                        onClick={() => setShowMenu(false)}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
-                                    >
-                                        <Package className="h-5 w-5" />
-                                        <span className="font-medium">Track Order</span>
-                                    </Link>
-                                    <Link
-                                        href="/login"
-                                        onClick={() => setShowMenu(false)}
-                                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-secondary transition-colors"
-                                    >
-                                        <User className="h-5 w-5" />
-                                        <span className="font-medium">Profile</span>
-                                    </Link>
 
-                                </div>
+                            {/* Scrollable Content */}
+                            <nav className="flex-1 overflow-y-auto">
+                                {/* All Category Button */}
+                                <Link
+                                    href="/categories"
+                                    onClick={() => setShowMenu(false)}
+                                    className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                                >
+                                    <LayoutGrid className="h-5 w-5 text-[#103E34]" />
+                                    <span className="font-semibold text-[#103E34] uppercase text-sm">All Category</span>
+                                </Link>
+
+                                {/* Category List with Collapsible Brands */}
+                                {categories.slice(0, 9).map((category) => {
+                                    const IconComponent = category.Icon;
+                                    const isExpanded = expandedMobileCategory === category.id;
+                                    const brands = categoryBrands[category.id] || [];
+                                    const isLoadingBrands = loadingBrands[category.id];
+
+                                    return (
+                                        <div key={category.id} className="border-b border-gray-200">
+                                            {/* Category Button */}
+                                            <button
+                                                onClick={() => {
+                                                    if (isExpanded) {
+                                                        setExpandedMobileCategory(null);
+                                                    } else {
+                                                        setExpandedMobileCategory(category.id);
+                                                        fetchCategoryBrands(category.id);
+                                                    }
+                                                }}
+                                                className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <IconComponent className="h-5 w-5 text-[#103E34]" />
+                                                    <span className="font-medium text-[#103E34] uppercase text-sm">{category.name}</span>
+                                                </div>
+                                                <ChevronRight
+                                                    className={`h-4 w-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''
+                                                        }`}
+                                                />
+                                            </button>
+
+                                            {/* Brand Dropdown */}
+                                            {isExpanded && (
+                                                <div className="bg-gray-50 py-2">
+                                                    {isLoadingBrands ? (
+                                                        <div className="px-4 py-2 text-sm text-gray-500">Loading brands...</div>
+                                                    ) : brands.length > 0 ? (
+                                                        brands.map((brand) => (
+                                                            <Link
+                                                                key={brand.id}
+                                                                href={`/categories/${category.id}?brand=${brand.id}`}
+                                                                onClick={() => setShowMenu(false)}
+                                                                className="block px-8 py-2 text-sm text-[#103E34] hover:bg-gray-100 transition-colors"
+                                                            >
+                                                                {brand.name}
+                                                            </Link>
+                                                        ))
+                                                    ) : (
+                                                        <div className="px-8 py-2 text-sm text-gray-500">No brands available</div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+
+                                {/* Additional Links */}
+                                <Link
+                                    href="/offers"
+                                    onClick={() => setShowMenu(false)}
+                                    className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                                >
+                                    <Zap className="h-5 w-5 text-[#103E34]" />
+                                    <span className="font-medium text-[#103E34] uppercase text-sm">Offers</span>
+                                </Link>
+
+                                <Link
+                                    href="/blog"
+                                    onClick={() => setShowMenu(false)}
+                                    className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                                >
+                                    <FileText className="h-5 w-5 text-[#103E34]" />
+                                    <span className="font-medium text-[#103E34] uppercase text-sm">Blog</span>
+                                </Link>
+
+                                <Link
+                                    href="/compare"
+                                    onClick={() => setShowMenu(false)}
+                                    className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                                >
+                                    <GitCompare className="h-5 w-5 text-[#103E34]" />
+                                    <span className="font-medium text-[#103E34] uppercase text-sm">Compare</span>
+                                </Link>
+
+                                <Link
+                                    href="/track-order"
+                                    onClick={() => setShowMenu(false)}
+                                    className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                                >
+                                    <Package className="h-5 w-5 text-[#103E34]" />
+                                    <span className="font-medium text-[#103E34] uppercase text-sm">Order Tracking</span>
+                                </Link>
+
+                                <Link
+                                    href="/login"
+                                    onClick={() => setShowMenu(false)}
+                                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                                >
+                                    <User className="h-5 w-5 text-[#103E34]" />
+                                    <span className="font-medium text-[#103E34] uppercase text-sm">Profile</span>
+                                </Link>
                             </nav>
                         </div>
-                    </div >
+                    </div>
                 </>
             )
             }
