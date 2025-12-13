@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import {
     Search, ShoppingCart, Menu, Zap, FileText, GitCompare, Package, Home,
-    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight, User, Battery, LayoutGrid, Speaker
+    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight, User, Battery, LayoutGrid, Speaker,
+    MonitorSmartphone, TabletSmartphone, MonitorPlay, Volume2, RefreshCcw, Plug2
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useProduct } from "@/context/ProductContext";
@@ -27,13 +28,14 @@ const defaultCategories = [
 const iconMap = {
     // Navbar categories (primary)
     "Phones": Smartphone,
-    "Tablet": Tablet,
+    "Tablet": TabletSmartphone,         // Tablet-specific icon
     "Laptop": Laptop,
     "Smart Watch": Watch,
+    "Airpods": Headphones,              // Headphones icon for Airpods
     "Gadget": Zap,
-    "Accessories": Cable,
-    "Sounds": Speaker,
-    "Used Phone": Smartphone,
+    "Accessories": Plug2,               // Plug icon for accessories
+    "Sounds": Volume2,                  // Volume/speaker icon
+    "Used Phone": RefreshCcw,           // Refresh/recycle icon for used phones
 
     // Legacy mappings (for backwards compatibility)
     "I Phone Series": Smartphone,
@@ -59,6 +61,7 @@ const NAVBAR_CATEGORIES = [
     "Tablet",
     "Laptop",
     "Smart Watch",
+    "Airpods",
     "Gadget",
     "Accessories",
     "Sounds",
