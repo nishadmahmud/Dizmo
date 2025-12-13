@@ -76,20 +76,23 @@ export default function BlogPage() {
         const fetchBlogs = async () => {
             try {
                 setLoading(true);
-                const apiBaseUrl = process.env.NEXT_PUBLIC_API_BLOG_BASE_URL;
-                const blogsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_BLOGS;
+                
+                // Use fallback values if env variables are undefined
+                const apiBaseUrl = process.env.NEXT_PUBLIC_API_BLOG_BASE_URL || 'https://www.outletexpense.xyz/api';
+                const blogsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_BLOGS || '/latest-ecommerce-blog-list';
                 const storeId = process.env.NEXT_PUBLIC_STORE_ID || '265';
-
+                
                 // Construct the blog API URL
                 const url = `${apiBaseUrl}${blogsEndpoint}/${storeId}`;
                 console.log('Fetching blogs from:', url);
-
+                
                 // Try to fetch from blog API
                 const response = await fetch(url);
-
+                
                 if (response.ok) {
                     const data = await response.json();
-
+                    console.log('Blog API response:', data);
+                    
                     // Check if API returned data
                     if (data.success && data.data && data.data.length > 0) {
                         // Map API data to our format
@@ -112,6 +115,7 @@ export default function BlogPage() {
                                 slug: blog.id.toString()
                             };
                         });
+                        console.log('Mapped blogs:', mappedBlogs);
                         setBlogPosts(mappedBlogs);
                     } else {
                         // API returned empty, use dummy data
@@ -120,7 +124,7 @@ export default function BlogPage() {
                     }
                 } else {
                     // API call failed, use dummy data
-                    console.log('Blog API call failed, using dummy data');
+                    console.log('Blog API call failed with status:', response.status);
                     setBlogPosts(dummyBlogPosts);
                 }
             } catch (error) {

@@ -53,6 +53,9 @@ export default function CompareClient() {
         const newSelected = [...selectedProducts];
 
         if (fullProduct) {
+            console.log('Full product data:', fullProduct);
+            console.log('Specifications:', fullProduct.specifications);
+
             // Map the fetched data to match our expected structure
             let price = parseFloat(fullProduct.retails_price);
             if (fullProduct.imeis && fullProduct.imeis.length > 0) {
@@ -205,7 +208,23 @@ export default function CompareClient() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
-
+                            {/* Basic Info */}
+                            <tr>
+                                <td className="p-4 font-medium text-muted-foreground bg-secondary/10">Brand</td>
+                                {selectedProducts.map((p, i) => (
+                                    <td key={i} className={`p-4 text-sm ${i === 2 ? 'hidden md:table-cell' : ''}`}>
+                                        {p ? (p.brand || '-') : '-'}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="p-4 font-medium text-muted-foreground bg-secondary/10">Price</td>
+                                {selectedProducts.map((p, i) => (
+                                    <td key={i} className={`p-4 text-sm font-bold text-primary ${i === 2 ? 'hidden md:table-cell' : ''}`}>
+                                        {p ? `৳${p.price.toLocaleString()}` : '-'}
+                                    </td>
+                                ))}
+                            </tr>
 
                             {/* Dynamic Specifications */}
                             {specKeys.length > 0 && (
@@ -215,7 +234,7 @@ export default function CompareClient() {
                                     </tr>
                                     {specKeys.map((key) => (
                                         <tr key={key}>
-                                            <td className="p-4 font-medium text-muted-foreground">{key}</td>
+                                            <td className="p-4 font-medium text-muted-foreground bg-secondary/10">{key}</td>
                                             {selectedProducts.map((p, i) => (
                                                 <td key={i} className={`p-4 text-sm ${i === 2 ? 'hidden md:table-cell' : ''}`}>{getSpecValue(p, key)}</td>
                                             ))}
