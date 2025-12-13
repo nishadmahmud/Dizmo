@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import {
     Search, ShoppingCart, Menu, Zap, FileText, GitCompare, Package, Home,
-    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight, User, Battery, LayoutGrid
+    Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight, User, Battery, LayoutGrid, Speaker
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useProduct } from "@/context/ProductContext";
@@ -25,13 +25,21 @@ const defaultCategories = [
 
 // Icon mapping for categories
 const iconMap = {
+    // Navbar categories (primary)
+    "Phones": Smartphone,
+    "Tablet": Tablet,
+    "Laptop": Laptop,
+    "Smart Watch": Watch,
+    "Gadget": Zap,
+    "Accessories": Cable,
+    "Sounds": Speaker,
+    "Used Phone": Smartphone,
+
+    // Legacy mappings (for backwards compatibility)
     "I Phone Series": Smartphone,
     "Smart Phone": Smartphone,
-    "Smart Watch": Watch,
     "Airpods": Headphones,
-    "Accessories": Cable,
     "Adapter": Cable,
-    "Used Phone": Smartphone,
     "Powerbank": Battery,
     "iPhone": Smartphone,
     "iPhone Brands": Smartphone,
@@ -44,6 +52,18 @@ const iconMap = {
     "Earbuds": Headphones,
     "Power Bank": Battery,
 };
+
+// Category whitelist - only these categories will be shown in navbar (in order)
+const NAVBAR_CATEGORIES = [
+    "Phones",
+    "Tablet",
+    "Laptop",
+    "Smart Watch",
+    "Gadget",
+    "Accessories",
+    "Sounds",
+    "Used Phone"
+];
 
 export default function Navbar() {
     const { openDrawer, cartCount } = useCart();
@@ -249,12 +269,30 @@ export default function Navbar() {
                     const data = await response.json();
 
                     if (data.success && data.data && data.data.length > 0) {
-                        const fetchedCategories = data.data.map((cat) => ({
-                            id: cat.category_id.toString(),
-                            name: cat.name,
-                            Icon: iconMap[cat.name] || Package
-                        }));
-                        setCategories(fetchedCategories);
+                        // Log all categories from API to help debug
+                        console.log('All categories from API:', data.data.map(cat => cat.name));
+
+                        // Filter categories to only include whitelisted ones
+                        const filteredCategories = data.data
+                            .filter(cat => NAVBAR_CATEGORIES.includes(cat.name))
+                            .map((cat) => ({
+                                id: cat.category_id.toString(),
+                                name: cat.name,
+                                Icon: iconMap[cat.name] || Package
+                            }));
+
+                        // Remove duplicates by ID (in case API returns duplicates)
+                        const uniqueCategories = Array.from(
+                            new Map(filteredCategories.map(cat => [cat.name, cat])).values()
+                        );
+
+                        // Sort categories based on whitelist order
+                        const sortedCategories = uniqueCategories.sort((a, b) => {
+                            return NAVBAR_CATEGORIES.indexOf(a.name) - NAVBAR_CATEGORIES.indexOf(b.name);
+                        });
+
+                        console.log('Filtered navbar categories:', sortedCategories.map(cat => cat.name));
+                        setCategories(sortedCategories);
                     }
                 }
             } catch (error) {
@@ -520,9 +558,15 @@ export default function Navbar() {
                                                 <span>{category.name}</span>
                                             </Link>
 
-                                            {/* Brand Dropdown */}
                                             {isHovered && (
-                                                <div className={`absolute top-full mt-2 w-[600px] bg-background rounded-xl shadow-xl border border-border z-50 p-6 animate-in fade-in slide-in-from-top-2 ${isRightAligned ? 'right-0' : 'left-0'}`}>
+                                                <div
+                                                    className={`absolute top-full mt-2 w-[600px] bg-background rounded-xl shadow-xl border border-border z-50 p-6 ${isRightAligned ? 'right-0' : 'left-0'}`}
+                                                    style={{
+                                                        animation: 'slideDown 0.3s ease-out',
+                                                        transformOrigin: 'top',
+                                                        transition: 'opacity 0.3s ease-out, transform 0.3s ease-out'
+                                                    }}
+                                                >
                                                     <div className="flex items-center justify-between mb-4 border-b border-border pb-2">
                                                         <h3 className="font-bold text-lg text-primary">{category.name} Brands</h3>
                                                         <Link
