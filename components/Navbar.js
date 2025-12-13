@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import {
-    Search, ShoppingCart, Menu, Zap, FileText, GitCompare, Package, Home,
+    Search, ShoppingCart, Menu, Zap, FileText, GitCompare, MapPin, Package, Home,
     Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight, User, Battery, LayoutGrid, Speaker,
     MonitorSmartphone, TabletSmartphone, MonitorPlay, Volume2, RefreshCcw, Plug2, ChevronDown, ChevronRight
 } from "lucide-react";
@@ -387,6 +387,18 @@ export default function Navbar() {
                             <Package className="h-5 w-5" />
                             Track Order
                         </Link>
+
+                        <a
+                            href="https://www.google.com/maps/place/DIZMO/@23.8143061,90.4221582,17z/data=!4m6!3m5!1s0x3755c76859d0b31b:0x9761e02933dd029!8m2!3d23.8143061!4d90.4247331!16s%2Fg%2F11xlnj8vry?entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoKLDEwMDc5MjA2N0gBUAM%3D"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-white hover:text-[#FCB042] transition-colors px-3 py-2 rounded-lg hover:bg-white/10"
+                        >
+                            <MapPin className="h-5 w-5 flex-shrink-0" />
+                            <span className="text-xs leading-tight">
+                                Store<br />Location
+                            </span>
+                        </a>
                     </div>
 
                     {/* Icons */}
