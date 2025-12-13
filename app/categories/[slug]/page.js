@@ -198,20 +198,20 @@ export default function CategoryDetailPage({ params }) {
 
     // Navigate to specific page (instant since data is already fetched)
     const goToPage = (page) => {
-        if (page === currentPage || page < 1 || page > totalPagesKnown) return;
+        if (page === currentPage || page < 1) return;
 
         setCurrentPage(page);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
 
-    // Get products for current page
-    const products = allPages[currentPage] || [];
+    // Get ALL products from all pages for filtering
+    const allProducts = useMemo(() => Object.values(allPages).flat(), [allPages]);
 
-    // Extract unique brands from products
+    // Extract unique brands from ALL products
     const uniqueBrands = useMemo(() => {
         const brandMap = new Map();
-        products.forEach(product => {
+        allProducts.forEach(product => {
             if (product.brandId && product.brand && !brandMap.has(product.brandId)) {
                 brandMap.set(product.brandId, {
                     id: product.brandId,
@@ -220,12 +220,12 @@ export default function CategoryDetailPage({ params }) {
             }
         });
         return Array.from(brandMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-    }, [products]);
+    }, [allProducts]);
 
     // Extract unique colors from all product variants
     const availableColors = useMemo(() => {
         const colorMap = new Map();
-        products.forEach(product => {
+        allProducts.forEach(product => {
             product.imeis.forEach(imei => {
                 if (imei.color && imei.color_code && !colorMap.has(imei.color)) {
                     colorMap.set(imei.color, {
@@ -236,12 +236,12 @@ export default function CategoryDetailPage({ params }) {
             });
         });
         return Array.from(colorMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-    }, [products]);
+    }, [allProducts]);
 
     // Extract unique storage options
     const availableStorage = useMemo(() => {
         const storageSet = new Set();
-        products.forEach(product => {
+        allProducts.forEach(product => {
             product.imeis.forEach(imei => {
                 if (imei.storage) {
                     storageSet.add(imei.storage);
@@ -249,12 +249,12 @@ export default function CategoryDetailPage({ params }) {
             });
         });
         return Array.from(storageSet).sort((a, b) => parseInt(a) - parseInt(b));
-    }, [products]);
+    }, [allProducts]);
 
     // Extract unique regions
     const availableRegions = useMemo(() => {
         const regionSet = new Set();
-        products.forEach(product => {
+        allProducts.forEach(product => {
             product.imeis.forEach(imei => {
                 if (imei.region) {
                     regionSet.add(imei.region);
@@ -262,11 +262,11 @@ export default function CategoryDetailPage({ params }) {
             });
         });
         return Array.from(regionSet).sort();
-    }, [products]);
+    }, [allProducts]);
 
-    // Filter and sort products
+    // Filter and sort products from ALL products
     const filteredProducts = useMemo(() => {
-        let filtered = [...products];
+        let filtered = [...allProducts];
 
         // Filter by price
         filtered = filtered.filter(p => p.price >= priceRange.min && p.price <= priceRange.max);
@@ -342,7 +342,22 @@ export default function CategoryDetailPage({ params }) {
         }
 
         return filtered;
-    }, [products, priceRange, availability, selectedBrand, selectedColors, sortBy, selectedBatteryRange, selectedStorage, selectedRegions]);
+    }, [allProducts, priceRange, availability, selectedBrand, selectedColors, sortBy, selectedBatteryRange, selectedStorage, selectedRegions]);
+
+    // Calculate total pages based on filtered results
+    const totalFilteredPages = Math.ceil(filteredProducts.length / 20);
+
+    // Get products for current page from filtered results
+    const paginatedProducts = useMemo(() => {
+        const startIndex = (currentPage - 1) * 20;
+        const endIndex = startIndex + 20;
+        return filteredProducts.slice(startIndex, endIndex);
+    }, [filteredProducts, currentPage]);
+
+    // Reset to page 1 when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedBrand, selectedColors, selectedStorage, selectedRegions, selectedBatteryRange, availability]);
 
     // Handle color selection toggle
     const handleColorChange = (colorName) => {
@@ -373,8 +388,8 @@ export default function CategoryDetailPage({ params }) {
 
     // Clear all filters
     const handleClearFilters = () => {
-        if (products.length > 0) {
-            const prices = products.map(p => p.price);
+        if (allProducts.length > 0) {
+            const prices = allProducts.map(p => p.price);
             setPriceRange({
                 min: Math.floor(Math.min(...prices)),
                 max: Math.ceil(Math.max(...prices))
@@ -477,7 +492,7 @@ export default function CategoryDetailPage({ params }) {
 
                             <div className="flex items-center gap-4">
                                 <p className="text-sm text-muted-foreground">
-                                    Showing {((currentPage - 1) * 20) + 1} to {Math.min(currentPage * 20, Object.values(allPages).flat().length)} from {Object.values(allPages).flat().length} Products
+                                    Showing {((currentPage - 1) * 20) + 1} to {Math.min(currentPage * 20, filteredProducts.length)} from {filteredProducts.length} Products
                                 </p>
 
                                 {/* Sort Dropdown */}
@@ -503,17 +518,17 @@ export default function CategoryDetailPage({ params }) {
                             <div className="text-center py-12">
                                 <p className="text-muted-foreground">Loading products...</p>
                             </div>
-                        ) : filteredProducts.length > 0 ? (
+                        ) : paginatedProducts.length > 0 ? (
                             <>
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                    {filteredProducts.map((product) => (
+                                    {paginatedProducts.map((product) => (
                                         <ProductCard key={product.id} product={product} category={categoryName} />
                                     ))}
                                 </div>
 
 
                                 {/* Pagination */}
-                                {totalPagesKnown > 1 && (
+                                {totalFilteredPages > 1 && (
                                     <div className="flex justify-center items-center gap-2 mt-8">
                                         {/* Previous Button */}
                                         <button
@@ -527,7 +542,7 @@ export default function CategoryDetailPage({ params }) {
                                         </button>
 
                                         {/* Page Numbers */}
-                                        {[...Array(totalPagesKnown)].map((_, idx) => {
+                                        {[...Array(totalFilteredPages)].map((_, idx) => {
                                             const pageNum = idx + 1;
 
                                             return (
@@ -544,19 +559,10 @@ export default function CategoryDetailPage({ params }) {
                                             );
                                         })}
 
-                                        {/* Loading indicator for background fetch */}
-                                        {isFetchingBackground && (
-                                            <div className="flex items-center gap-2 px-3 text-sm text-muted-foreground">
-                                                <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                                                Loading...
-                                            </div>
-                                        )}
-
-
                                         {/* Next Button */}
                                         <button
                                             onClick={() => goToPage(currentPage + 1)}
-                                            disabled={currentPage >= totalPagesKnown}
+                                            disabled={currentPage >= totalFilteredPages}
                                             className="p-2 rounded-lg border border-border hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
