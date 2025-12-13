@@ -790,7 +790,7 @@ export default function Navbar() {
                             }`}
                     >
                         <Package className="h-5 w-5" />
-                        <span className="text-[10px] font-medium">Products</span>
+                        <span className="text-[10px] font-medium">Categories</span>
                     </Link>
 
                     {/* Profile (Mobile) */}
