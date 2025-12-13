@@ -93,18 +93,43 @@ export default function CategoryDetailPage({ params }) {
 
             // Process products
             return data.data.map(product => {
-                let lowestPrice = parseFloat(product.retails_price);
+                // Get the base retail price (this is the original price before any discount)
+                const retailPrice = parseFloat(product.retails_price);
+
+                // Check if there are IMEI prices (variant prices)
+                let currentPrice = retailPrice;
                 if (product.imeis && product.imeis.length > 0) {
                     const prices = product.imeis.map(imei => parseFloat(imei.sale_price));
-                    lowestPrice = Math.min(...prices);
+                    currentPrice = Math.min(...prices);
+                }
+
+                // Get discount information
+                const discountValue = parseFloat(product.discount) || 0;
+                const discountType = product.discount_type || 'Percentage';
+
+                // Calculate final price and original price based on discount type
+                let finalPrice = currentPrice;
+                let originalPrice = retailPrice;
+
+                if (discountValue > 0) {
+                    if (discountType === 'Fixed') {
+                        // For fixed discount: final price = retail price - discount amount
+                        finalPrice = retailPrice - discountValue;
+                        originalPrice = retailPrice;
+                    } else {
+                        // For percentage discount: final price = retail price - (retail price * discount / 100)
+                        finalPrice = retailPrice - (retailPrice * discountValue / 100);
+                        originalPrice = retailPrice;
+                    }
                 }
 
                 return {
                     id: product.id,
                     name: product.name,
-                    price: lowestPrice,
-                    originalPrice: parseFloat(product.retails_price),
-                    discount: parseFloat(product.discount) || 0,
+                    price: finalPrice,
+                    originalPrice: discountValue > 0 ? originalPrice : null,
+                    discount: discountValue,
+                    discountType: discountType,
                     inStock: product.status === "In stock",
                     image: product.image_path,
                     brand: product.brand_name,

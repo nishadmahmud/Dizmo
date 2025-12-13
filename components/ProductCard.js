@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Eye } from "lucide-react";
 
 export default function ProductCard({ product, category }) {
-    const { id, name, price, originalPrice, image, discount } = product;
+    const { id, name, price, originalPrice, image, discount, discountType } = product;
 
     // Construct URL with category query param if available
     const productUrl = category
@@ -17,7 +17,7 @@ export default function ProductCard({ product, category }) {
             {/* Discount Badge */}
             {discount > 0 && (
                 <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    -{discount}%
+                    {discountType === 'Fixed' ? `-${discount.toLocaleString()} Taka` : `-${discount}%`}
                 </div>
             )}
 
