@@ -10,6 +10,7 @@ export default function OffersPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [timers, setTimers] = useState({});
+    const [endTimes, setEndTimes] = useState({}); // Store fixed end times
 
     useEffect(() => {
         const fetchOffers = async () => {
@@ -21,13 +22,16 @@ export default function OffersPage() {
                 if (data.success && data.data) {
                     setOffers(data.data);
 
-                    // Initialize timers for each offer
+                    // Initialize fixed end times and timers for each offer
                     const initialTimers = {};
+                    const initialEndTimes = {};
                     data.data.forEach(offer => {
                         const endTime = new Date();
                         endTime.setDate(endTime.getDate() + 7);
+                        initialEndTimes[offer.id] = endTime;
                         initialTimers[offer.id] = calculateTimeLeft(endTime);
                     });
+                    setEndTimes(initialEndTimes);
                     setTimers(initialTimers);
                 } else {
                     setError('Failed to load offers');
@@ -43,15 +47,15 @@ export default function OffersPage() {
         fetchOffers();
     }, []);
 
-    // Update timers every second
+    // Update timers every second using fixed end times
     useEffect(() => {
         const interval = setInterval(() => {
             setTimers(prev => {
                 const newTimers = { ...prev };
                 Object.keys(newTimers).forEach(offerId => {
-                    const endTime = new Date();
-                    endTime.setDate(endTime.getDate() + 7);
-                    newTimers[offerId] = calculateTimeLeft(endTime);
+                    if (endTimes[offerId]) {
+                        newTimers[offerId] = calculateTimeLeft(endTimes[offerId]);
+                    }
                 });
                 return newTimers;
             });
@@ -127,7 +131,7 @@ export default function OffersPage() {
                                     />
 
                                     {/* Overlay Gradient */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/10 to-transparent" />
 
                                     {/* Content Overlay - Centered at Bottom */}
                                     <div className="absolute inset-0 flex flex-col items-center justify-end pb-8">
