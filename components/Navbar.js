@@ -36,23 +36,6 @@ const iconMap = {
     "Accessories": Plug2,               // Plug icon for accessories
     "Sounds": Volume2,                  // Volume/speaker icon
     "Used Phone": RefreshCcw,           // Refresh/recycle icon for used phones
-
-    // Legacy mappings (for backwards compatibility)
-    "I Phone Series": Smartphone,
-    "Smart Phone": Smartphone,
-    "Airpods": Headphones,
-    "Adapter": Cable,
-    "Powerbank": Battery,
-    "iPhone": Smartphone,
-    "iPhone Brands": Smartphone,
-    "View All": LayoutGrid,
-    "Apple": Smartphone,
-    "Andriod": Smartphone,
-    "Macbook": Laptop,
-    "iPad": Tablet,
-    "Tab": Tablet,
-    "Earbuds": Headphones,
-    "Power Bank": Battery,
 };
 
 // Category whitelist - only these categories will be shown in navbar (in order)

@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Calendar, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 export default function OffersPage() {
     const [offers, setOffers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [timers, setTimers] = useState({});
 
     useEffect(() => {
         const fetchOffers = async () => {
@@ -19,6 +20,15 @@ export default function OffersPage() {
 
                 if (data.success && data.data) {
                     setOffers(data.data);
+
+                    // Initialize timers for each offer
+                    const initialTimers = {};
+                    data.data.forEach(offer => {
+                        const endTime = new Date();
+                        endTime.setDate(endTime.getDate() + 7);
+                        initialTimers[offer.id] = calculateTimeLeft(endTime);
+                    });
+                    setTimers(initialTimers);
                 } else {
                     setError('Failed to load offers');
                 }
@@ -33,13 +43,35 @@ export default function OffersPage() {
         fetchOffers();
     }, []);
 
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+    // Update timers every second
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimers(prev => {
+                const newTimers = { ...prev };
+                Object.keys(newTimers).forEach(offerId => {
+                    const endTime = new Date();
+                    endTime.setDate(endTime.getDate() + 7);
+                    newTimers[offerId] = calculateTimeLeft(endTime);
+                });
+                return newTimers;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [offers]);
+
+    const calculateTimeLeft = (endTime) => {
+        const difference = endTime - new Date();
+
+        if (difference > 0) {
+            return {
+                days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                minutes: Math.floor((difference / 1000 / 60) % 60),
+                seconds: Math.floor((difference / 1000) % 60)
+            };
+        }
+        return { days: 0, hours: 0, minutes: 0, seconds: 0 };
     };
 
     return (
@@ -57,16 +89,9 @@ export default function OffersPage() {
 
                 {/* Loading State */}
                 {loading && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[...Array(6)].map((_, i) => (
-                            <div key={i} className="bg-card rounded-2xl overflow-hidden border border-border">
-                                <div className="aspect-[16/9] bg-secondary/50 animate-pulse" />
-                                <div className="p-6 space-y-3">
-                                    <div className="h-6 bg-secondary/50 rounded animate-pulse" />
-                                    <div className="h-4 bg-secondary/50 rounded animate-pulse w-3/4" />
-                                    <div className="h-4 bg-secondary/50 rounded animate-pulse w-1/2" />
-                                </div>
-                            </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {[...Array(4)].map((_, i) => (
+                            <div key={i} className="aspect-[2/1] bg-secondary/50 rounded-2xl animate-pulse" />
                         ))}
                     </div>
                 )}
@@ -81,50 +106,67 @@ export default function OffersPage() {
                     </div>
                 )}
 
-                {/* Offers Grid */}
+                {/* Offers Grid - 2 columns on large screens */}
                 {!loading && !error && offers.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {offers.map((offer) => (
-                            <Link
-                                key={offer.id}
-                                href={`/offers/${offer.id}`}
-                                className="bg-card rounded-2xl overflow-hidden border border-border hover:shadow-xl transition-all duration-300 group"
-                            >
-                                {/* Image */}
-                                <div className="relative aspect-[16/9] overflow-hidden bg-secondary">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {offers.map((offer) => {
+                            const timer = timers[offer.id] || { days: 0, hours: 0, minutes: 0, seconds: 0 };
+
+                            return (
+                                <Link
+                                    key={offer.id}
+                                    href={`/offers/${offer.id}`}
+                                    className="relative aspect-[1/1] rounded-2xl overflow-hidden group block"
+                                >
+                                    {/* Background Image */}
                                     <Image
                                         src={offer.image}
                                         alt={offer.title}
                                         fill
-                                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
-                                </div>
 
-                                {/* Content */}
-                                <div className="p-6">
-                                    {/* Title */}
-                                    <h2 className="text-xl font-bold text-foreground mb-3 line-clamp-2 group-hover:text-primary transition-colors">
-                                        {offer.title}
-                                    </h2>
+                                    {/* Overlay Gradient */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-                                    {/* Description */}
-                                    <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                                        {offer.description}
-                                    </p>
+                                    {/* Content Overlay - Centered at Bottom */}
+                                    <div className="absolute inset-0 flex flex-col items-center justify-end pb-8">
+                                        {/* Countdown Timer */}
+                                        <div className="flex gap-2 mb-4">
+                                            <div className="bg-black/60 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
+                                                <div className="text-xl font-bold text-white">
+                                                    {String(timer.days).padStart(2, '0')}
+                                                </div>
+                                                <div className="text-xs text-white/80 uppercase mt-1">Day</div>
+                                            </div>
+                                            <div className="bg-black/60 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
+                                                <div className="text-xl font-bold text-white">
+                                                    {String(timer.hours).padStart(2, '0')}
+                                                </div>
+                                                <div className="text-xs text-white/80 uppercase mt-1">Hrs</div>
+                                            </div>
+                                            <div className="bg-black/60 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
+                                                <div className="text-xl font-bold text-white">
+                                                    {String(timer.minutes).padStart(2, '0')}
+                                                </div>
+                                                <div className="text-xs text-white/80 uppercase mt-1">Min</div>
+                                            </div>
+                                            <div className="bg-black/60 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
+                                                <div className="text-xl font-bold text-white">
+                                                    {String(timer.seconds).padStart(2, '0')}
+                                                </div>
+                                                <div className="text-xs text-white/80 uppercase mt-1">Sec</div>
+                                            </div>
+                                        </div>
 
-                                    {/* Date */}
-                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                        <Calendar className="h-4 w-4" />
-                                        <span>{formatDate(offer.created_at)}</span>
+                                        {/* View Details Button */}
+                                        <button className="bg-[#FCB042] hover:bg-[#FCB042]/90 text-white font-semibold px-8 py-3 rounded-lg transition-colors text-base">
+                                            View Details
+                                        </button>
                                     </div>
-
-                                    {/* Click to view products hint */}
-                                    <div className="mt-4 text-sm text-primary font-medium">
-                                        View Products →
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
+                                </Link>
+                            );
+                        })}
                     </div>
                 )}
 
