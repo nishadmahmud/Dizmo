@@ -1,9 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Calendar, User, ArrowRight } from "lucide-react";
+import { Calendar, User, ArrowRight, Loader2 } from "lucide-react";
 
-const blogPosts = [
+// Dummy blog posts as fallback
+const dummyBlogPosts = [
     {
         id: 1,
         title: "Top 10 Smartphones to Buy in 2025",
@@ -67,6 +69,72 @@ const blogPosts = [
 ];
 
 export default function BlogPage() {
+    const [blogPosts, setBlogPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchBlogs = async () => {
+            try {
+                setLoading(true);
+                const apiBaseUrl = process.env.NEXT_PUBLIC_API_BLOG_BASE_URL;
+                const blogsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_BLOGS;
+                const storeId = process.env.NEXT_PUBLIC_STORE_ID || '265';
+
+                // Construct the blog API URL
+                const url = `${apiBaseUrl}${blogsEndpoint}/${storeId}`;
+                console.log('Fetching blogs from:', url);
+
+                // Try to fetch from blog API
+                const response = await fetch(url);
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Check if API returned data
+                    if (data.success && data.data && data.data.length > 0) {
+                        // Map API data to our format
+                        const mappedBlogs = data.data.map(blog => {
+                            // Extract plain text from HTML description for excerpt
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = blog.description || '';
+                            const plainText = tempDiv.textContent || tempDiv.innerText || '';
+                            const excerpt = plainText.substring(0, 150) + (plainText.length > 150 ? '...' : '');
+
+                            return {
+                                id: blog.id,
+                                title: blog.title,
+                                excerpt: excerpt,
+                                description: blog.description, // Keep full HTML for detail page
+                                image: blog.image || "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=250&fit=crop",
+                                author: "Dizmo Team",
+                                date: new Date(blog.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                                category: "News",
+                                slug: blog.id.toString()
+                            };
+                        });
+                        setBlogPosts(mappedBlogs);
+                    } else {
+                        // API returned empty, use dummy data
+                        console.log('Blog API returned empty, using dummy data');
+                        setBlogPosts(dummyBlogPosts);
+                    }
+                } else {
+                    // API call failed, use dummy data
+                    console.log('Blog API call failed, using dummy data');
+                    setBlogPosts(dummyBlogPosts);
+                }
+            } catch (error) {
+                // Error occurred, use dummy data
+                console.error('Error fetching blogs:', error);
+                setBlogPosts(dummyBlogPosts);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBlogs();
+    }, []);
+
     return (
         <main className="min-h-screen flex flex-col bg-background">
 
@@ -79,58 +147,65 @@ export default function BlogPage() {
                     </p>
                 </div>
 
-                {/* Blog Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {blogPosts.map((post) => (
-                        <article
-                            key={post.id}
-                            className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full"
-                        >
-                            {/* Image */}
-                            <Link href={`/blog/${post.slug}`} className="block relative h-48 bg-secondary overflow-hidden flex-shrink-0 group">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                    src={post.image}
-                                    alt={post.title}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                />
-                                <div className="absolute top-4 left-4 bg-primary text-white px-3 py-1 rounded-full text-xs font-bold">
-                                    {post.category}
-                                </div>
-                            </Link>
-
-                            <div className="p-6 flex flex-col flex-grow">
-                                <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
-                                    <div className="flex items-center gap-1">
-                                        <User className="h-3 w-3" />
-                                        <span>{post.author}</span>
+                {/* Loading State */}
+                {loading ? (
+                    <div className="flex justify-center items-center py-20">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                ) : (
+                    /* Blog Grid */
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {blogPosts.map((post) => (
+                            <article
+                                key={post.id}
+                                className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full"
+                            >
+                                {/* Image */}
+                                <Link href={`/blog/${post.slug}`} className="block relative h-48 bg-secondary overflow-hidden flex-shrink-0 group">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        src={post.image}
+                                        alt={post.title}
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    />
+                                    <div className="absolute top-4 left-4 bg-primary text-white px-3 py-1 rounded-full text-xs font-bold">
+                                        {post.category}
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                        <Calendar className="h-3 w-3" />
-                                        <span>{post.date}</span>
-                                    </div>
-                                </div>
-
-                                <Link href={`/blog/${post.slug}`} className="block">
-                                    <h2 className="text-xl font-bold text-primary mb-3 line-clamp-2 hover:text-accent transition-colors">
-                                        {post.title}
-                                    </h2>
                                 </Link>
 
-                                <p className="text-muted-foreground text-sm mb-6 line-clamp-3 flex-grow">
-                                    {post.excerpt}
-                                </p>
+                                <div className="p-6 flex flex-col flex-grow">
+                                    <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
+                                        <div className="flex items-center gap-1">
+                                            <User className="h-3 w-3" />
+                                            <span>{post.author}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <Calendar className="h-3 w-3" />
+                                            <span>{post.date}</span>
+                                        </div>
+                                    </div>
 
-                                <Link
-                                    href={`/blog/${post.slug}`}
-                                    className="inline-flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all mt-auto"
-                                >
-                                    Read More <ArrowRight className="h-4 w-4" />
-                                </Link>
-                            </div>
-                        </article>
-                    ))}
-                </div>
+                                    <Link href={`/blog/${post.slug}`} className="block">
+                                        <h2 className="text-xl font-bold text-primary mb-3 line-clamp-2 hover:text-accent transition-colors">
+                                            {post.title}
+                                        </h2>
+                                    </Link>
+
+                                    <p className="text-muted-foreground text-sm mb-6 line-clamp-3 flex-grow">
+                                        {post.excerpt}
+                                    </p>
+
+                                    <Link
+                                        href={`/blog/${post.slug}`}
+                                        className="inline-flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all mt-auto"
+                                    >
+                                        Read More <ArrowRight className="h-4 w-4" />
+                                    </Link>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                )}
             </div>
 
         </main>
