@@ -121,7 +121,7 @@ export default function Footer() {
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
+
                 <div className="pt-6 border-t border-primary-foreground/10 text-center text-xs text-primary-foreground/60">
                     <p>&copy; {new Date().getFullYear()} Dizmo. All rights reserved. Developed by <a href="https://squadinnovators.com/" target="_blank" rel="noopener noreferrer" className="text-[#FCB042] hover:underline">Squad Innovetors</a></p>
                 </div>
