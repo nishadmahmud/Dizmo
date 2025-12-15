@@ -102,7 +102,7 @@ export default function WarrantyPolicy() {
                             <ul className="list-disc pl-5 space-y-1">
                                 <li>Customers must bring device + box (no need for accessories).</li>
                                 <li>Replacements are completed within promised time.</li>
-                                <li>Replacement devices carry the remainder of the original Dazzle Care+ warranty.</li>
+                                <li>Replacement devices carry the remainder of the original DIZMO Care+ warranty.</li>
                             </ul>
                         </div>
                     </div>
