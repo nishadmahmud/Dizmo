@@ -5,9 +5,8 @@ import { Package, Search, Clock, CheckCircle2, Truck, MapPin, Phone, User, Credi
 import Image from "next/image";
 
 const API_URL = "https://www.outletexpense.xyz/api/search-web-invoice";
-const USER_ID = 265;
+const USER_ID = 265; // store id 203 for test
 
-// Helper function to get status text and color
 const getOrderStatus = (status) => {
     switch (status) {
         case 0:
