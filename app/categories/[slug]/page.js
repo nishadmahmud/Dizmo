@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 import CategoryFilters from "@/components/CategoryFilters";
 import BrandFilter from "@/components/BrandFilter";
@@ -8,6 +9,9 @@ import { SlidersHorizontal, ChevronDown } from "lucide-react";
 import Link from "next/link";
 
 export default function CategoryDetailPage({ params }) {
+    const searchParams = useSearchParams();
+    const brandFromUrl = searchParams.get('brand');
+
     const [allPages, setAllPages] = useState({}); // Store all fetched pages {1: [...products], 2: [...products]}
     const [loading, setLoading] = useState(true);
     const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -42,6 +46,13 @@ export default function CategoryDetailPage({ params }) {
     useEffect(() => {
         params.then(p => setSlug(p.slug));
     }, [params]);
+
+    // Set brand from URL parameter when it changes
+    useEffect(() => {
+        if (brandFromUrl) {
+            setSelectedBrand(parseInt(brandFromUrl));
+        }
+    }, [brandFromUrl]);
 
     // Fetch category name
     useEffect(() => {
