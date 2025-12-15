@@ -163,10 +163,29 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
 
             {/* Price */}
             <div className="space-y-1 border-t border-b border-border py-4">
+                {/* Discount Badge */}
+                {product.discount > 0 && (
+                    <div className="inline-block bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mb-2">
+                        {product.discountType === 'Fixed' ? `-${product.discount.toLocaleString()} Taka` : `-${product.discount}%`}
+                    </div>
+                )}
                 <div className="flex items-baseline gap-3">
-                    <span className="text-2xl font-bold text-primary">৳{totalPrice.toLocaleString()}</span>
-                    {product.discount > 0 && product.originalPrice && (
-                        <span className="text-lg text-muted-foreground line-through">৳{product.originalPrice.toLocaleString()}</span>
+                    {product.discount > 0 ? (
+                        <>
+                            {/* Discounted Price */}
+                            <span className="text-2xl font-bold text-primary">
+                                ৳{(product.discountType === 'Fixed'
+                                    ? totalPrice - product.discount
+                                    : Math.round(totalPrice * (1 - product.discount / 100))
+                                ).toLocaleString()}
+                            </span>
+                            {/* Original Price (strikethrough) */}
+                            <span className="text-lg text-muted-foreground line-through">
+                                ৳{totalPrice.toLocaleString()}
+                            </span>
+                        </>
+                    ) : (
+                        <span className="text-2xl font-bold text-primary">৳{totalPrice.toLocaleString()}</span>
                     )}
                 </div>
                 <p className="text-xs text-muted-foreground">Price includes VAT</p>
