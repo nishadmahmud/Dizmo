@@ -392,8 +392,8 @@ export default function Navbar() {
                 <div className="container flex h-16 items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-[#FCB042] tracking-tight">
-                            DIZMO<span className="text-[#FCB042]">™</span>
+                        <span className="text-2xl font-bold text-white tracking-tight">
+                            DIZMO<span className="text-white ml-0.5 text-sm relative -top-3">™</span>
                         </span>
                     </Link>
 
