@@ -34,6 +34,7 @@ const iconMap = {
     "Smart Watch": Watch,
     "Airpods": Headphones,              // Headphones icon for Airpods
     "Gadget": Zap,
+    "Gadgets": Zap,                     // Plural version
     "Accessories": Plug2,               // Plug icon for accessories
     "Sounds": Speaker,                  // Speaker icon for sound products
     "Used Phone": RefreshCcw,           // Refresh/recycle icon for used phones
@@ -45,8 +46,7 @@ const NAVBAR_CATEGORIES = [
     "Tablet",
     "Laptop",
     "Smart Watch",
-    "Airpods",
-    "Gadget",
+    "Gadgets",
     "Accessories",
     "Sounds",
     "Used Phone"
