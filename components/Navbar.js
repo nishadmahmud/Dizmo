@@ -32,11 +32,11 @@ const iconMap = {
     "Tablet": TabletSmartphone,         // Tablet-specific icon
     "Laptop": Laptop,
     "Smart Watch": Watch,
-    "Airpods": Headphones,              // Headphones icon for Airpods
+    "Airpods": Headphones,
     "Gadget": Zap,
-    "Gadgets": Zap,                     // Plural version
-    "Accessories": Plug2,               // Plug icon for accessories
-    "Sounds": Speaker,                  // Speaker icon for sound products
+    "Gadgets": Zap,
+    "Accessories": Plug2,
+    "Sounds": Speaker,
     "Used Phone": RefreshCcw,
 };
 

@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { CheckCircle2, Award, Users, Globe, ArrowRight, ShieldCheck, Truck, Headphones, Target, Lightbulb, Heart, MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
+
+// Store images
+const storeImages = {
+    storeFront: "https://lh3.googleusercontent.com/p/AF1QipPtgI7i501SL0pqmYWKJKFkezULjr4Tpuz8Th81=w408-h306-k-no",
+    happyCustomer: "https://scontent.fdac178-1.fna.fbcdn.net/v/t39.30808-6/598006029_122146142450704421_8632810897370606840_n.jpg?stp=cp6_dst-jpg_p526x296_tt6&_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=IxFDuDfSOxwQ7kNvwE3hOyu&_nc_oc=AdkV6JofoHgI7CPj-y6oSHQAUJtGMKeW-HT6bcnAlHRUAdqPvjjV1EWwlac9Xwcxwq8&_nc_zt=23&_nc_ht=scontent.fdac178-1.fna&_nc_gid=t_5Uu4VMvXxDB0VM6pjuTQ&oh=00_AfncWt2xZuXSzNR57BbeBddOey3455tGTYXgFcYcFH6h6A&oe=6947181D"
+};
 
 export default function AboutPage() {
     return (
@@ -20,32 +27,54 @@ export default function AboutPage() {
 
             {/* Who We Are & Our Journey */}
             <section className="py-12 bg-background">
-                <div className="container max-w-4xl mx-auto">
-                    <div className="mb-12">
-                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6 border-l-4 border-primary pl-4">
-                            Who We Are
-                        </h2>
-                        <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground">
-                            <p className="mb-6">
-                                Dizmo is more than just a gadget shop; we are a collective of tech enthusiasts, geeks, and visionaries dedicated to redefining the electronics retail landscape in Bangladesh. Founded in 2024, we identified a significant gap in the market: the lack of a reliable, transparent, and customer-centric source for authentic international tech products.
-                            </p>
-                            <p>
-                                We started with a simple promise: to sell only what we would use ourselves. This philosophy has guided every decision we make, from our curated product selection to our rigorous quality control processes. Today, Dizmo stands as a beacon of trust for thousands of customers who refuse to compromise on quality.
-                            </p>
+                <div className="container max-w-6xl mx-auto">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+                        <div>
+                            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6 border-l-4 border-primary pl-4">
+                                Who We Are
+                            </h2>
+                            <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground">
+                                <p className="mb-6">
+                                    Dizmo is more than just a gadget shop; we are a collective of tech enthusiasts, geeks, and visionaries dedicated to redefining the electronics retail landscape in Bangladesh. Founded in 2024, we identified a significant gap in the market: the lack of a reliable, transparent, and customer-centric source for authentic international tech products.
+                                </p>
+                                <p>
+                                    We started with a simple promise: to sell only what we would use ourselves. This philosophy has guided every decision we make, from our curated product selection to our rigorous quality control processes. Today, Dizmo stands as a beacon of trust for thousands of customers who refuse to compromise on quality.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl">
+                            <Image
+                                unoptimized
+                                src={storeImages.storeFront}
+                                alt="DIZMO Store Front"
+                                fill
+                                className="object-cover"
+                            />
                         </div>
                     </div>
 
-                    <div>
-                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6 border-l-4 border-primary pl-4">
-                            Our Journey
-                        </h2>
-                        <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground">
-                            <p className="mb-6">
-                                Our journey began in a small room with a handful of products and a big dream. We faced the challenges of a saturated market filled with counterfeits and unreliable warranties. Instead of competing on price alone, we chose to compete on integrity. We built direct relationships with authorized distributors and established a supply chain that guarantees authenticity.
-                            </p>
-                            <p>
-                                Over the years, we have expanded our catalog to include everything from the latest flagship smartphones and high-performance laptops to smart home ecosystems and audiophile-grade sound systems. But our core mission remains unchanged: to empower our customers with technology that enhances their lives.
-                            </p>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl order-2 lg:order-1">
+                            <Image
+                                unoptimized
+                                src={storeImages.happyCustomer}
+                                alt="Happy DIZMO Customer"
+                                fill
+                                className="object-cover"
+                            />
+                        </div>
+                        <div className="order-1 lg:order-2">
+                            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6 border-l-4 border-primary pl-4">
+                                Our Journey
+                            </h2>
+                            <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground">
+                                <p className="mb-6">
+                                    Our journey began in a small room with a handful of products and a big dream. We faced the challenges of a saturated market filled with counterfeits and unreliable warranties. Instead of competing on price alone, we chose to compete on integrity. We built direct relationships with authorized distributors and established a supply chain that guarantees authenticity.
+                                </p>
+                                <p>
+                                    Over the years, we have expanded our catalog to include everything from the latest flagship smartphones and high-performance laptops to smart home ecosystems and audiophile-grade sound systems. But our core mission remains unchanged: to empower our customers with technology that enhances their lives.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
