@@ -131,6 +131,8 @@ export default function OffersPage() {
                                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
 
+
+
                                     {/* Overlay Gradient */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/10 to-transparent" />
 
