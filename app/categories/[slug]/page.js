@@ -7,6 +7,41 @@ import CategoryFilters from "@/components/CategoryFilters";
 import BrandFilter from "@/components/BrandFilter";
 import { SlidersHorizontal, ChevronDown } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+
+// Category banner images (replace with real URLs later)
+const categoryBanners = {
+    'phones': 'https://placehold.co/1200x300/103E34/FFFFFF?text=Mobile+Phones+-+Your+Next+Phone+Every+Brand+Every+Budget',
+    'tablet': 'https://placehold.co/1200x300/2563eb/FFFFFF?text=Tablets+-+Work+and+Play+Anywhere',
+    'laptop': 'https://placehold.co/1200x300/1e293b/FFFFFF?text=Laptops+-+Power+Meets+Portability',
+    'smart watch': 'https://placehold.co/1200x300/7c3aed/FFFFFF?text=Smart+Watches+-+Stay+Connected',
+    'airpods': 'https://placehold.co/1200x300/000000/FFFFFF?text=Airpods+and+Earbuds+-+Premium+Audio',
+    'gadget': 'https://placehold.co/1200x300/059669/FFFFFF?text=Gadgets+-+Tech+Accessories',
+    'accessories': 'https://placehold.co/1200x300/dc2626/FFFFFF?text=Accessories+-+Complete+Your+Setup',
+    'sounds': 'https://placehold.co/1200x300/ea580c/FFFFFF?text=Speakers+and+Audio+-+Premium+Sound',
+    'used phone': 'https://placehold.co/1200x300/FCB042/000000?text=Used+Phones+-+Quality+Certified+Pre-Owned',
+};
+
+// Brand banner images for Phones category (replace with real URLs later)
+const phoneBrandBanners = {
+    'apple': 'https://placehold.co/1200x300/000000/FFFFFF?text=Apple+iPhone+Collection',
+    'samsung': 'https://placehold.co/1200x300/1428A0/FFFFFF?text=Samsung+Galaxy+Series',
+    'xiaomi': 'https://placehold.co/1200x300/FF6900/FFFFFF?text=Xiaomi+Smartphones',
+    'oneplus': 'https://placehold.co/1200x300/F5010C/FFFFFF?text=OnePlus+Never+Settle',
+    'google': 'https://placehold.co/1200x300/4285F4/FFFFFF?text=Google+Pixel+Phones',
+    'oppo': 'https://placehold.co/1200x300/1D6F42/FFFFFF?text=OPPO+Smartphones',
+    'vivo': 'https://placehold.co/1200x300/415FFF/FFFFFF?text=Vivo+Smartphones',
+    'realme': 'https://placehold.co/1200x300/F7C600/000000?text=Realme+Dare+to+Leap',
+    'tecno': 'https://placehold.co/1200x300/0066CC/FFFFFF?text=TECNO+Smartphones',
+    'infinix': 'https://placehold.co/1200x300/00AEEF/FFFFFF?text=Infinix+Smartphones',
+    'motorola': 'https://placehold.co/1200x300/5C068C/FFFFFF?text=Motorola+Phones',
+    'nokia': 'https://placehold.co/1200x300/124191/FFFFFF?text=Nokia+Phones',
+    'huawei': 'https://placehold.co/1200x300/CF0A2C/FFFFFF?text=Huawei+Smartphones',
+    'honor': 'https://placehold.co/1200x300/0066FF/FFFFFF?text=Honor+Smartphones',
+    'asus': 'https://placehold.co/1200x300/00529B/FFFFFF?text=ASUS+ROG+Phones',
+    'sony': 'https://placehold.co/1200x300/000000/FFFFFF?text=Sony+Xperia',
+    'nothing': 'https://placehold.co/1200x300/000000/FFFFFF?text=Nothing+Phone',
+};
 
 export default function CategoryDetailPage({ params }) {
     const searchParams = useSearchParams();
@@ -447,6 +482,61 @@ export default function CategoryDetailPage({ params }) {
     return (
         <main className="min-h-screen flex flex-col bg-background">
 
+            {/* Banner - Show category banner when "All" selected, brand banner when specific brand selected */}
+            {(() => {
+                const categoryNameLower = categoryName.toLowerCase();
+                const isPhonesCat = categoryNameLower.includes('phone');
+
+                // If a specific brand is selected (for phones category)
+                if (selectedBrand && isPhonesCat) {
+                    const selectedBrandObj = uniqueBrands.find(b => b.id === selectedBrand);
+                    const brandNameLower = selectedBrandObj?.name?.toLowerCase();
+                    const bannerUrl = brandNameLower && phoneBrandBanners[brandNameLower];
+
+                    if (bannerUrl) {
+                        return (
+                            <div className="container pt-6">
+                                <div className="relative h-40 md:h-52 w-full rounded-2xl overflow-hidden">
+                                    <Image
+                                        unoptimized
+                                        src={bannerUrl}
+                                        alt={`${selectedBrandObj?.name || 'Brand'} Banner`}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
+                            </div>
+                        );
+                    }
+                }
+
+                // Show category banner when "All" is selected (selectedBrand is null)
+                if (!selectedBrand && categoryName) {
+                    // Find matching category banner
+                    const categoryBannerUrl = Object.entries(categoryBanners).find(
+                        ([key]) => categoryNameLower.includes(key) || key.includes(categoryNameLower)
+                    )?.[1];
+
+                    if (categoryBannerUrl) {
+                        return (
+                            <div className="container pt-6">
+                                <div className="relative h-40 md:h-52 w-full rounded-2xl overflow-hidden">
+                                    <Image
+                                        unoptimized
+                                        src={categoryBannerUrl}
+                                        alt={`${categoryName} Banner`}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
+                            </div>
+                        );
+                    }
+                }
+
+                return null;
+            })()}
+
             <div className="container py-6">
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
@@ -488,6 +578,7 @@ export default function CategoryDetailPage({ params }) {
                                 onBrandChange={setSelectedBrand}
                             />
                         )}
+
 
                         {/* Battery Life Filter - Only show for Used Phone category */}
                         {categoryName === 'Used Phone' && (
