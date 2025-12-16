@@ -10,6 +10,7 @@ const storeImages = {
     happyCustomer: "https://scontent.fdac178-1.fna.fbcdn.net/v/t39.30808-6/598006029_122146142450704421_8632810897370606840_n.jpg?stp=cp6_dst-jpg_p526x296_tt6&_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=IxFDuDfSOxwQ7kNvwE3hOyu&_nc_oc=AdkV6JofoHgI7CPj-y6oSHQAUJtGMKeW-HT6bcnAlHRUAdqPvjjV1EWwlac9Xwcxwq8&_nc_zt=23&_nc_ht=scontent.fdac178-1.fna&_nc_gid=t_5Uu4VMvXxDB0VM6pjuTQ&oh=00_AfncWt2xZuXSzNR57BbeBddOey3455tGTYXgFcYcFH6h6A&oe=6947181D"
 };
 
+
 export default function AboutPage() {
     return (
         <main className="min-h-screen flex flex-col bg-background">
