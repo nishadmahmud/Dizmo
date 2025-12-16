@@ -124,6 +124,7 @@ export default function OffersPage() {
                                 >
                                     {/* Background Image */}
                                     <Image
+                                        unoptimized
                                         src={offer.image}
                                         alt={offer.title}
                                         fill

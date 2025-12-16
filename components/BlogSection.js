@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Calendar, User } from "lucide-react";
 
 export default function BlogSection() {
@@ -102,10 +103,11 @@ export default function BlogSection() {
                             >
                                 {/* Blog Image */}
                                 <div className="relative h-48 bg-secondary overflow-hidden flex-shrink-0">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
+                                    <Image
+                                        unoptimized
                                         src={post.image}
                                         alt={post.title}
+                                        fill
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                                     />
                                     <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1 rounded-full text-xs font-bold">

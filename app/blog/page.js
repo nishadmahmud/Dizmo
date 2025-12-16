@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Calendar, User, ArrowRight, Loader2 } from "lucide-react";
 
 // Dummy blog posts as fallback
@@ -76,23 +77,23 @@ export default function BlogPage() {
         const fetchBlogs = async () => {
             try {
                 setLoading(true);
-                
+
                 // Use fallback values if env variables are undefined
                 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BLOG_BASE_URL || 'https://www.outletexpense.xyz/api';
                 const blogsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_BLOGS || '/latest-ecommerce-blog-list';
                 const storeId = process.env.NEXT_PUBLIC_STORE_ID || '265';
-                
+
                 // Construct the blog API URL
                 const url = `${apiBaseUrl}${blogsEndpoint}/${storeId}`;
                 console.log('Fetching blogs from:', url);
-                
+
                 // Try to fetch from blog API
                 const response = await fetch(url);
-                
+
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Blog API response:', data);
-                    
+
                     // Check if API returned data
                     if (data.success && data.data && data.data.length > 0) {
                         // Map API data to our format
@@ -166,10 +167,11 @@ export default function BlogPage() {
                             >
                                 {/* Image */}
                                 <Link href={`/blog/${post.slug}`} className="block relative h-48 bg-secondary overflow-hidden flex-shrink-0 group">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
+                                    <Image
+                                        unoptimized
                                         src={post.image}
                                         alt={post.title}
+                                        fill
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                     />
                                     <div className="absolute top-4 left-4 bg-primary text-white px-3 py-1 rounded-full text-xs font-bold">

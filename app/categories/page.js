@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function CategoriesPage() {
     const [categories, setCategories] = useState([]);
@@ -57,15 +58,13 @@ export default function CategoriesPage() {
                                 href={`/categories/${cat.id}`}
                                 className="group bg-card border border-border rounded-xl p-8 flex flex-col items-center gap-4 hover:shadow-lg transition-all hover:border-primary/50"
                             >
-                                <div className="w-24 h-24 rounded-full bg-secondary p-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
-                                    <img
+                                <div className="w-24 h-24 rounded-full bg-secondary p-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden relative">
+                                    <Image
+                                        unoptimized
                                         src={cat.image}
                                         alt={cat.name}
-                                        className="w-full h-full object-contain"
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.src = "https://via.placeholder.com/150?text=No+Image";
-                                        }}
+                                        fill
+                                        className="object-contain"
                                     />
                                 </div>
                                 <span className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors text-center">

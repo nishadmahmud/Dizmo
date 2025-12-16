@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Facebook, Instagram, Youtube, MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
 
 export default function Footer() {
@@ -113,9 +114,12 @@ export default function Footer() {
                 {/* Payment Image - Spans 3 columns (Company, Policy, Newsletter) */}
                 <div className="md:col-span-2 lg:col-span-3 flex items-end mb-8">
                     <div className="w-full bg-white rounded-lg">
-                        <img
+                        <Image
+                            unoptimized
                             src="https://securepay.sslcommerz.com/public/image/SSLCommerz-Pay-With-logo-All-Size-03.png"
                             alt="Payment Methods"
+                            width={800}
+                            height={100}
                             className="w-full h-auto object-contain"
                         />
                     </div>

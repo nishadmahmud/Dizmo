@@ -4,6 +4,7 @@ import { useState } from "react";
 import { GitCompare, Plus, X, Search, Check, Trash2 } from "lucide-react";
 import { useProduct } from "@/context/ProductContext";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function CompareClient() {
     const { searchProducts } = useProduct();
@@ -164,7 +165,7 @@ export default function CompareClient() {
                                     <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
                                 </button>
                                 <div className="h-24 md:h-48 w-full mb-2 md:mb-6 flex items-center justify-center">
-                                    <img src={product.image} alt={product.name} className="max-h-full max-w-full object-contain" />
+                                    <Image unoptimized src={product.image} alt={product.name} width={192} height={192} className="max-h-full max-w-full object-contain" />
                                 </div>
                                 <h3 className="font-bold text-sm md:text-lg mb-1 md:mb-2 line-clamp-2 leading-tight">{product.name}</h3>
                                 <p className="text-primary font-bold text-sm md:text-xl mb-2 md:mb-4">৳{product.price.toLocaleString()}</p>
@@ -275,7 +276,7 @@ export default function CompareClient() {
                                             className="w-full flex items-center gap-4 p-3 hover:bg-secondary rounded-lg transition-colors text-left group"
                                         >
                                             <div className="h-12 w-12 bg-white rounded-md border border-border flex items-center justify-center overflow-hidden">
-                                                <img src={product.image} alt={product.name} className="h-full w-full object-contain" />
+                                                <Image unoptimized src={product.image} alt={product.name} width={48} height={48} className="h-full w-full object-contain" />
                                             </div>
                                             <div className="flex-1">
                                                 <h4 className="font-medium group-hover:text-primary transition-colors">{product.name}</h4>

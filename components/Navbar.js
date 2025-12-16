@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -428,7 +429,7 @@ export default function Navbar() {
                                                     className="w-full flex items-center gap-3 p-3 hover:bg-secondary transition-colors text-left"
                                                 >
                                                     <div className="h-10 w-10 rounded-md bg-secondary overflow-hidden flex-shrink-0">
-                                                        <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+                                                        <Image unoptimized src={product.image} alt={product.name} width={40} height={40} className="h-full w-full object-cover" />
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium line-clamp-1">{product.name}</p>

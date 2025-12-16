@@ -251,6 +251,7 @@ export default function TrackOrderPage() {
                                         {item.product_info?.image_path && (
                                             <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-white">
                                                 <Image
+                                                    unoptimized
                                                     src={item.product_info.image_path}
                                                     alt={item.product_info.name || "Product"}
                                                     fill
@@ -368,6 +369,7 @@ export default function TrackOrderPage() {
                                     {orderData.user_info.profile_pic && (
                                         <div className="relative w-12 h-12 rounded-full overflow-hidden">
                                             <Image
+                                                unoptimized
                                                 src={orderData.user_info.profile_pic}
                                                 alt={orderData.user_info.outlet_name || "Seller"}
                                                 fill

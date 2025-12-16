@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Calendar, User, ArrowLeft, Share2 } from "lucide-react";
 
 export default function BlogPostPage() {
@@ -91,10 +92,11 @@ export default function BlogPostPage() {
             <article className="flex-1">
                 {/* Hero Image */}
                 <div className="w-full h-[300px] md:h-[500px] relative bg-secondary">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
+                        unoptimized
                         src={post.image}
                         alt={post.title}
+                        fill
                         className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-black/40" />

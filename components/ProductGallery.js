@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ImageIcon } from "lucide-react";
 
 export default function ProductGallery({ images }) {
@@ -12,9 +13,11 @@ export default function ProductGallery({ images }) {
             <div className="aspect-square bg-secondary rounded-2xl overflow-hidden border border-border relative group">
                 <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-white relative">
                     {images && images.length > 0 && images[activeImage] ? (
-                        <img
+                        <Image
+                            unoptimized
                             src={images[activeImage]}
                             alt={`Product Image ${activeImage + 1}`}
+                            fill
                             className="w-full h-full object-contain p-4"
                         />
                     ) : (
@@ -42,9 +45,11 @@ export default function ProductGallery({ images }) {
                     >
                         <div className="w-full h-full bg-secondary flex items-center justify-center overflow-hidden">
                             {img ? (
-                                <img
+                                <Image
+                                    unoptimized
                                     src={img}
                                     alt={`Thumbnail ${index + 1}`}
+                                    fill
                                     className="w-full h-full object-cover"
                                 />
                             ) : (

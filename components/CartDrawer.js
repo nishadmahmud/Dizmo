@@ -3,6 +3,7 @@
 import { X, Plus, Minus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
@@ -59,7 +60,7 @@ export default function CartDrawer() {
                                 {/* Image */}
                                 <div className="h-20 w-20 bg-secondary rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
                                     {item.image ? (
-                                        <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                                        <Image unoptimized src={item.image} alt={item.name} width={80} height={80} className="h-full w-full object-cover" />
                                     ) : (
                                         <span className="text-xs text-muted-foreground">Img</span>
                                     )}

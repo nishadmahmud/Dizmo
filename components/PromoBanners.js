@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function PromoBanners() {
     const [banners, setBanners] = useState([]);
@@ -57,9 +58,11 @@ export default function PromoBanners() {
                             className="relative rounded-2xl overflow-hidden group h-[350px] hover:shadow-xl transition-shadow"
                         >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
+                            <Image
+                                unoptimized
                                 src={banner.image}
                                 alt={banner.title || `Banner ${banner.id}`}
+                                fill
                                 className="w-full h-full object-cover"
                             />
                         </Link>

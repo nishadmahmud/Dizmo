@@ -27,6 +27,7 @@ export default function ProductCard({ product, category }) {
                 <div className="relative aspect-square bg-secondary/50 overflow-hidden">
                     {image ? (
                         <Image
+                            unoptimized
                             src={image}
                             alt={name}
                             fill

@@ -300,7 +300,7 @@ export default function CheckoutPage() {
                                     <div key={item.id} className="flex gap-3 items-start">
                                         <div className="w-14 h-14 bg-secondary rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden border border-border">
                                             {item.image ? (
-                                                <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                                                <Image unoptimized src={item.image} alt={item.name} className="h-full w-full object-cover" />
                                             ) : (
                                                 <span className="text-xs text-muted-foreground">Img</span>
                                             )}

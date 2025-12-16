@@ -3,6 +3,7 @@
 import { useCart } from "@/context/CartContext";
 import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function CartPage() {
     const { cart, updateQuantity, removeFromCart, cartTotal } = useCart();
@@ -29,7 +30,7 @@ export default function CartPage() {
                                     {/* Image */}
                                     <div className="w-24 h-24 bg-secondary rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                                         {item.image ? (
-                                            <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                                            <Image unoptimized src={item.image} alt={item.name} className="h-full w-full object-cover" />
                                         ) : (
                                             <span className="text-xs text-muted-foreground">Img</span>
                                         )}

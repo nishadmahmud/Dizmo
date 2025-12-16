@@ -121,6 +121,7 @@ export default function CategoryIcons() {
                             >
                                 <div className="relative w-20 h-20 mb-3 group-hover:scale-110 transition-transform duration-300">
                                     <Image
+                                        unoptimized
                                         src={cat.image}
                                         alt={cat.name}
                                         fill

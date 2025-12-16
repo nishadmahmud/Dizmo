@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function FullWidthBanner() {
     const [banner, setBanner] = useState(null);
@@ -53,9 +54,11 @@ export default function FullWidthBanner() {
                     className="relative rounded-2xl overflow-hidden group block h-[400px] hover:shadow-xl transition-shadow"
                 >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
+                        unoptimized
                         src={banner.image}
                         alt={banner.title || `Banner ${banner.id}`}
+                        fill
                         className="w-full h-full object-cover"
                     />
                 </Link>

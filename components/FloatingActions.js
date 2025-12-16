@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { GitCompare, X } from "lucide-react";
 
@@ -70,9 +71,12 @@ export default function FloatingActions() {
                     aria-label="Chat on WhatsApp"
                 >
                     {/* Avatar Image */}
-                    <img
+                    <Image
+                        unoptimized
                         src="/customer_support_avatar.png"
                         alt="Customer Support"
+                        width={48}
+                        height={48}
                         className="w-full h-full object-cover"
                     />
                     <span className="absolute right-14 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
