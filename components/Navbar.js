@@ -400,7 +400,7 @@ export default function Navbar() {
                     {/* Search Bar (Visible on all screens) */}
                     <div className="flex flex-1 max-w-xl mx-2 lg:mx-6 relative" onClick={(e) => e.stopPropagation()}>
                         <div className="relative w-full">
-                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <input
                                 type="search"
                                 placeholder={isListening ? "Listening..." : "Search gadgets..."}
@@ -411,7 +411,7 @@ export default function Navbar() {
                             />
                             <button
                                 onClick={handleVoiceSearch}
-                                className={`absolute right-3 top-2.5 transition-colors ${isListening ? 'text-red-500 animate-pulse' : 'text-muted-foreground hover:text-primary'}`}
+                                className={`absolute right-3 top-1/2 -translate-y-1/2 transition-colors ${isListening ? 'text-red-500 animate-pulse' : 'text-muted-foreground hover:text-primary'}`}
                             >
                                 <Mic className="h-4 w-4" />
                             </button>
