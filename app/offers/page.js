@@ -132,7 +132,6 @@ export default function OffersPage() {
                                     />
 
 
-
                                     {/* Overlay Gradient */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-black/10 to-transparent" />
 

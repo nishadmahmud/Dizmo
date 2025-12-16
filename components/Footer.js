@@ -8,43 +8,81 @@ export default function Footer() {
     return (
         <footer className="bg-[#103E34] text-primary-foreground pt-12 pb-6 mt-auto border-t border-primary-foreground/10">
             <div className="container">
-                <Link href="/" className="flex items-center gap-2 mb-2">
+                <Link href="/" className="flex items-center gap-2 mb-6">
                     <span className="text-2xl font-bold text-white tracking-tight">
                         DIZMO<span className="text-[#FCB042]">™</span>
                     </span>
                 </Link>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {/* Column 1: Contact & Support - Spans 2 rows on large screens */}
-                    <div className="space-y-6 lg:row-span-2">
 
+                {/* Mobile: Contact Section (hidden on desktop) */}
+                <div className="md:hidden space-y-4 text-primary-foreground/80 text-sm mb-6">
+                    <h4 className="font-bold text-[#FCB042] text-lg">Contact Us</h4>
+                    <ul className="space-y-3">
+                        <li className="flex gap-3 items-start">
+                            <MapPin className="h-5 w-5 text-[#FCB042] shrink-0 mt-0.5" />
+                            <span>Level: 4, Block: B, Shop:028A & 028B, Jamuna Future Park, Dhaka, Bangladesh</span>
+                        </li>
+                        <li className="flex gap-3 items-center">
+                            <Phone className="h-5 w-5 text-[#FCB042] shrink-0" />
+                            <span>Emergency: 01751 05 32 52</span>
+                        </li>
+                        <li className="flex gap-3 items-center">
+                            <Mail className="h-5 w-5 text-[#FCB042] shrink-0" />
+                            <span>dizmo.bd@gmail.com</span>
+                        </li>
+                        <li className="flex gap-3 items-center">
+                            <Clock className="h-5 w-5 text-[#FCB042] shrink-0" />
+                            <span>Office Time: 11.00 am To 9.00 pm</span>
+                        </li>
+                        <li className="flex gap-3 items-center">
+                            <MessageCircle className="h-5 w-5 text-[#FCB042] shrink-0" />
+                            <a href="https://wa.me/8801710425454" target="_blank" rel="noopener noreferrer" className="hover:text-[#FCB042] transition-colors">
+                                WhatsApp: 01710 42 54 54
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
-                        <div className="space-y-4 text-primary-foreground/80 text-sm">
-                            <h4 className="font-bold text-[#FCB042] text-lg">Contact Us</h4>
-                            <ul className="space-y-3">
-                                <li className="flex gap-3 items-start">
-                                    <MapPin className="h-5 w-5 text-[#FCB042] shrink-0 mt-0.5" />
-                                    <span>Level: 4, Block: B, Shop:028A & 028B, Jamuna Future Park, Dhaka, Bangladesh</span>
-                                </li>
-                                <li className="flex gap-3 items-center">
-                                    <Phone className="h-5 w-5 text-[#FCB042] shrink-0" />
-                                    <span>Emergency: 01751 05 32 52</span>
-                                </li>
-                                <li className="flex gap-3 items-center">
-                                    <Mail className="h-5 w-5 text-[#FCB042] shrink-0" />
-                                    <span>dizmo.bd@gmail.com</span>
-                                </li>
-                                <li className="flex gap-3 items-center">
-                                    <Clock className="h-5 w-5 text-[#FCB042] shrink-0" />
-                                    <span>Office Time: 11.00 am To 9.00 pm</span>
-                                </li>
-                                <li className="flex gap-3 items-center">
-                                    <MessageCircle className="h-5 w-5 text-[#FCB042] shrink-0" />
-                                    <a href="https://wa.me/8801710425454" target="_blank" rel="noopener noreferrer" className="hover:text-[#FCB042] transition-colors">
-                                        WhatsApp: 01710 42 54 54
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+                {/* Store Locations - Mobile Only Highlighted Banner */}
+                <div className="md:hidden mb-6">
+                    <Link
+                        href="/store-locations"
+                        className="flex items-center justify-center gap-3 bg-[#FCB042] text-[#103E34] font-bold py-4 px-6 rounded-xl hover:bg-[#FCB042]/90 transition-all shadow-lg"
+                    >
+                        <MapPin className="h-5 w-5" />
+                        <span>Find Our Store Locations</span>
+                    </Link>
+                </div>
+
+                {/* Desktop: 4 Column Layout | Mobile: 2 Column for Company/Policy */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                    {/* Column 1: Contact (Desktop Only) */}
+                    <div className="hidden md:block space-y-4 text-primary-foreground/80 text-sm">
+                        <h4 className="font-bold text-[#FCB042] text-lg">Contact Us</h4>
+                        <ul className="space-y-3">
+                            <li className="flex gap-3 items-start">
+                                <MapPin className="h-5 w-5 text-[#FCB042] shrink-0 mt-0.5" />
+                                <span>Level: 4, Block: B, Shop:028A & 028B, Jamuna Future Park, Dhaka, Bangladesh</span>
+                            </li>
+                            <li className="flex gap-3 items-center">
+                                <Phone className="h-5 w-5 text-[#FCB042] shrink-0" />
+                                <span>Emergency: 01751 05 32 52</span>
+                            </li>
+                            <li className="flex gap-3 items-center">
+                                <Mail className="h-5 w-5 text-[#FCB042] shrink-0" />
+                                <span>dizmo.bd@gmail.com</span>
+                            </li>
+                            <li className="flex gap-3 items-center">
+                                <Clock className="h-5 w-5 text-[#FCB042] shrink-0" />
+                                <span>Office Time: 11.00 am To 9.00 pm</span>
+                            </li>
+                            <li className="flex gap-3 items-center">
+                                <MessageCircle className="h-5 w-5 text-[#FCB042] shrink-0" />
+                                <a href="https://wa.me/8801710425454" target="_blank" rel="noopener noreferrer" className="hover:text-[#FCB042] transition-colors">
+                                    WhatsApp: 01710 42 54 54
+                                </a>
+                            </li>
+                        </ul>
                     </div>
 
                     {/* Column 2: Company */}
@@ -56,25 +94,25 @@ export default function Footer() {
                             <li><Link href="/blog" className="hover:text-[#FCB042] transition-colors">Blog</Link></li>
                             <li><Link href="/offers" className="hover:text-[#FCB042] transition-colors">Offers</Link></li>
                             <li><Link href="/track-order" className="hover:text-[#FCB042] transition-colors">Track Order</Link></li>
-                            <li><Link href="/compare" className="hover:text-[#FCB042] transition-colors">Compare Products</Link></li>
+                            <li><Link href="/compare" className="hover:text-[#FCB042] transition-colors">Compare</Link></li>
                         </ul>
                     </div>
 
-                    {/* Column 3: Policy */}
+                    {/* Column 2: Policy */}
                     <div>
                         <h3 className="text-lg font-bold mb-4 text-[#FCB042]">Policy</h3>
                         <ul className="space-y-2 text-primary-foreground/80 text-sm">
-                            <li><Link href="/privacy" className="hover:text-[#FCB042] transition-colors">Privacy Policy</Link></li>
-                            <li><Link href="/terms" className="hover:text-[#FCB042] transition-colors">Terms & Conditions</Link></li>
-                            <li><Link href="/warranty" className="hover:text-[#FCB042] transition-colors">Warranty Policy</Link></li>
-                            <li><Link href="/emi" className="hover:text-[#FCB042] transition-colors">EMI Policy</Link></li>
-                            <li><Link href="/shipping" className="hover:text-[#FCB042] transition-colors">Shipping Policy</Link></li>
-                            <li><Link href="/returns" className="hover:text-[#FCB042] transition-colors">Return Policy</Link></li>
+                            <li><Link href="/privacy" className="hover:text-[#FCB042] transition-colors">Privacy</Link></li>
+                            <li><Link href="/terms" className="hover:text-[#FCB042] transition-colors">Terms</Link></li>
+                            <li><Link href="/warranty" className="hover:text-[#FCB042] transition-colors">Warranty</Link></li>
+                            <li><Link href="/emi" className="hover:text-[#FCB042] transition-colors">EMI</Link></li>
+                            <li><Link href="/shipping" className="hover:text-[#FCB042] transition-colors">Shipping</Link></li>
+                            <li><Link href="/returns" className="hover:text-[#FCB042] transition-colors">Returns</Link></li>
                         </ul>
                     </div>
 
-                    {/* Column 4: Newsletter & Socials */}
-                    <div className="space-y-6">
+                    {/* Column 4: Newsletter & Socials - Full width on mobile */}
+                    <div className="col-span-2 md:col-span-1 space-y-6">
                         <div>
                             <h4 className="font-bold mb-2 text-[#FCB042]">Newsletter</h4>
                             <p className="text-sm text-primary-foreground/80 mb-3">Sign up for get latest news and update</p>
@@ -111,6 +149,7 @@ export default function Footer() {
                         </div>
                     </div>
                 </div>
+
                 {/* Payment Image - Spans 3 columns (Company, Policy, Newsletter) */}
                 <div className="md:col-span-2 lg:col-span-3 flex items-end mb-8">
                     <div className="w-full bg-white rounded-lg">

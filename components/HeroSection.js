@@ -40,7 +40,7 @@ const features = [
     { icon: BadgeCheck, text: "100% Genuine Products", color: "text-emerald-600" },
     { icon: Truck, text: "Super Fast Delivery", color: "text-sky-600" },
     { icon: CreditCard, text: "36 Months Installments", color: "text-[#FCB042]" },
-    { icon: ArrowLeftRight, text: "2 Years Replacement", color: "text-violet-600" },
+    { icon: ArrowLeftRight, text: "1 Years Replacement", color: "text-violet-600" },
     { icon: BadgePercent, text: "Best Price in BD", color: "text-rose-600" },
     { icon: Headset, text: "24/7 Customer Support", color: "text-teal-600" }
 ];
