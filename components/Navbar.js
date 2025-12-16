@@ -37,7 +37,7 @@ const iconMap = {
     "Gadgets": Zap,                     // Plural version
     "Accessories": Plug2,               // Plug icon for accessories
     "Sounds": Speaker,                  // Speaker icon for sound products
-    "Used Phone": RefreshCcw,           // Refresh/recycle icon for used phones
+    "Used Phone": RefreshCcw,
 };
 
 // Category whitelist - only these categories will be shown in navbar (in order)
