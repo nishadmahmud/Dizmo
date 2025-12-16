@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShieldCheck, MapPin, CreditCard, Truck, Star, Share2, Plus, Minus, Check } from "lucide-react";
+import { ShieldCheck, MapPin, CreditCard, Truck, Star, Share2, Plus, Minus, Check, Gift } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 
@@ -209,7 +209,46 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
                 <p className="text-xs text-muted-foreground">Price includes VAT</p>
             </div>
 
-            {/* Core Specifications */}
+            {/* Minimum Booking & Purchase Points */}
+            {(() => {
+                // Calculate Minimum Booking: 20% of price, rounded to nearest 100 for products >= 10000, else nearest 10
+                const price = totalPrice || product.price || 0;
+                const bookingRaw = price * 0.20;
+                const minBooking = price >= 10000
+                    ? Math.round(bookingRaw / 100) * 100
+                    : Math.round(bookingRaw / 10) * 10;
+
+                // Calculate Purchase Points: 1 point per 1000 BDT, minimum 10, rounded to nearest 10
+                const pointsRaw = Math.max(price / 1000, 10);
+                const purchasePoints = Math.round(pointsRaw / 10) * 10;
+
+                return (
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* Minimum Booking */}
+                        <div className="bg-secondary/30 rounded-xl p-4 flex items-center gap-3">
+                            <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
+                                <CreditCard className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <div>
+                                <p className="text-xs text-muted-foreground">Minimum Booking</p>
+                                <p className="text-lg font-bold text-foreground">{minBooking.toLocaleString()} BDT</p>
+                            </div>
+                        </div>
+
+                        {/* Purchase Points */}
+                        <div className="bg-secondary/30 rounded-xl p-4 flex items-center gap-3">
+                            <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
+                                <Gift className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <div>
+                                <p className="text-xs text-muted-foreground">Purchase Points</p>
+                                <p className="text-lg font-bold text-foreground">{purchasePoints} Points</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
+
             {/* Core Specifications */}
             {(() => {
                 // Helper to find spec value by name (case-insensitive)

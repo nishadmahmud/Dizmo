@@ -73,6 +73,21 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                     </div>
                 );
             case "perks":
+                // Check if category is Phones and brand is Apple
+                const categoryLowerPerks = (product.category || '').toLowerCase();
+                const brandLower = (product.brand || '').toLowerCase();
+                const isPhonesCategory = categoryLowerPerks.includes('phone') || categoryLowerPerks.includes('phones');
+                const isAppleBrand = brandLower.includes('apple');
+
+                // Determine warranty text
+                let warrantyTitle = "3 Days Full Replacement Warranty";
+                let warrantyDesc = "Get 3-Days Full Replacement of your device";
+
+                if (isPhonesCategory && isAppleBrand) {
+                    warrantyTitle = "1 Year Apple Warranty";
+                    warrantyDesc = "Get official 1 Year Apple warranty coverage";
+                }
+
                 return (
                     <div className="space-y-6">
                         <h3 className="font-bold text-lg">Perks & benefits included</h3>
@@ -83,8 +98,8 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                                     <ShieldCheck className="h-6 w-6 text-green-600" />
                                 </div>
                                 <div>
-                                    <h4 className="font-bold">7-Days Replacement</h4>
-                                    <p className="text-sm text-muted-foreground">Get 7-Days Replacement of your device</p>
+                                    <h4 className="font-bold">{warrantyTitle}</h4>
+                                    <p className="text-sm text-muted-foreground">{warrantyDesc}</p>
                                     <p className="text-xs text-muted-foreground mt-1">*Condition apply</p>
                                 </div>
                             </div>
