@@ -67,6 +67,7 @@ export default function Navbar() {
     const [hoveredSidebarCategory, setHoveredSidebarCategory] = useState(null);
     const [loadingBrands, setLoadingBrands] = useState({});
     const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
+    const [brandsPreloaded, setBrandsPreloaded] = useState(false);
 
     // Search State
     const [searchQuery, setSearchQuery] = useState("");
@@ -74,20 +75,45 @@ export default function Navbar() {
     const [showResults, setShowResults] = useState(false);
     const [isListening, setIsListening] = useState(false);
 
-    const fetchCategoryBrands = async (categoryId) => {
-        // If brands already loaded, don't fetch again
-        if (categoryBrands[categoryId]) return;
+    // localStorage key for cached brands
+    const BRANDS_CACHE_KEY = 'dizmo_category_brands';
+    const BRANDS_CACHE_EXPIRY_KEY = 'dizmo_category_brands_expiry';
+    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-        setLoadingBrands(prev => ({ ...prev, [categoryId]: true }));
+    // Load cached brands from localStorage on mount
+    useEffect(() => {
+        try {
+            const cachedBrands = localStorage.getItem(BRANDS_CACHE_KEY);
+            const cacheExpiry = localStorage.getItem(BRANDS_CACHE_EXPIRY_KEY);
 
+            if (cachedBrands && cacheExpiry) {
+                const expiryTime = parseInt(cacheExpiry);
+                if (Date.now() < expiryTime) {
+                    // Cache is still valid
+                    const parsedBrands = JSON.parse(cachedBrands);
+                    setCategoryBrands(parsedBrands);
+                    setBrandsPreloaded(true);
+                    console.log('Loaded brands from localStorage cache');
+                } else {
+                    // Cache expired, clear it
+                    localStorage.removeItem(BRANDS_CACHE_KEY);
+                    localStorage.removeItem(BRANDS_CACHE_EXPIRY_KEY);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading cached brands:', error);
+        }
+    }, []);
+
+    // Function to fetch brands for a single category (used for preloading)
+    const fetchBrandsForCategory = async (categoryId) => {
         try {
             const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
             const productsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
 
-            // Fetch products for this category to extract brands (limit to first 2 pages for performance)
             let allProducts = [];
             const limit = 20;
-            const maxPages = 2; // Limit to 40 products for brand extraction in dropdown
+            const maxPages = 2;
 
             for (let page = 1; page <= maxPages; page++) {
                 try {
@@ -100,10 +126,8 @@ export default function Navbar() {
 
                     allProducts.push(...data.data);
 
-                    // If we got fewer items than limit, we've reached the end
                     if (data.data.length < limit) break;
                 } catch (e) {
-                    console.error(`Error fetching category ${categoryId} page ${page}:`, e);
                     break;
                 }
             }
@@ -113,7 +137,6 @@ export default function Navbar() {
                 const brandIds = new Set();
 
                 allProducts.forEach(product => {
-                    // Check both brand_id/brand_name and brands object structure
                     let brandId, brandName;
 
                     if (product.brand_id && product.brand_name) {
@@ -130,16 +153,83 @@ export default function Navbar() {
                     }
                 });
 
-                // Sort brands alphabetically
                 uniqueBrands.sort((a, b) => a.name.localeCompare(b.name));
-
-                setCategoryBrands(prev => ({ ...prev, [categoryId]: uniqueBrands }));
+                return uniqueBrands;
             }
+            return [];
         } catch (error) {
-            console.error("Error fetching category brands:", error);
-        } finally {
-            setLoadingBrands(prev => ({ ...prev, [categoryId]: false }));
+            console.error(`Error fetching brands for category ${categoryId}:`, error);
+            return [];
         }
+    };
+
+    // Preload all category brands in background after categories are loaded
+    useEffect(() => {
+        if (categories.length === 0 || brandsPreloaded) return;
+
+        const preloadAllBrands = async () => {
+            console.log('Preloading brands for all categories in background...');
+            const allBrands = {};
+
+            // Fetch brands for all categories in parallel (with small batches to avoid overload)
+            const batchSize = 3;
+            for (let i = 0; i < categories.length; i += batchSize) {
+                const batch = categories.slice(i, i + batchSize);
+                const results = await Promise.all(
+                    batch.map(async (cat) => {
+                        const brands = await fetchBrandsForCategory(cat.id);
+                        return { categoryId: cat.id, brands };
+                    })
+                );
+
+                results.forEach(({ categoryId, brands }) => {
+                    if (brands.length > 0) {
+                        allBrands[categoryId] = brands;
+                    }
+                });
+            }
+
+            // Update state with all brands
+            setCategoryBrands(prev => ({ ...prev, ...allBrands }));
+            setBrandsPreloaded(true);
+
+            // Save to localStorage
+            try {
+                localStorage.setItem(BRANDS_CACHE_KEY, JSON.stringify({ ...categoryBrands, ...allBrands }));
+                localStorage.setItem(BRANDS_CACHE_EXPIRY_KEY, (Date.now() + CACHE_DURATION).toString());
+                console.log('Brands cached to localStorage');
+            } catch (error) {
+                console.error('Error saving brands to localStorage:', error);
+            }
+        };
+
+        // Start preloading after a short delay to not block initial render
+        const timer = setTimeout(preloadAllBrands, 1000);
+        return () => clearTimeout(timer);
+    }, [categories, brandsPreloaded]);
+
+    // Fetch brands on hover (fallback if not preloaded)
+    const fetchCategoryBrands = async (categoryId) => {
+        // If brands already loaded, don't fetch again
+        if (categoryBrands[categoryId]) return;
+
+        setLoadingBrands(prev => ({ ...prev, [categoryId]: true }));
+
+        const brands = await fetchBrandsForCategory(categoryId);
+
+        if (brands.length > 0) {
+            setCategoryBrands(prev => {
+                const updated = { ...prev, [categoryId]: brands };
+                // Also update localStorage
+                try {
+                    localStorage.setItem(BRANDS_CACHE_KEY, JSON.stringify(updated));
+                    localStorage.setItem(BRANDS_CACHE_EXPIRY_KEY, (Date.now() + CACHE_DURATION).toString());
+                } catch (e) { }
+                return updated;
+            });
+        }
+
+        setLoadingBrands(prev => ({ ...prev, [categoryId]: false }));
     };
 
     const handleTopCategoryHover = (categoryId) => {
@@ -481,14 +571,14 @@ export default function Navbar() {
                                                         className={`flex items-center gap-3 px-4 py-3 transition-colors border-b border-border last:border-0 ${isHovered ? 'bg-secondary text-primary' : 'hover:bg-secondary'}`}
                                                     >
                                                         <IconComponent className={`h-5 w-5 ${isHovered ? 'text-primary' : 'text-[#103E34]'}`} />
-                                                        <span className="text-sm font-medium">{category.name}</span>
+                                                        <span className="text-sm font-medium">{category.name.toUpperCase()}</span>
                                                     </Link>
 
                                                     {/* Brand Dropdown (Side) */}
                                                     {isHovered && (
                                                         <div className="absolute top-0 left-full ml-2 w-[300px] bg-background rounded-xl shadow-xl border border-border z-50 p-4 animate-in fade-in slide-in-from-left-2 min-h-[200px]">
                                                             <div className="flex items-center justify-between mb-3 border-b border-border pb-2">
-                                                                <h3 className="font-bold text-base text-primary">{category.name} Brands</h3>
+                                                                <h3 className="font-bold text-base text-primary">{category.name.toUpperCase()} Brands</h3>
                                                                 <Link
                                                                     href={`/categories/${category.id}`}
                                                                     onClick={() => setShowAllCategories(false)}
@@ -554,7 +644,7 @@ export default function Navbar() {
                                                     }`}
                                             >
                                                 <IconComponent className="h-6 w-6" />
-                                                <span>{category.name}</span>
+                                                <span>{category.name.toUpperCase()}</span>
                                             </Link>
 
                                             {isHovered && (
@@ -567,7 +657,7 @@ export default function Navbar() {
                                                     }}
                                                 >
                                                     <div className="flex items-center justify-between mb-4 border-b border-border pb-2">
-                                                        <h3 className="font-bold text-lg text-primary">{category.name} Brands</h3>
+                                                        <h3 className="font-bold text-lg text-primary">{category.name.toUpperCase()} Brands</h3>
                                                         <Link
                                                             href={`/categories/${category.id}`}
                                                             className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
@@ -682,7 +772,7 @@ export default function Navbar() {
                                             >
                                                 <div className="flex items-center gap-3">
                                                     <IconComponent className="h-5 w-5 text-[#103E34]" />
-                                                    <span className="font-medium text-[#103E34] uppercase text-sm">{category.name}</span>
+                                                    <span className="font-medium text-[#103E34] text-sm">{category.name.toUpperCase()}</span>
                                                 </div>
                                                 <ChevronRight
                                                     className={`h-4 w-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''
