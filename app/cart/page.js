@@ -1,7 +1,7 @@
 "use client";
 
 import { useCart } from "@/context/CartContext";
-import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
+import { Trash2, Plus, Minus, ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -27,10 +27,14 @@ export default function CartPage() {
                         <div className="flex-1 space-y-4">
                             {cart.map((item) => (
                                 <div key={item.id} className="flex gap-4 p-4 bg-card border border-border rounded-xl">
-                                    {/* Image */}
+                                    {/* Image or Care Plan Icon */}
                                     <div className="w-24 h-24 bg-secondary rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-                                        {item.image ? (
-                                            <Image unoptimized src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                                        {item.isCarePlan ? (
+                                            <div className="w-full h-full bg-black flex items-center justify-center">
+                                                <ShieldCheck className="h-10 w-10 text-[#FCB042]" />
+                                            </div>
+                                        ) : item.image ? (
+                                            <Image unoptimized src={item.image} alt={item.name} width={96} height={96} className="h-full w-full object-cover" />
                                         ) : (
                                             <span className="text-xs text-muted-foreground">Img</span>
                                         )}
@@ -38,7 +42,12 @@ export default function CartPage() {
 
                                     <div className="flex-1 flex flex-col justify-between">
                                         <div className="flex justify-between items-start">
-                                            <h3 className="font-semibold text-lg text-foreground">{item.name}</h3>
+                                            <div>
+                                                <h3 className="font-semibold text-lg text-foreground">{item.name}</h3>
+                                                {item.isCarePlan && (
+                                                    <span className="inline-block text-[10px] bg-black text-white px-1.5 py-0.5 rounded mt-1">Dizmo Care</span>
+                                                )}
+                                            </div>
                                             <button
                                                 onClick={() => removeFromCart(item.id)}
                                                 className="text-muted-foreground hover:text-red-500"

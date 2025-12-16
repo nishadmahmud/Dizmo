@@ -238,18 +238,18 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                             {carePlansToShow.map((plan) => (
                                 <label
                                     key={plan.id}
-                                    className={`cursor-pointer bg-white border p-2.5 rounded-lg flex items-start gap-2 transition-all hover:shadow-sm ${selectedCarePlans.includes(plan.id)
+                                    className={`cursor-pointer bg-white border p-2.5 rounded-lg flex items-start gap-2 transition-all hover:shadow-sm ${selectedCarePlans.some(p => p.id === plan.id)
                                         ? "border-primary ring-1 ring-primary"
                                         : "border-border"
                                         }`}
                                 >
-                                    <div className={`mt-0.5 w-4 h-4 border-2 rounded flex items-center justify-center transition-colors ${selectedCarePlans.includes(plan.id) ? "bg-black border-black" : "border-gray-300"}`}>
-                                        {selectedCarePlans.includes(plan.id) && <CheckCircle2 className="h-2.5 w-2.5 text-white" />}
+                                    <div className={`mt-0.5 w-4 h-4 border-2 rounded flex items-center justify-center transition-colors ${selectedCarePlans.some(p => p.id === plan.id) ? "bg-black border-black" : "border-gray-300"}`}>
+                                        {selectedCarePlans.some(p => p.id === plan.id) && <CheckCircle2 className="h-2.5 w-2.5 text-white" />}
                                     </div>
                                     <input
                                         type="checkbox"
-                                        checked={selectedCarePlans.includes(plan.id)}
-                                        onChange={() => toggleCarePlan(plan.id)}
+                                        checked={selectedCarePlans.some(p => p.id === plan.id)}
+                                        onChange={() => toggleCarePlan(plan)}
                                         className="hidden"
                                     />
                                     <div className="flex-1 min-w-0">

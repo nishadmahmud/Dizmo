@@ -28,12 +28,15 @@ export default function ProductDetailsClient({ product }) {
 
     const [selectedCarePlans, setSelectedCarePlans] = useState([]);
 
-    const toggleCarePlan = (planId) => {
-        setSelectedCarePlans(prev =>
-            prev.includes(planId)
-                ? prev.filter(id => id !== planId)
-                : [...prev, planId]
-        );
+    // Toggle care plan - now stores full plan objects with id, name, price
+    const toggleCarePlan = (plan) => {
+        setSelectedCarePlans(prev => {
+            const exists = prev.find(p => p.id === plan.id);
+            if (exists) {
+                return prev.filter(p => p.id !== plan.id);
+            }
+            return [...prev, plan];
+        });
     };
 
     return (

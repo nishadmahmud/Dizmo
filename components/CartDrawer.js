@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Plus, Minus, ShoppingBag, Trash2 } from "lucide-react";
+import { X, Plus, Minus, ShoppingBag, Trash2, ShieldCheck } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import Link from "next/link";
 import Image from "next/image";
@@ -56,10 +56,13 @@ export default function CartDrawer() {
                     ) : (
                         cart.map((item) => (
                             <div key={item.id} className="flex gap-4 bg-card p-3 rounded-lg border border-border">
-                                {/* Image Placeholder */}
-                                {/* Image */}
+                                {/* Image or Care Plan Icon */}
                                 <div className="h-20 w-20 bg-secondary rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
-                                    {item.image ? (
+                                    {item.isCarePlan ? (
+                                        <div className="w-full h-full bg-black flex items-center justify-center">
+                                            <ShieldCheck className="h-8 w-8 text-[#FCB042]" />
+                                        </div>
+                                    ) : item.image ? (
                                         <Image unoptimized src={item.image} alt={item.name} width={80} height={80} className="h-full w-full object-cover" />
                                     ) : (
                                         <span className="text-xs text-muted-foreground">Img</span>
@@ -69,6 +72,9 @@ export default function CartDrawer() {
                                 <div className="flex-1 flex flex-col justify-between">
                                     <div>
                                         <h3 className="font-medium text-foreground line-clamp-1">{item.name}</h3>
+                                        {item.isCarePlan && (
+                                            <span className="inline-block text-[10px] bg-black text-white px-1.5 py-0.5 rounded mt-1">Dizmo Care</span>
+                                        )}
                                         <p className="text-sm text-primary font-bold">৳{item.price.toLocaleString()}</p>
                                     </div>
 

@@ -3,7 +3,8 @@
 import { useCart } from "@/context/CartContext";
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle, Truck, Store, CreditCard, Banknote, Info, CheckSquare, MapPin } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, CheckCircle, Truck, Store, CreditCard, Banknote, Info, CheckSquare, MapPin, ShieldCheck } from "lucide-react";
 
 export default function CheckoutPage() {
     const { cart, cartTotal } = useCart();
@@ -299,14 +300,21 @@ export default function CheckoutPage() {
                                 {cart.map((item) => (
                                     <div key={item.id} className="flex gap-3 items-start">
                                         <div className="w-14 h-14 bg-secondary rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden border border-border">
-                                            {item.image ? (
-                                                <Image unoptimized src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                                            {item.isCarePlan ? (
+                                                <div className="w-full h-full bg-black flex items-center justify-center">
+                                                    <ShieldCheck className="h-6 w-6 text-[#FCB042]" />
+                                                </div>
+                                            ) : item.image ? (
+                                                <Image unoptimized src={item.image} alt={item.name} width={56} height={56} className="h-full w-full object-cover" />
                                             ) : (
                                                 <span className="text-xs text-muted-foreground">Img</span>
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h4 className="font-medium text-sm line-clamp-2 text-foreground">{item.name}</h4>
+                                            {item.isCarePlan && (
+                                                <span className="inline-block text-[10px] bg-black text-white px-1.5 py-0.5 rounded mt-1">Dizmo Care</span>
+                                            )}
                                             <p className="text-xs text-muted-foreground mt-1">{item.quantity} quantity</p>
                                         </div>
                                         <div className="font-bold text-sm">

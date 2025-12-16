@@ -79,12 +79,11 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
         return storage?.price || product.price;
     };
 
-    // Calculate total with care plans
+    // Calculate total with care plans (selectedCarePlans now contains full plan objects)
     const getTotalPrice = () => {
         let total = getCurrentPrice();
-        selectedCarePlans.forEach(planId => {
-            const plan = product.carePlans?.find(p => p.id === planId);
-            if (plan) total += plan.price;
+        selectedCarePlans.forEach(plan => {
+            if (plan && plan.price) total += plan.price;
         });
         return total;
     };
@@ -98,6 +97,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
     // };
 
     const handleAddToCart = () => {
+        // Add the main product
         const productWithVariants = {
             ...product,
             selectedVariants: {
@@ -105,11 +105,29 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
                 color: product.variants?.colors?.find(c => c.id === selectedColor)?.label,
                 region: product.variants?.regions?.find(r => r.id === selectedRegion)?.label,
             },
-            carePlans: selectedCarePlans.map(id => product.carePlans?.find(p => p.id === id)?.name),
-            price: getTotalPrice(),
+            price: getCurrentPrice(), // Just the product price, not including care plans
             image: product.images?.[0] || product.image,
         };
         addToCart(productWithVariants, quantity);
+
+        // Add each selected care plan as a separate cart item
+        selectedCarePlans.forEach(plan => {
+            if (plan && plan.id && plan.name && plan.price) {
+                const carePlanItem = {
+                    id: `care_${product.id}_${plan.id}`, // Unique ID for this care plan + product combo
+                    name: `${plan.name} - ${product.name}`,
+                    price: plan.price,
+                    image: '/dizmo_care_icon.png', // Fallback image for care plans
+                    isCarePlan: true,
+                    parentProductId: product.id,
+                    carePlanDetails: {
+                        planName: plan.name,
+                        planDescription: plan.description || '',
+                    }
+                };
+                addToCart(carePlanItem, quantity);
+            }
+        });
     };
 
     const handleBuyNow = () => {
