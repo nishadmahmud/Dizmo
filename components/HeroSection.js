@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, BadgeCheck, Truck, CreditCard, ArrowLeftRight, BadgePercent, Headset } from "lucide-react";
 
-
 const defaultSlides = [
     {
         id: 1,
