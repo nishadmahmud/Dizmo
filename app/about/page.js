@@ -7,7 +7,8 @@ import { CheckCircle2, Award, Users, Globe, ArrowRight, ShieldCheck, Truck, Head
 // Store images
 const storeImages = {
     storeFront: "https://lh3.googleusercontent.com/p/AF1QipPtgI7i501SL0pqmYWKJKFkezULjr4Tpuz8Th81=w408-h306-k-no",
-    happyCustomer: "https://scontent.fdac178-1.fna.fbcdn.net/v/t39.30808-6/598006029_122146142450704421_8632810897370606840_n.jpg?stp=cp6_dst-jpg_p526x296_tt6&_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=IxFDuDfSOxwQ7kNvwE3hOyu&_nc_oc=AdkV6JofoHgI7CPj-y6oSHQAUJtGMKeW-HT6bcnAlHRUAdqPvjjV1EWwlac9Xwcxwq8&_nc_zt=23&_nc_ht=scontent.fdac178-1.fna&_nc_gid=t_5Uu4VMvXxDB0VM6pjuTQ&oh=00_AfncWt2xZuXSzNR57BbeBddOey3455tGTYXgFcYcFH6h6A&oe=6947181D"
+    happyCustomer: "https://scontent.fdac178-1.fna.fbcdn.net/v/t39.30808-6/598006029_122146142450704421_8632810897370606840_n.jpg?stp=cp6_dst-jpg_p526x296_tt6&_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=IxFDuDfSOxwQ7kNvwE3hOyu&_nc_oc=AdkV6JofoHgI7CPj-y6oSHQAUJtGMKeW-HT6bcnAlHRUAdqPvjjV1EWwlac9Xwcxwq8&_nc_zt=23&_nc_ht=scontent.fdac178-1.fna&_nc_gid=t_5Uu4VMvXxDB0VM6pjuTQ&oh=00_AfncWt2xZuXSzNR57BbeBddOey3455tGTYXgFcYcFH6h6A&oe=6947181D",
+    productDisplay: "https://scontent.fdac178-1.fna.fbcdn.net/v/t39.30808-6/599590143_122145846374704421_5981123238252589811_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=kL16YEraw7IQ7kNvwHB1FGJ&_nc_oc=Adk-cVc7YOX2PiOiTQr6AzDKq1KUPx521r89XBV1ShT4MWKgKBBaRXOkbGTcGqWm-tc&_nc_zt=23&_nc_ht=scontent.fdac178-1.fna&_nc_gid=c7WtztqQfNVa8bOJ4TX0KQ&oh=00_AfnePiIvoyflHR1r0gs3QvlStYhLHoX-UrEYS7cQqZhdsg&oe=69473A37"
 };
 
 
@@ -54,28 +55,17 @@ export default function AboutPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                        <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl order-2 lg:order-1">
-                            <Image
-                                unoptimized
-                                src={storeImages.happyCustomer}
-                                alt="Happy DIZMO Customer"
-                                fill
-                                className="object-cover"
-                            />
-                        </div>
-                        <div className="order-1 lg:order-2">
-                            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6 border-l-4 border-primary pl-4">
-                                Our Journey
-                            </h2>
-                            <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground">
-                                <p className="mb-6">
-                                    Our journey began in a small room with a handful of products and a big dream. We faced the challenges of a saturated market filled with counterfeits and unreliable warranties. Instead of competing on price alone, we chose to compete on integrity. We built direct relationships with authorized distributors and established a supply chain that guarantees authenticity.
-                                </p>
-                                <p>
-                                    Over the years, we have expanded our catalog to include everything from the latest flagship smartphones and high-performance laptops to smart home ecosystems and audiophile-grade sound systems. But our core mission remains unchanged: to empower our customers with technology that enhances their lives.
-                                </p>
-                            </div>
+                    <div className="mt-12">
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6 border-l-4 border-primary pl-4">
+                            Our Journey
+                        </h2>
+                        <div className="prose prose-lg dark:prose-invert max-w-none text-muted-foreground">
+                            <p className="mb-6">
+                                Our journey began in a small room with a handful of products and a big dream. We faced the challenges of a saturated market filled with counterfeits and unreliable warranties. Instead of competing on price alone, we chose to compete on integrity. We built direct relationships with authorized distributors and established a supply chain that guarantees authenticity.
+                            </p>
+                            <p>
+                                Over the years, we have expanded our catalog to include everything from the latest flagship smartphones and high-performance laptops to smart home ecosystems and audiophile-grade sound systems. But our core mission remains unchanged: to empower our customers with technology that enhances their lives.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -84,28 +74,42 @@ export default function AboutPage() {
             {/* Mission & Vision */}
             <section className="py-12 bg-secondary/20">
                 <div className="container">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                        <div className="bg-card border border-border p-8 rounded-2xl shadow-sm">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="bg-primary/10 p-3 rounded-full">
-                                    <Target className="h-8 w-8 text-primary" />
-                                </div>
-                                <h2 className="text-2xl font-bold text-foreground">Our Mission</h2>
-                            </div>
-                            <p className="text-muted-foreground leading-relaxed">
-                                To bridge the gap between technology and people by providing authentic, high-quality electronics at competitive prices, backed by a service experience that builds lasting trust and empowers our customers to achieve more.
-                            </p>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto items-center">
+                        {/* Customer Image on Left */}
+                        <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-xl bg-gray-100">
+                            <Image
+                                unoptimized
+                                src={storeImages.happyCustomer}
+                                alt="Happy DIZMO Customer"
+                                fill
+                                className="object-contain"
+                            />
                         </div>
-                        <div className="bg-card border border-border p-8 rounded-2xl shadow-sm">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="bg-primary/10 p-3 rounded-full">
-                                    <Lightbulb className="h-8 w-8 text-primary" />
+
+                        {/* Mission & Vision Cards on Right */}
+                        <div className="flex flex-col gap-6">
+                            <div className="bg-card border border-border p-8 rounded-2xl shadow-sm">
+                                <div className="flex items-center gap-4 mb-6">
+                                    <div className="bg-primary/10 p-3 rounded-full">
+                                        <Target className="h-8 w-8 text-primary" />
+                                    </div>
+                                    <h2 className="text-2xl font-bold text-foreground">Our Mission</h2>
                                 </div>
-                                <h2 className="text-2xl font-bold text-foreground">Our Vision</h2>
+                                <p className="text-muted-foreground leading-relaxed">
+                                    To bridge the gap between technology and people by providing authentic, high-quality electronics at competitive prices, backed by a service experience that builds lasting trust and empowers our customers to achieve more.
+                                </p>
                             </div>
-                            <p className="text-muted-foreground leading-relaxed">
-                                To become Bangladesh's most trusted and innovative retail platform for consumer electronics, setting the standard for authenticity, customer service, and technological accessibility in the region.
-                            </p>
+                            <div className="bg-card border border-border p-8 rounded-2xl shadow-sm">
+                                <div className="flex items-center gap-4 mb-6">
+                                    <div className="bg-primary/10 p-3 rounded-full">
+                                        <Lightbulb className="h-8 w-8 text-primary" />
+                                    </div>
+                                    <h2 className="text-2xl font-bold text-foreground">Our Vision</h2>
+                                </div>
+                                <p className="text-muted-foreground leading-relaxed">
+                                    To become Bangladesh's most trusted and innovative retail platform for consumer electronics, setting the standard for authenticity, customer service, and technological accessibility in the region.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -211,39 +215,53 @@ export default function AboutPage() {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {[
-                            {
-                                icon: <ShieldCheck className="h-10 w-10 text-primary" />,
-                                title: "Genuine Products",
-                                description: "We guarantee 100% authenticity on all our products, sourced directly from authorized distributors."
-                            },
-                            {
-                                icon: <Award className="h-10 w-10 text-primary" />,
-                                title: "Best Prices",
-                                description: "Get the most competitive market prices without compromising on quality or service."
-                            },
-                            {
-                                icon: <Truck className="h-10 w-10 text-primary" />,
-                                title: "Fast Shipping",
-                                description: "We offer lightning-fast delivery across Bangladesh, ensuring your gadgets reach you safely."
-                            },
-                            {
-                                icon: <Headphones className="h-10 w-10 text-primary" />,
-                                title: "Expert Support",
-                                description: "Our dedicated support team is here to assist you with any queries or technical issues."
-                            }
-                        ].map((feature, index) => (
-                            <div key={index} className="bg-card border border-border p-8 rounded-2xl hover:shadow-lg transition-all hover:-translate-y-1 group">
-                                <div className="bg-secondary w-16 h-16 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary/10 transition-colors">
-                                    {feature.icon}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto items-center">
+                        {/* Product Display Image */}
+                        <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
+                            <Image
+                                unoptimized
+                                src={storeImages.productDisplay}
+                                alt="DIZMO Product Display"
+                                fill
+                                className="object-cover"
+                            />
+                        </div>
+
+                        {/* Feature Cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {[
+                                {
+                                    icon: <ShieldCheck className="h-8 w-8 text-primary" />,
+                                    title: "Genuine Products",
+                                    description: "100% authenticity guaranteed, sourced directly from authorized distributors."
+                                },
+                                {
+                                    icon: <Award className="h-8 w-8 text-primary" />,
+                                    title: "Best Prices",
+                                    description: "Competitive market prices without compromising on quality."
+                                },
+                                {
+                                    icon: <Truck className="h-8 w-8 text-primary" />,
+                                    title: "Fast Shipping",
+                                    description: "Lightning-fast delivery across Bangladesh."
+                                },
+                                {
+                                    icon: <Headphones className="h-8 w-8 text-primary" />,
+                                    title: "Expert Support",
+                                    description: "Dedicated support team for all your queries."
+                                }
+                            ].map((feature, index) => (
+                                <div key={index} className="bg-card border border-border p-6 rounded-xl hover:shadow-lg transition-all hover:-translate-y-1 group">
+                                    <div className="bg-secondary w-12 h-12 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
+                                        {feature.icon}
+                                    </div>
+                                    <h3 className="text-lg font-bold text-foreground mb-2">{feature.title}</h3>
+                                    <p className="text-muted-foreground text-sm leading-relaxed">
+                                        {feature.description}
+                                    </p>
                                 </div>
-                                <h3 className="text-xl font-bold text-foreground mb-3">{feature.title}</h3>
-                                <p className="text-muted-foreground text-sm leading-relaxed">
-                                    {feature.description}
-                                </p>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
