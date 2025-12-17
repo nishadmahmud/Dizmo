@@ -395,9 +395,9 @@ export default function Navbar() {
                         <Image
                             src="/dizmo_logo_1.png"
                             alt="DIZMO"
-                            width={100}
-                            height={30}
-                            className="h-8 w-auto"
+                            width={120}
+                            height={40}
+                            className="h-10 w-auto"
                             unoptimized
                         />
                     </Link>
