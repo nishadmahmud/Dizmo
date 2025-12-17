@@ -14,6 +14,7 @@ import FullWidthBanner from "@/components/FullWidthBanner";
 import SEOContent from "@/components/SEOContent";
 
 export default function Home() {
+
   return (
     <main className="min-h-screen flex flex-col bg-background">
 
