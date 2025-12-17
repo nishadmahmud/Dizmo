@@ -224,8 +224,8 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
 
                 // Calculate extended warranty prices for non-phone categories
                 const productPrice = product.price || 0;
-                const warranty12MonthPrice = Math.round(productPrice * 0.20); // 20% of product price
-                const warranty18MonthPrice = Math.round(productPrice * 0.30); // 30% of product price
+                const warranty12MonthPrice = Math.round(productPrice * 0.10); // 20% of product price
+                const warranty18MonthPrice = Math.round(productPrice * 0.20); // 30% of product price
 
                 // Care plans for phones
                 const phoneCarePlans = product.carePlans && product.carePlans.length > 0 ? product.carePlans : [
@@ -236,8 +236,8 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
 
                 // Extended warranty for other categories (like the uploaded image style)
                 const otherCategoryPlans = [
-                    { id: 'warranty_12', name: '12 Months Extended Warranty', description: 'Extended coverage for hardware issues', price: warranty12MonthPrice },
-                    { id: 'warranty_18', name: '18 Months Extended Warranty', description: 'Extended coverage for hardware issues', price: warranty18MonthPrice },
+                    { id: 'warranty_12', name: '6 Months Extended Warranty', description: 'Extended coverage for hardware issues', price: warranty12MonthPrice },
+                    { id: 'warranty_18', name: '12 Months Extended Warranty', description: 'Extended coverage for hardware issues', price: warranty18MonthPrice },
                 ];
 
                 const carePlansToShow = isPhoneCategory ? phoneCarePlans : otherCategoryPlans;

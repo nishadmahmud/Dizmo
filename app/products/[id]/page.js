@@ -24,12 +24,38 @@ async function getProduct(id) {
     }
 }
 
+// Fetch categories to look up category name by ID
+async function getCategories() {
+    try {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+        const categoriesEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORIES;
+        const storeId = process.env.NEXT_PUBLIC_STORE_ID;
+
+        const res = await fetch(`${apiBaseUrl}${categoriesEndpoint}/${storeId}`, { cache: 'no-store' });
+
+        if (!res.ok) {
+            return [];
+        }
+
+        const data = await res.json();
+        return data.success && data.data ? data.data : [];
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+        return [];
+    }
+}
+
 export default async function ProductPage({ params, searchParams }) {
     const { id } = await params;
     const resolvedSearchParams = await searchParams;
 
     const categoryParam = resolvedSearchParams?.category;
-    const data = await getProduct(id);
+
+    // Fetch product and categories in parallel
+    const [data, categories] = await Promise.all([
+        getProduct(id),
+        getCategories()
+    ]);
 
     if (!data || !data.success || !data.data) {
         return (
@@ -43,6 +69,49 @@ export default async function ProductPage({ params, searchParams }) {
     }
 
     const productData = data.data;
+
+    // Phone brands list for category detection
+    const phoneBrands = [
+        'apple', 'samsung', 'xiaomi', 'oneplus', 'google', 'oppo', 'vivo',
+        'realme', 'tecno', 'infinix', 'motorola', 'nokia', 'huawei', 'honor',
+        'asus', 'sony', 'nothing', 'iqoo', 'redmi', 'poco'
+    ];
+
+    // Look up category name from category_id
+    let categoryName = categoryParam || "";
+    if (productData.category_id && categories.length > 0) {
+        const foundCategory = categories.find(cat => cat.category_id === productData.category_id || cat.category_id?.toString() === productData.category_id?.toString());
+        if (foundCategory) {
+            categoryName = foundCategory.name;
+        }
+    }
+    // Fallback to API-provided category_name if available
+    if (!categoryName && productData.category_name) {
+        categoryName = productData.category_name;
+    }
+    if (!categoryName && productData.category?.name) {
+        categoryName = productData.category.name;
+    }
+
+    // Brand-based detection as final fallback (since API doesn't return category_id)
+    if (!categoryName && productData.brand_name) {
+        const brandLower = productData.brand_name.toLowerCase();
+        if (phoneBrands.includes(brandLower)) {
+            categoryName = "Phones";
+        }
+    }
+
+    // Also check product name for phone keywords as last resort
+    if (!categoryName && productData.name) {
+        const nameLower = productData.name.toLowerCase();
+        if (nameLower.includes('iphone') || nameLower.includes('galaxy') ||
+            nameLower.includes('pixel') || nameLower.includes('redmi') ||
+            nameLower.includes('oneplus') || nameLower.includes('poco')) {
+            categoryName = "Phones";
+        }
+    }
+
+    console.log("Final categoryName:", categoryName);
 
     // Process variants from IMEIs
     const imeis = productData.imeis || [];
@@ -134,8 +203,8 @@ export default async function ProductPage({ params, searchParams }) {
         // Care plans (API doesn't have this, using empty or static)
         carePlans: [],
 
-        // Category for conditional rendering
-        category: productData.category_name || productData.category?.name || categoryParam || ""
+        // Category for conditional rendering (resolved from category_id lookup)
+        category: categoryName
     };
 
     return (
@@ -145,7 +214,7 @@ export default async function ProductPage({ params, searchParams }) {
                 <ProductDetailsClient product={product} />
 
                 {/* Variants Grid - Only for Used Phones */}
-                {((productData.category_name || productData.category?.name || categoryParam || "").toLowerCase().includes("used phone")) && (
+                {categoryName.toLowerCase().includes("used phone") && (
                     <div className="mt-12">
                         <ProductVariantsGrid imeis={product.imeis} product={product} />
                     </div>

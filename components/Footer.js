@@ -70,7 +70,7 @@ export default function Footer() {
                             </li>
                             <li className="flex gap-3 items-center">
                                 <Mail className="h-5 w-5 text-[#FCB042] shrink-0" />
-                                <span>dizmo.bd@gmail.com</span>
+                                <span>info.dizmo@gmail.com</span>
                             </li>
                             <li className="flex gap-3 items-center">
                                 <Clock className="h-5 w-5 text-[#FCB042] shrink-0" />
@@ -164,9 +164,8 @@ export default function Footer() {
                     </div>
                 </div>
 
-
                 <div className="pt-6 border-t border-primary-foreground/10 text-center text-xs text-primary-foreground/60">
-                    <p>&copy; {new Date().getFullYear()} Dizmo. All rights reserved. Developed by <a href="https://squadinnovators.com/" target="_blank" rel="noopener noreferrer" className="text-[#FCB042] hover:underline">Squad Innovetors</a></p>
+                    <p>&copy; {new Date().getFullYear()} Dizmo. All rights reserved.</p>
                 </div>
             </div>
         </footer>
