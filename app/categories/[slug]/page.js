@@ -49,6 +49,9 @@ export default function CategoryDetailPage({ params }) {
     // State for brand banners from API
     const [brandBanners, setBrandBanners] = useState({});
 
+    // State for category banner from API
+    const [categoryBanner, setCategoryBanner] = useState(null);
+
     // Filter States
     const [priceRange, setPriceRange] = useState({ min: 0, max: 200000 });
     const [availability, setAvailability] = useState('all');
@@ -104,6 +107,8 @@ export default function CategoryDetailPage({ params }) {
                     if (categoriesData.success && categoriesData.data) {
                         const category = categoriesData.data.find(cat => cat.category_id.toString() === slug);
                         setCategoryName(category ? category.name : 'Category');
+                        // Store category banner if available
+                        setCategoryBanner(category?.banner || null);
                     }
                 }
             } catch (error) {
@@ -525,6 +530,23 @@ export default function CategoryDetailPage({ params }) {
                             <div className="relative h-40 md:h-52 w-full rounded-2xl overflow-hidden shadow-lg">
                                 <Image
                                     src={brandBannerUrl}
+                                    alt={bannerText}
+                                    fill
+                                    className="object-cover"
+                                    unoptimized
+                                />
+                            </div>
+                        </div>
+                    );
+                }
+
+                // If no brand selected and we have a category banner, show it without overlay
+                if (!selectedBrand && categoryBanner) {
+                    return (
+                        <div className="container pt-6">
+                            <div className="relative h-40 md:h-52 w-full rounded-2xl overflow-hidden shadow-lg">
+                                <Image
+                                    src={categoryBanner}
                                     alt={bannerText}
                                     fill
                                     className="object-cover"
