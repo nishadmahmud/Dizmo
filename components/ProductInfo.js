@@ -343,26 +343,28 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
             {product.variants?.colors?.length > 0 && (
                 <div className="space-y-3">
                     <h3 className="text-sm font-semibold text-foreground">Color</h3>
-                    <div className="flex flex-wrap gap-3">
-                        {availableColors.map((color) => (
-                            <button
-                                key={color.id}
-                                onClick={() => {
-                                    setSelectedColor(color.id);
-                                    if (onColorChange) onColorChange(color.id);
-                                }}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${selectedColor === color.id
-                                    ? "border-primary ring-2 ring-primary"
-                                    : "border-border hover:border-primary/50"
-                                    }`}
-                            >
-                                <div
-                                    className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
-                                    style={{ backgroundColor: color.hex }}
-                                />
-                                <span className="text-sm font-medium">{color.label}</span>
-                            </button>
-                        ))}
+                    <div className="overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide md:overflow-visible md:pb-0">
+                        <div className="flex gap-3 md:flex-wrap min-w-max md:min-w-0">
+                            {availableColors.map((color) => (
+                                <button
+                                    key={color.id}
+                                    onClick={() => {
+                                        setSelectedColor(color.id);
+                                        if (onColorChange) onColorChange(color.id);
+                                    }}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all flex-shrink-0 ${selectedColor === color.id
+                                        ? "border-primary ring-2 ring-primary"
+                                        : "border-border hover:border-primary/50"
+                                        }`}
+                                >
+                                    <div
+                                        className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+                                        style={{ backgroundColor: color.hex }}
+                                    />
+                                    <span className="text-sm font-medium whitespace-nowrap">{color.label}</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
@@ -371,7 +373,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
             {product.variants?.regions?.length > 0 && (
                 <div className="space-y-3">
                     <h3 className="text-sm font-semibold text-foreground">Region</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {product.variants.regions.map((region) => (
                             <button
                                 key={region.id}
