@@ -46,6 +46,9 @@ export default function CategoryDetailPage({ params }) {
     // New state for dynamic banner color
     const [bannerColor, setBannerColor] = useState('bg-[#103E34]');
 
+    // State for brand banners from API
+    const [brandBanners, setBrandBanners] = useState({});
+
     // Filter States
     const [priceRange, setPriceRange] = useState({ min: 0, max: 200000 });
     const [availability, setAvailability] = useState('all');
@@ -122,17 +125,20 @@ export default function CategoryDetailPage({ params }) {
             const response = await fetch(url);
 
             if (!response.ok) {
-                return [];
+                return { products: [], brandBanners: {} };
             }
 
             const data = await response.json();
 
             if (!data.success || !data.data || data.data.length === 0) {
-                return [];
+                return { products: [], brandBanners: {} };
             }
 
+            // Extract brand banners from filter_options (only on first page typically has this)
+            const apiBrandBanners = data.filter_options?.brand_banners || {};
+
             // Process products
-            return data.data.map(product => {
+            const products = data.data.map(product => {
                 // Get the base retail price (this is the original price before any discount)
                 const retailPrice = parseFloat(product.retails_price);
 
@@ -181,9 +187,11 @@ export default function CategoryDetailPage({ params }) {
                     brands: product.brands
                 };
             });
+
+            return { products, brandBanners: apiBrandBanners };
         } catch (error) {
             console.error(`Error fetching page ${page}:`, error);
-            return [];
+            return { products: [], brandBanners: {} };
         }
     };
 
@@ -196,9 +204,15 @@ export default function CategoryDetailPage({ params }) {
             setCurrentPage(1);
             setTotalPagesKnown(1);
             setAllPages({});
+            setBrandBanners({});
 
             // Fetch first page immediately
-            const firstPageProducts = await fetchProductsPage(1);
+            const { products: firstPageProducts, brandBanners: apiBrandBanners } = await fetchProductsPage(1);
+
+            // Store brand banners from first page (this is where filter_options is returned)
+            if (Object.keys(apiBrandBanners).length > 0) {
+                setBrandBanners(apiBrandBanners);
+            }
 
             if (firstPageProducts.length > 0) {
                 setAllPages({ 1: firstPageProducts });
@@ -224,7 +238,7 @@ export default function CategoryDetailPage({ params }) {
             let page = 2;
 
             while (true) {
-                const pageProducts = await fetchProductsPage(page);
+                const { products: pageProducts } = await fetchProductsPage(page);
 
                 if (pageProducts.length === 0) {
                     setIsFetchingBackground(false);
@@ -480,6 +494,7 @@ export default function CategoryDetailPage({ params }) {
             {(() => {
                 let bannerText = '';
                 let subText = 'Explore our collection';
+                let brandBannerUrl = null;
 
                 // Always try to get categoryName first as fallback
                 if (categoryName) {
@@ -493,11 +508,34 @@ export default function CategoryDetailPage({ params }) {
                     if (brandObj) {
                         bannerText = brandObj.name;
                         subText = `Check out the latest products from ${brandObj.name}`;
+
+                        // Check if we have a banner image for this brand
+                        if (brandBanners[selectedBrand]) {
+                            brandBannerUrl = brandBanners[selectedBrand];
+                        }
                     }
                 }
 
                 if (!bannerText) return <div className="pt-6"></div>; // Placeholder space if loading
 
+                // If we have a brand banner image, show it without overlay
+                if (brandBannerUrl) {
+                    return (
+                        <div className="container pt-6">
+                            <div className="relative h-40 md:h-52 w-full rounded-2xl overflow-hidden shadow-lg">
+                                <Image
+                                    src={brandBannerUrl}
+                                    alt={bannerText}
+                                    fill
+                                    className="object-cover"
+                                    unoptimized
+                                />
+                            </div>
+                        </div>
+                    );
+                }
+
+                // Fallback to text-based colored banner
                 return (
                     <div className="container pt-6">
                         <div className={`relative h-40 md:h-52 w-full rounded-2xl overflow-hidden shadow-lg transition-colors duration-500 ${bannerColor} flex flex-col items-center justify-center text-center px-4`}>
