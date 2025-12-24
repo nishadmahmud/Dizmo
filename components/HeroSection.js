@@ -51,7 +51,7 @@ export default function HeroSection() {
     const [banners, setBanners] = useState(defaultBanners);
     const [loading, setLoading] = useState(true);
 
-    // Fetch sliders and banners from API
+    // Fetch sliders and banners from API with caching
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -60,19 +60,29 @@ export default function HeroSection() {
                 const sliderEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_SLIDERS;
                 const bannerEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_BANNERS;
 
+                // Check localStorage cache first
+                const cachedData = localStorage.getItem('hero_section_cache');
+                if (cachedData) {
+                    const { slides: cachedSlides, banners: cachedBanners, timestamp } = JSON.parse(cachedData);
+                    // Use cache if less than 5 minutes old
+                    if (Date.now() - timestamp < 5 * 60 * 1000) {
+                        if (cachedSlides?.length) setSlides(cachedSlides);
+                        if (cachedBanners?.length) setBanners(cachedBanners);
+                        setLoading(false);
+                        return;
+                    }
+                }
+
                 // Fetch sliders
                 const sliderUrl = `${apiBaseUrl}${sliderEndpoint}/${storeId}`;
-                console.log('Fetching sliders from:', sliderUrl);
-
                 const sliderResponse = await fetch(sliderUrl);
+                let fetchedSlides = null;
 
                 if (sliderResponse.ok) {
                     const sliderData = await sliderResponse.json();
-                    console.log('Slider data:', sliderData);
-
                     if (sliderData.success && sliderData.data && sliderData.data.length > 0) {
                         const sliderInfo = sliderData.data[0];
-                        const fetchedSlides = sliderInfo.image_path.map((imagePath, index) => ({
+                        fetchedSlides = sliderInfo.image_path.map((imagePath, index) => ({
                             id: index + 1,
                             image: imagePath,
                             link: sliderInfo.product_id[index]
@@ -85,17 +95,13 @@ export default function HeroSection() {
 
                 // Fetch banners
                 const bannerUrl = `${apiBaseUrl}${bannerEndpoint}/${storeId}`;
-                console.log('Fetching banners from:', bannerUrl);
-
                 const bannerResponse = await fetch(bannerUrl);
+                let fetchedBanners = null;
 
                 if (bannerResponse.ok) {
                     const bannerData = await bannerResponse.json();
-                    console.log('Banner data:', bannerData);
-
                     if (bannerData.success && bannerData.data && bannerData.data.length >= 2) {
-                        // Get first two banners for side section
-                        const fetchedBanners = bannerData.data.slice(0, 2).map((banner) => ({
+                        fetchedBanners = bannerData.data.slice(0, 2).map((banner) => ({
                             id: banner.id,
                             image: banner.image_path,
                             link: banner.button_url,
@@ -104,9 +110,15 @@ export default function HeroSection() {
                         setBanners(fetchedBanners);
                     }
                 }
+
+                // Cache the fetched data
+                localStorage.setItem('hero_section_cache', JSON.stringify({
+                    slides: fetchedSlides,
+                    banners: fetchedBanners,
+                    timestamp: Date.now()
+                }));
             } catch (error) {
                 console.error("Error fetching data:", error);
-                // Keep default slides and banners on error
             } finally {
                 setLoading(false);
             }
@@ -131,21 +143,7 @@ export default function HeroSection() {
         setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
     };
 
-    if (loading) {
-        return (
-            <section className="py-6 bg-background">
-                <div className="container">
-                    <div className="mb-6">
-                        <div className="relative rounded-2xl overflow-hidden bg-secondary/30 h-[400px] animate-pulse">
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <p className="text-muted-foreground">Loading...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        );
-    }
+    // No loading blocker - show default content immediately while API fetches in background
 
     return (
         <section className="py-6 bg-background">
@@ -167,6 +165,8 @@ export default function HeroSection() {
                                     src={slide.image}
                                     alt={`Banner ${slide.id}`}
                                     fill
+                                    priority={index === 0}
+                                    loading="eager"
                                     className="w-full h-full object-cover"
                                 />
                             </Link>
@@ -213,6 +213,8 @@ export default function HeroSection() {
                                     src={banner.image}
                                     alt={banner.title || `Banner ${banner.id}`}
                                     fill
+                                    priority
+                                    loading="eager"
                                     className="w-full h-full object-cover"
                                 />
                             </Link>
