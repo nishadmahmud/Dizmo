@@ -4,10 +4,10 @@ import { useCart } from "@/context/CartContext";
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, CheckCircle, Truck, Store, CreditCard, Banknote, Info, CheckSquare, MapPin, ShieldCheck } from "lucide-react";
+import { ArrowLeft, CheckCircle, Truck, Store, CreditCard, Banknote, Info, CheckSquare, MapPin, ShieldCheck, Loader2 } from "lucide-react";
 
 export default function CheckoutPage() {
-    const { cart, cartTotal } = useCart();
+    const { cart, cartTotal, clearCart } = useCart();
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -22,6 +22,9 @@ export default function CheckoutPage() {
     });
     const [orderPlaced, setOrderPlaced] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState("");
+    const [invoiceId, setInvoiceId] = useState("");
 
     const districts = {
         dhaka: ["Dhaka", "Faridpur", "Gazipur", "Gopalganj", "Kishoreganj", "Madaripur", "Manikganj", "Munshiganj", "Narayanganj", "Narsingdi", "Rajbari", "Shariatpur", "Tangail"],
@@ -45,16 +48,111 @@ export default function CheckoutPage() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!agreedToTerms) {
             alert("Please agree to the Terms and Conditions");
             return;
         }
-        // Simulate order placement
-        setTimeout(() => {
+
+        if (cart.length === 0) {
+            alert("Your cart is empty");
+            return;
+        }
+
+        setIsSubmitting(true);
+        setError("");
+
+        try {
+            const storeId = process.env.NEXT_PUBLIC_STORE_ID;
+
+            // Construct full address string
+            const fullAddress = `${formData.address}, ${formData.upazila}, ${formData.district}, ${formData.division}${formData.postCode ? `, ${formData.postCode}` : ''}`;
+
+            // Build product array matching API structure
+            const productArray = cart.map(item => ({
+                product_id: item.id,
+                qty: item.quantity,
+                price: item.price,
+                mode: 1,
+                size: 1,
+                sales_id: parseInt(storeId)
+            }));
+
+            // Calculate delivery fee
+            const deliveryFee = formData.deliveryMethod === 'pickup' ? 0 : 80;
+
+            // Construct payload matching exact API structure
+            const payload = {
+                pay_mode: formData.paymentMethod === 'cod' ? 'Cash' : 'Online',
+                paid_amount: formData.paymentMethod === 'cod' ? 0 : cartTotal + deliveryFee,
+                user_id: parseInt(storeId),
+                sub_total: cartTotal,
+                vat: 0,
+                tax: 0,
+                discount: 0,
+                product: productArray,
+                delivery_method_id: formData.deliveryMethod === 'courier' ? 1 : 2,
+                delivery_info_id: 1,
+                delivery_customer_name: formData.fullName,
+                delivery_customer_address: fullAddress,
+                delivery_customer_phone: formData.phone,
+                delivery_fee: deliveryFee,
+                variants: [],
+                imeis: [null],
+                created_at: new Date().toISOString(),
+                customer_id: null, // Will be created by API
+                customer_name: formData.fullName,
+                customer_phone: formData.phone,
+                sales_id: parseInt(storeId),
+                wholeseller_id: 1,
+                status: 3
+            };
+
+            const response = await fetch('https://www.outletexpense.xyz/api/public/ecommerce-save-sales', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            // Check if response is JSON before parsing
+            const contentType = response.headers.get('content-type');
+            let data;
+
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                // Server returned HTML (error page) instead of JSON
+                const textResponse = await response.text();
+                console.error('Server returned non-JSON response:', textResponse.substring(0, 500));
+                throw new Error('Server error. Please try again later.');
+            }
+
+            // Check for API-level errors
+            if (data.success === false) {
+                throw new Error(data.message || 'Failed to place order. Please try again.');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to place order. Please try again.');
+            }
+
+            // Store invoice ID if returned (it's in data.data.invoice_id)
+            if (data.data?.invoice_id) {
+                setInvoiceId(data.data.invoice_id);
+            }
+
+            // Clear cart and show success
+            clearCart();
             setOrderPlaced(true);
-        }, 1500);
+        } catch (err) {
+            console.error('Order placement error:', err);
+            setError(err.message || 'Something went wrong. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (orderPlaced) {
@@ -69,12 +167,26 @@ export default function CheckoutPage() {
                         <p className="text-muted-foreground">
                             Thank you for your purchase. Your order has been received and is being processed.
                         </p>
-                        <Link
-                            href="/"
-                            className="inline-block bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors"
-                        >
-                            Continue Shopping
-                        </Link>
+                        {invoiceId && (
+                            <div className="bg-secondary/50 rounded-lg p-4">
+                                <p className="text-sm text-muted-foreground">Your Invoice ID</p>
+                                <p className="text-lg font-bold text-foreground">{invoiceId}</p>
+                            </div>
+                        )}
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            <Link
+                                href="/track-order"
+                                className="inline-block bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors"
+                            >
+                                Track Order
+                            </Link>
+                            <Link
+                                href="/"
+                                className="inline-block bg-secondary text-foreground px-6 py-3 rounded-lg font-bold hover:bg-secondary/80 transition-colors"
+                            >
+                                Continue Shopping
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -380,12 +492,26 @@ export default function CheckoutPage() {
                                 </label>
                             </div>
 
+                            {error && (
+                                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                    <p className="text-sm text-red-600">{error}</p>
+                                </div>
+                            )}
+
                             <button
                                 type="submit"
                                 form="checkout-form"
-                                className="w-full bg-[#FCB042] text-white py-3.5 rounded-full font-bold hover:bg-[#e5a03d] transition-colors shadow-lg hover:shadow-[#FCB042]/25"
+                                disabled={isSubmitting || cart.length === 0}
+                                className="w-full bg-[#FCB042] text-white py-3.5 rounded-full font-bold hover:bg-[#e5a03d] transition-colors shadow-lg hover:shadow-[#FCB042]/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
-                                Confirm & Place Order
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                        Processing...
+                                    </>
+                                ) : (
+                                    'Confirm & Place Order'
+                                )}
                             </button>
                         </div>
                     </div>
