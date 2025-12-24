@@ -422,42 +422,101 @@ export default function Navbar() {
                             </button>
                         </div>
 
-                        {/* Desktop Search Results Dropdown */}
+                        {/* Desktop Search Results Dropdown - Redesigned */}
                         {showResults && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-xl shadow-xl overflow-hidden z-50">
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-xl shadow-2xl overflow-hidden z-50 min-w-[600px] lg:min-w-[800px]">
                                 {searchResults.length > 0 ? (
-                                    <ul>
-                                        {searchResults.map((product) => (
-                                            <li key={product.id}>
+                                    <div className="flex">
+                                        {/* Left Column - Categories */}
+                                        <div className="w-1/3 border-r border-border bg-gray-50/50 p-4">
+                                            <h3 className="font-bold text-sm text-foreground mb-3">Categories</h3>
+                                            <ul className="space-y-2">
+                                                {/* Get unique categories from search results */}
+                                                {[...new Set(searchResults.map(p => p.category || 'Products'))].slice(0, 8).map((category, idx) => (
+                                                    <li key={idx}>
+                                                        <button
+                                                            onClick={() => {
+                                                                router.push(`/products?search=${encodeURIComponent(searchQuery)}&category=${encodeURIComponent(category)}`);
+                                                                setShowResults(false);
+                                                            }}
+                                                            className="text-sm text-muted-foreground hover:text-[#FCB042] transition-colors text-left w-full truncate"
+                                                        >
+                                                            {category}
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+
+                                        {/* Right Column - Products Grid */}
+                                        <div className="w-2/3 p-4">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <h3 className="font-bold text-sm text-foreground">Products</h3>
                                                 <button
-                                                    onClick={() => handleResultClick(product.id)}
-                                                    className="w-full flex items-center gap-3 p-3 hover:bg-secondary transition-colors text-left"
+                                                    onClick={() => {
+                                                        router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+                                                        setShowResults(false);
+                                                    }}
+                                                    className="text-sm text-[#FCB042] hover:text-[#e5a03d] font-medium flex items-center gap-1"
                                                 >
-                                                    <div className="h-10 w-10 rounded-md bg-secondary overflow-hidden flex-shrink-0">
-                                                        <Image unoptimized src={product.image} alt={product.name} width={40} height={40} className="h-full w-full object-cover" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium line-clamp-1">{product.name}</p>
-                                                        <p className="text-xs text-muted-foreground">৳{product.price.toLocaleString()}</p>
-                                                    </div>
+                                                    View all results <ChevronRight className="h-4 w-4" />
                                                 </button>
-                                            </li>
-                                        ))}
-                                        <li className="border-t border-border">
-                                            <button
-                                                onClick={() => {
-                                                    router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
-                                                    setShowResults(false);
-                                                }}
-                                                className="w-full p-3 text-center text-sm text-primary font-medium hover:bg-secondary transition-colors"
-                                            >
-                                                View all results
-                                            </button>
-                                        </li>
-                                    </ul>
+                                            </div>
+
+                                            <div className="grid grid-cols-3 gap-3">
+                                                {searchResults.slice(0, 6).map((product) => {
+                                                    const discount = product.originalPrice && product.originalPrice > product.price
+                                                        ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+                                                        : 0;
+
+                                                    return (
+                                                        <button
+                                                            key={product.id}
+                                                            onClick={() => handleResultClick(product.id)}
+                                                            className="bg-white border border-border rounded-lg p-2 hover:shadow-md hover:border-[#FCB042]/50 transition-all text-left group"
+                                                        >
+                                                            {/* Product Image */}
+                                                            <div className="aspect-square rounded-md bg-gray-50 overflow-hidden mb-2 relative">
+                                                                <Image
+                                                                    unoptimized
+                                                                    src={product.image}
+                                                                    alt={product.name}
+                                                                    fill
+                                                                    className="object-contain p-2 group-hover:scale-105 transition-transform"
+                                                                />
+                                                            </div>
+
+                                                            {/* Product Name */}
+                                                            <p className="text-xs font-medium text-foreground line-clamp-2 mb-1 min-h-[2rem]">
+                                                                {product.name}
+                                                            </p>
+
+                                                            {/* Price */}
+                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                <span className="text-sm font-bold text-foreground">
+                                                                    ৳ {product.price.toLocaleString()}
+                                                                </span>
+                                                                {product.originalPrice && product.originalPrice > product.price && (
+                                                                    <>
+                                                                        <span className="text-xs text-muted-foreground line-through">
+                                                                            ৳{product.originalPrice.toLocaleString()}
+                                                                        </span>
+                                                                        <span className="text-[10px] font-bold text-[#FCB042] bg-[#FCB042]/10 px-1.5 py-0.5 rounded">
+                                                                            {discount}% OFF
+                                                                        </span>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
                                 ) : (
-                                    <div className="p-4 text-center text-sm text-muted-foreground">
-                                        No products found
+                                    <div className="p-8 text-center text-muted-foreground">
+                                        <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                        <p className="text-sm">No products found for "{searchQuery}"</p>
                                     </div>
                                 )}
                             </div>

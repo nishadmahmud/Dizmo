@@ -12,7 +12,7 @@ export function ProductProvider({ children }) {
     const hasFetched = useRef(false);
 
     // Helper to process raw product data
-    const processProducts = (productData, categoryId) => {
+    const processProducts = (productData, categoryName) => {
         return productData
             .map((product) => {
                 // Get the lowest price from imeis if available
@@ -28,7 +28,7 @@ export function ProductProvider({ children }) {
                     price: lowestPrice,
                     originalPrice: parseFloat(product.retails_price),
                     discount: parseFloat(product.discount) || 0,
-                    category: categoryId,
+                    category: categoryName,
                     inStock: product.status === "In stock",
                     image: product.image_path,
                     brand: product.brand_name,
@@ -61,6 +61,10 @@ export function ProductProvider({ children }) {
                 if (!categoriesData.success || !categoriesData.data) return;
 
                 const categoryIds = categoriesData.data.map(cat => cat.category_id.toString());
+                const categoryMap = {};
+                categoriesData.data.forEach(cat => {
+                    categoryMap[cat.category_id.toString()] = cat.name;
+                });
 
                 if (categoryIds.length === 0) {
                     setLoading(false);
@@ -93,7 +97,7 @@ export function ProductProvider({ children }) {
                     }
 
                     if (allFirstCategoryProducts.length > 0) {
-                        const processed = processProducts(allFirstCategoryProducts, firstCategoryId);
+                        const processed = processProducts(allFirstCategoryProducts, categoryMap[firstCategoryId] || 'Products');
                         setProducts(prev => [...prev, ...processed]);
                     }
                 } catch (err) {
@@ -144,7 +148,7 @@ export function ProductProvider({ children }) {
                         try {
                             const productsData = await fetchCategoryWithPagination(catId);
                             if (productsData.length > 0) {
-                                return processProducts(productsData, catId);
+                                return processProducts(productsData, categoryMap[catId] || 'Products');
                             }
                             return [];
                         } catch (e) {
