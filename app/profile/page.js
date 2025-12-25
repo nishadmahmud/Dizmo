@@ -111,10 +111,12 @@ export default function ProfilePage() {
         setSaving(true);
 
         try {
+            const token = localStorage.getItem("dizmo_token");
             const response = await fetch("https://www.outletexpense.xyz/api/customer/update-profile", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     id: user.id,
@@ -333,8 +335,8 @@ export default function ProfilePage() {
                                 key={tab.type}
                                 onClick={() => setActiveTab(tab.type)}
                                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${activeTab === tab.type
-                                        ? "border-[#103E34] text-[#103E34]"
-                                        : "border-transparent text-muted-foreground hover:text-foreground"
+                                    ? "border-[#103E34] text-[#103E34]"
+                                    : "border-transparent text-muted-foreground hover:text-foreground"
                                     }`}
                             >
                                 <tab.icon className="h-4 w-4" />

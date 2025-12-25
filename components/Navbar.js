@@ -30,7 +30,7 @@ const defaultCategories = [
 const iconMap = {
     // Navbar categories (primary)
     "Phones": Smartphone,
-    "Tablet": TabletSmartphone,         // Tablet-specific icon
+    "Tablet": TabletSmartphone,
     "Laptop": Laptop,
     "Smart Watch": Watch,
     "Airpods": Headphones,
