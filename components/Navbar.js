@@ -56,7 +56,7 @@ const NAVBAR_CATEGORIES = [
 export default function Navbar() {
     const { openDrawer, cartCount } = useCart();
     const { searchProducts } = useProduct();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, loading: authLoading } = useAuth();
     const pathname = usePathname();
     const router = useRouter();
     const recognitionRef = useRef(null);
@@ -71,6 +71,29 @@ export default function Navbar() {
     const [loadingBrands, setLoadingBrands] = useState({});
     const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
     const [brandsPreloaded, setBrandsPreloaded] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    // Check localStorage for auth on mount and listen for changes
+    useEffect(() => {
+        const checkAuth = () => {
+            const token = localStorage.getItem("dizmo_token");
+            const user = localStorage.getItem("dizmo_user");
+            setIsLoggedIn(!!(token && user));
+        };
+
+        checkAuth();
+
+        // Listen for storage changes (from login/logout)
+        window.addEventListener('storage', checkAuth);
+
+        // Also check periodically in case of same-tab updates
+        const interval = setInterval(checkAuth, 500);
+
+        return () => {
+            window.removeEventListener('storage', checkAuth);
+            clearInterval(interval);
+        };
+    }, []);
 
     // Search State
     const [searchQuery, setSearchQuery] = useState("");
@@ -569,12 +592,15 @@ export default function Navbar() {
                             )}
                         </button>
 
-                        <Link
-                            href="/login"
+                        <button
+                            onClick={() => {
+                                const token = localStorage.getItem("dizmo_token");
+                                router.push(token ? "/profile" : "/login");
+                            }}
                             className="hidden md:block p-2 hover:bg-white/10 rounded-full transition-colors"
                         >
                             <User className="h-5 w-5 text-white" />
-                        </Link>
+                        </button>
 
                         <button
                             onClick={() => setShowMenu(true)}
@@ -956,14 +982,17 @@ export default function Navbar() {
                     </Link>
 
                     {/* Profile (Mobile) */}
-                    <Link
-                        href={isAuthenticated ? "/profile" : "/login"}
+                    <button
+                        onClick={() => {
+                            const token = localStorage.getItem("dizmo_token");
+                            router.push(token ? "/profile" : "/login");
+                        }}
                         className={`flex flex-col items-center justify-center gap-1 transition-colors ${(pathname === '/profile' || pathname === '/login') ? 'text-[#FCB042]' : 'text-white hover:text-[#FCB042]'
                             }`}
                     >
                         <User className="h-5 w-5" />
-                        <span className="text-[10px] font-medium">{isAuthenticated ? 'Profile' : 'Login'}</span>
-                    </Link>
+                        <span className="text-[10px] font-medium">{isLoggedIn ? 'Profile' : 'Login'}</span>
+                    </button>
                 </div>
             </nav >
 

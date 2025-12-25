@@ -33,8 +33,9 @@ export default function LoginPage() {
 
         try {
             await login(email, password);
-            // Redirect to home or previous page
+            // Use router.push with refresh to update auth state
             router.push("/");
+            router.refresh();
         } catch (err) {
             console.error("Login error:", err);
             setError(err.message || "Login failed. Please try again.");
