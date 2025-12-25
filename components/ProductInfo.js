@@ -319,20 +319,19 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
 
             {/* Storage Variant Selector */}
             {product.variants?.storage?.length > 0 && (
-                <div className="space-y-3">
-                    <h3 className="text-sm font-semibold text-foreground">Storage</h3>
+                <div className="md:space-y-3 bg-white md:bg-transparent p-4 md:p-0 rounded-xl md:rounded-none border md:border-0 border-border">
+                    <h3 className="text-sm font-semibold text-foreground mb-3 md:mb-0">Storage:</h3>
                     <div className="flex flex-wrap gap-2">
                         {product.variants.storage.map((storage) => (
                             <button
                                 key={storage.id}
                                 onClick={() => handleStorageChange(storage.id)}
-                                className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${selectedStorage === storage.id
+                                className={`px-4 py-2 rounded-full md:rounded-lg border text-sm font-medium transition-all ${selectedStorage === storage.id
                                     ? "border-primary bg-primary text-white"
-                                    : "border-border hover:border-primary/50"
+                                    : "border-border hover:border-primary/50 bg-white md:bg-transparent"
                                     }`}
                             >
-                                <div>{storage.label}</div>
-                                <div className="text-xs opacity-80">৳{storage.price.toLocaleString()}</div>
+                                <span>{storage.label}</span>
                             </button>
                         ))}
                     </div>
@@ -341,50 +340,47 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
 
             {/* Color Variant Selector */}
             {product.variants?.colors?.length > 0 && (
-                <div className="space-y-3">
-                    <h3 className="text-sm font-semibold text-foreground">Color</h3>
-                    <div className="overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide md:overflow-visible md:pb-0">
-                        <div className="flex gap-3 md:flex-wrap min-w-max md:min-w-0">
-                            {availableColors.map((color) => (
-                                <button
-                                    key={color.id}
-                                    onClick={() => {
-                                        setSelectedColor(color.id);
-                                        if (onColorChange) onColorChange(color.id);
-                                    }}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all flex-shrink-0 ${selectedColor === color.id
-                                        ? "border-primary ring-2 ring-primary"
-                                        : "border-border hover:border-primary/50"
-                                        }`}
-                                >
-                                    <div
-                                        className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
-                                        style={{ backgroundColor: color.hex }}
-                                    />
-                                    <span className="text-sm font-medium whitespace-nowrap">{color.label}</span>
-                                </button>
-                            ))}
-                        </div>
+                <div className="md:space-y-3 bg-white md:bg-transparent p-4 md:p-0 rounded-xl md:rounded-none border md:border-0 border-border">
+                    <h3 className="text-sm font-semibold text-foreground mb-3 md:mb-0">Color:</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {availableColors.map((color) => (
+                            <button
+                                key={color.id}
+                                onClick={() => {
+                                    setSelectedColor(color.id);
+                                    if (onColorChange) onColorChange(color.id);
+                                }}
+                                className={`flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full md:rounded-lg border transition-all ${selectedColor === color.id
+                                    ? "border-primary ring-2 ring-primary bg-primary/5"
+                                    : "border-border hover:border-primary/50 bg-white md:bg-transparent"
+                                    }`}
+                            >
+                                <div
+                                    className="w-4 h-4 md:w-6 md:h-6 rounded-full border-2 border-white shadow-sm"
+                                    style={{ backgroundColor: color.hex }}
+                                />
+                                <span className="text-sm font-medium whitespace-nowrap">{color.label}</span>
+                            </button>
+                        ))}
                     </div>
                 </div>
             )}
 
             {/* Region Variant Selector */}
             {product.variants?.regions?.length > 0 && (
-                <div className="space-y-3">
-                    <h3 className="text-sm font-semibold text-foreground">Region</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div className="md:space-y-3 bg-white md:bg-transparent p-4 md:p-0 rounded-xl md:rounded-none border md:border-0 border-border">
+                    <h3 className="text-sm font-semibold text-foreground mb-3 md:mb-0">Region:</h3>
+                    <div className="flex flex-wrap gap-2">
                         {product.variants.regions.map((region) => (
                             <button
                                 key={region.id}
                                 onClick={() => setSelectedRegion(region.id)}
-                                className={`px-3 py-2 rounded-lg border text-sm transition-all ${selectedRegion === region.id
+                                className={`px-3 py-1.5 md:px-3 md:py-2 rounded-full md:rounded-lg border text-sm transition-all ${selectedRegion === region.id
                                     ? "border-primary bg-primary/5 ring-1 ring-primary"
-                                    : "border-border hover:border-primary/50"
+                                    : "border-border hover:border-primary/50 bg-white md:bg-transparent"
                                     }`}
                             >
-                                <div className="font-medium">{region.label}</div>
-                                <div className="text-xs text-muted-foreground">{region.description}</div>
+                                <span className="font-medium">{region.label}</span>
                             </button>
                         ))}
                     </div>
