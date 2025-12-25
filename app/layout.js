@@ -2,6 +2,7 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { ProductProvider } from "@/context/ProductContext";
+import { AuthProvider } from "@/context/AuthContext";
 import CartDrawer from "@/components/CartDrawer";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -23,15 +24,17 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${outfit.variable} antialiased`}>
-        <CartProvider>
-          <ProductProvider>
-            <Navbar />
-            {children}
-            <Footer />
-            <CartDrawer />
-            <FloatingActions />
-          </ProductProvider>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <ProductProvider>
+              <Navbar />
+              {children}
+              <Footer />
+              <CartDrawer />
+              <FloatingActions />
+            </ProductProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

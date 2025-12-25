@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useProduct } from "@/context/ProductContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
 // Default categories with icons as fallback
@@ -55,6 +56,7 @@ const NAVBAR_CATEGORIES = [
 export default function Navbar() {
     const { openDrawer, cartCount } = useCart();
     const { searchProducts } = useProduct();
+    const { isAuthenticated } = useAuth();
     const pathname = usePathname();
     const router = useRouter();
     const recognitionRef = useRef(null);
@@ -422,13 +424,13 @@ export default function Navbar() {
                             </button>
                         </div>
 
-                        {/* Desktop Search Results Dropdown - Redesigned */}
+                        {/* Search Results Dropdown - Responsive */}
                         {showResults && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-xl shadow-2xl overflow-hidden z-50 min-w-[600px] lg:min-w-[800px]">
+                            <div className="fixed md:absolute left-2 right-2 md:left-0 md:right-0 top-16 md:top-full mt-0 md:mt-2 bg-background border border-border rounded-xl shadow-2xl overflow-hidden z-[100] md:z-50 max-h-[70vh] md:max-h-[80vh] overflow-y-auto">
                                 {searchResults.length > 0 ? (
-                                    <div className="flex">
-                                        {/* Left Column - Categories */}
-                                        <div className="w-1/3 border-r border-border bg-gray-50/50 p-4">
+                                    <div className="flex flex-col md:flex-row">
+                                        {/* Left Column - Categories (Hidden on Mobile) */}
+                                        <div className="hidden md:block md:w-1/3 border-r border-border bg-gray-50/50 p-4">
                                             <h3 className="font-bold text-sm text-foreground mb-3">Categories</h3>
                                             <ul className="space-y-2">
                                                 {/* Get unique categories from search results */}
@@ -449,8 +451,8 @@ export default function Navbar() {
                                         </div>
 
                                         {/* Right Column - Products Grid */}
-                                        <div className="w-2/3 p-4">
-                                            <div className="flex items-center justify-between mb-4">
+                                        <div className="w-full md:w-2/3 p-3 md:p-4">
+                                            <div className="flex items-center justify-between mb-3 md:mb-4">
                                                 <h3 className="font-bold text-sm text-foreground">Products</h3>
                                                 <button
                                                     onClick={() => {
@@ -459,11 +461,11 @@ export default function Navbar() {
                                                     }}
                                                     className="text-sm text-[#FCB042] hover:text-[#e5a03d] font-medium flex items-center gap-1"
                                                 >
-                                                    View all results <ChevronRight className="h-4 w-4" />
+                                                    View all <ChevronRight className="h-4 w-4" />
                                                 </button>
                                             </div>
 
-                                            <div className="grid grid-cols-3 gap-3">
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                                                 {searchResults.slice(0, 6).map((product) => {
                                                     const discount = product.originalPrice && product.originalPrice > product.price
                                                         ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -482,29 +484,24 @@ export default function Navbar() {
                                                                     src={product.image}
                                                                     alt={product.name}
                                                                     fill
-                                                                    className="object-contain p-2 group-hover:scale-105 transition-transform"
+                                                                    className="object-contain p-1 md:p-2 group-hover:scale-105 transition-transform"
                                                                 />
                                                             </div>
 
                                                             {/* Product Name */}
-                                                            <p className="text-xs font-medium text-foreground line-clamp-2 mb-1 min-h-[2rem]">
+                                                            <p className="text-[10px] md:text-xs font-medium text-foreground line-clamp-2 mb-1 min-h-[2rem]">
                                                                 {product.name}
                                                             </p>
 
                                                             {/* Price */}
-                                                            <div className="flex items-center gap-2 flex-wrap">
-                                                                <span className="text-sm font-bold text-foreground">
-                                                                    ৳ {product.price.toLocaleString()}
+                                                            <div className="flex items-center gap-1 md:gap-2 flex-wrap">
+                                                                <span className="text-xs md:text-sm font-bold text-foreground">
+                                                                    ৳{product.price.toLocaleString()}
                                                                 </span>
                                                                 {product.originalPrice && product.originalPrice > product.price && (
-                                                                    <>
-                                                                        <span className="text-xs text-muted-foreground line-through">
-                                                                            ৳{product.originalPrice.toLocaleString()}
-                                                                        </span>
-                                                                        <span className="text-[10px] font-bold text-[#FCB042] bg-[#FCB042]/10 px-1.5 py-0.5 rounded">
-                                                                            {discount}% OFF
-                                                                        </span>
-                                                                    </>
+                                                                    <span className="text-[8px] md:text-[10px] font-bold text-[#FCB042] bg-[#FCB042]/10 px-1 py-0.5 rounded">
+                                                                        {discount}% OFF
+                                                                    </span>
                                                                 )}
                                                             </div>
                                                         </button>
@@ -514,8 +511,8 @@ export default function Navbar() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="p-8 text-center text-muted-foreground">
-                                        <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                    <div className="p-6 md:p-8 text-center text-muted-foreground">
+                                        <Search className="h-6 w-6 md:h-8 md:w-8 mx-auto mb-2 opacity-50" />
                                         <p className="text-sm">No products found for "{searchQuery}"</p>
                                     </div>
                                 )}
@@ -960,12 +957,12 @@ export default function Navbar() {
 
                     {/* Profile (Mobile) */}
                     <Link
-                        href="/login"
-                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${pathname === '/login' ? 'text-[#FCB042]' : 'text-white hover:text-[#FCB042]'
+                        href={isAuthenticated ? "/profile" : "/login"}
+                        className={`flex flex-col items-center justify-center gap-1 transition-colors ${(pathname === '/profile' || pathname === '/login') ? 'text-[#FCB042]' : 'text-white hover:text-[#FCB042]'
                             }`}
                     >
                         <User className="h-5 w-5" />
-                        <span className="text-[10px] font-medium">Profile</span>
+                        <span className="text-[10px] font-medium">{isAuthenticated ? 'Profile' : 'Login'}</span>
                     </Link>
                 </div>
             </nav >
