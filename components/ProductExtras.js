@@ -3,6 +3,82 @@
 import { useState } from "react";
 import { FileText, Gift, Truck, CreditCard, X, ShieldCheck, CheckCircle2, Clock, MapPin } from "lucide-react";
 
+// EMI Calculator Component
+function EMICalculator({ currentPrice, bankEmiData, getEmiPlans }) {
+    const [selectedBank, setSelectedBank] = useState(bankEmiData[0]);
+    const plans = getEmiPlans(selectedBank);
+
+    return (
+        <div className="space-y-4">
+            <h3 className="font-bold text-lg text-[#103E34]">EMI Options</h3>
+
+            <div className="flex gap-4 h-[calc(100vh-100px)]">
+                {/* Left: Bank List */}
+                <div className="w-1/3 overflow-y-auto border border-gray-200 rounded-lg">
+                    {bankEmiData.map((bank, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => setSelectedBank(bank)}
+                            className={`w-full flex items-center gap-3 p-3 text-left border-b border-gray-100 last:border-0 transition-all ${selectedBank.bank === bank.bank
+                                ? 'bg-orange-50 border-l-4 border-l-[#FCB042]'
+                                : 'hover:bg-gray-50'
+                                }`}
+                        >
+                            <div className={`w-8 h-8 ${bank.color} rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
+                                {bank.initial}
+                            </div>
+                            <span className="text-sm font-medium text-gray-700 truncate">{bank.bank}</span>
+                        </button>
+                    ))}
+                </div>
+
+                {/* Right: EMI Details */}
+                <div className="w-2/3 space-y-4">
+                    {/* Amount Display */}
+                    <div>
+                        <label className="text-sm text-gray-500 mb-1 block">Enter Amount</label>
+                        <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-lg font-medium">
+                            {currentPrice.toLocaleString()}
+                        </div>
+                    </div>
+
+                    {/* EMI Table */}
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                        <table className="w-full text-sm">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="text-left p-3 font-medium text-gray-600">Plan (Monthly)</th>
+                                    <th className="text-left p-3 font-medium text-gray-600">EMI</th>
+                                    <th className="text-left p-3 font-medium text-gray-600">Charge</th>
+                                    <th className="text-left p-3 font-medium text-gray-600">Effective Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {plans.length > 0 ? plans.map((plan, idx) => (
+                                    <tr key={idx} className="border-t border-gray-100">
+                                        <td className="p-3 font-medium">{plan.months}</td>
+                                        <td className="p-3 text-gray-700">৳ {plan.emi.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                                        <td className="p-3 text-gray-700">{plan.charge}%</td>
+                                        <td className="p-3 text-gray-700">৳ {plan.effectiveCost.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                                    </tr>
+                                )) : (
+                                    <tr>
+                                        <td colSpan={4} className="p-4 text-center text-gray-400">No EMI plans available</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p className="text-xs text-gray-500">
+                        * EMI facility available for purchases over ৳5,000. Terms apply.
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function ProductExtras({ product, selectedCarePlans, toggleCarePlan }) {
     const [activeDrawer, setActiveDrawer] = useState(null);
 
@@ -166,27 +242,124 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                 );
             case "emi":
                 const currentPrice = product.price || 0;
+
+                // Bank EMI data (Online rates - no POS charge)
+                const bankEmiData = [
+                    { bank: "AB Bank", initial: "A", color: "bg-red-500", m3: 4.16, m6: 6.38, m9: 7.52, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "AB Bank - Online", initial: "A", color: "bg-red-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Al-Arafah Islami Bank", initial: "A", color: "bg-red-600", m3: 4.71, m6: 5.82, m9: 6.95, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "Al-Arafah Islami Bank - Online", initial: "A", color: "bg-red-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Bank Asia", initial: "B", color: "bg-orange-500", m3: 4.71, m6: 5.82, m9: 6.95, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "Bank Asia - Online", initial: "B", color: "bg-orange-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Brac Bank", initial: "B", color: "bg-orange-600", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: 12.35, m24: 16.27, m36: null },
+                    { bank: "CBBL - Online", initial: "C", color: "bg-blue-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Citizens Bank", initial: "C", color: "bg-blue-500", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "Citizens Bank - Online", initial: "C", color: "bg-blue-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
+                    { bank: "City Bank", initial: "C", color: "bg-blue-600", m3: 4.16, m6: 5.82, m9: 6.95, m12: 8.10, m18: 11.73, m24: 15.60, m36: 24.22 },
+                    { bank: "City Bank (AMEX) - Online", initial: "C", color: "bg-blue-700", m3: 6.72, m6: 8.34, m9: 10.58, m12: 12.92, m18: 16.62, m24: 21.97, m36: 27.85 },
+                    { bank: "Commercial Bank of Ceylon", initial: "C", color: "bg-blue-800", m3: 5.26, m6: 7.52, m9: 9.89, m12: 11.73, m18: 14.94, m24: 19.04, m36: null },
+                    { bank: "DBBL", initial: "D", color: "bg-green-600", m3: 4.60, m6: 6.83, m9: 7.99, m12: 9.17, m18: 14.15, m24: 15.47, m36: 18.20 },
+                    { bank: "DBBL - Online", initial: "D", color: "bg-green-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Dhaka Bank", initial: "D", color: "bg-green-700", m3: 3.62, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: 23.45 },
+                    { bank: "Dhaka Bank - Online", initial: "D", color: "bg-green-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
+                    { bank: "Eastern Bank", initial: "E", color: "bg-purple-500", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: 11.73, m24: 16.27, m36: 23.45 },
+                    { bank: "Eastern Bank - Online", initial: "E", color: "bg-purple-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Exim Bank - Online", initial: "E", color: "bg-purple-600", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
+                    { bank: "Islami Bank", initial: "I", color: "bg-teal-500", m3: 4.16, m6: 5.26, m9: 6.38, m12: 7.52, m18: null, m24: null, m36: null },
+                    { bank: "Islami Bank - Online", initial: "I", color: "bg-teal-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Jamuna Bank", initial: "J", color: "bg-indigo-500", m3: 4.16, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
+                    { bank: "Jamuna Bank - Online", initial: "J", color: "bg-indigo-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Lanka Bangla", initial: "L", color: "bg-lime-600", m3: 4.16, m6: 6.38, m9: 7.52, m12: 9.89, m18: null, m24: null, m36: null },
+                    { bank: "Lanka Bangla - Online", initial: "L", color: "bg-lime-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Meghna Bank", initial: "M", color: "bg-pink-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
+                    { bank: "Meghna Bank - Online", initial: "M", color: "bg-pink-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Mercantile Bank", initial: "M", color: "bg-pink-600", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "Mercantile Bank - Online", initial: "M", color: "bg-pink-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Midland Bank", initial: "M", color: "bg-fuchsia-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
+                    { bank: "Midland Bank - Online", initial: "M", color: "bg-fuchsia-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Modhumoti Bank", initial: "M", color: "bg-violet-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 8.69, m18: 11.11, m24: 14.94, m36: null },
+                    { bank: "Modhumoti Bank - Online", initial: "M", color: "bg-violet-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Mutual Trust Bank", initial: "M", color: "bg-rose-500", m3: 3.62, m6: 5.26, m9: 6.95, m12: 9.28, m18: null, m24: null, m36: null },
+                    { bank: "Mutual Trust Bank - Online", initial: "M", color: "bg-rose-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "NCC Bank", initial: "N", color: "bg-cyan-500", m3: 3.62, m6: 4.16, m9: 6.38, m12: 7.52, m18: 11.11, m24: null, m36: null },
+                    { bank: "NCC Bank - Online", initial: "N", color: "bg-cyan-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "NRB Bank", initial: "N", color: "bg-cyan-600", m3: 3.09, m6: 5.26, m9: 6.38, m12: 7.52, m18: 12.35, m24: 14.94, m36: 19.04 },
+                    { bank: "NRB Bank - Online", initial: "N", color: "bg-cyan-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "NRB Commercial Bank", initial: "N", color: "bg-sky-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 8.10, m18: null, m24: null, m36: null },
+                    { bank: "NRBC Bank - Online", initial: "N", color: "bg-sky-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "One Bank", initial: "O", color: "bg-amber-500", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "One Bank - Online", initial: "O", color: "bg-amber-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
+                    { bank: "Premier Bank", initial: "P", color: "bg-amber-600", m3: 4.16, m6: 5.26, m9: 6.38, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "Premier Bank - Online", initial: "P", color: "bg-amber-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
+                    { bank: "Prime Bank", initial: "P", color: "bg-yellow-600", m3: 4.16, m6: 5.26, m9: 6.38, m12: 7.52, m18: null, m24: null, m36: null },
+                    { bank: "Prime Bank - Online", initial: "P", color: "bg-yellow-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Pubali Bank", initial: "P", color: "bg-yellow-400", m3: 4.16, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
+                    { bank: "Pubali Bank - Online", initial: "P", color: "bg-yellow-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "SBAC", initial: "S", color: "bg-emerald-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "SBAC - Online", initial: "S", color: "bg-emerald-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Shahjalal Islami Bank", initial: "S", color: "bg-emerald-600", m3: 4.71, m6: 5.26, m9: 6.95, m12: 9.28, m18: 11.11, m24: 14.28, m36: null },
+                    { bank: "Shahjalal Islami Bank - Online", initial: "S", color: "bg-emerald-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
+                    { bank: "Shimanto Bank - Online", initial: "S", color: "bg-green-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Social Islami Bank", initial: "S", color: "bg-teal-600", m3: 4.71, m6: 5.26, m9: 6.95, m12: 9.28, m18: 11.11, m24: 14.28, m36: null },
+                    { bank: "Southeast Bank", initial: "S", color: "bg-teal-700", m3: 4.16, m6: 5.26, m9: 7.52, m12: 9.89, m18: 13.63, m24: 19.04, m36: 25.00 },
+                    { bank: "Southeast Bank - Online", initial: "S", color: "bg-teal-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Standard Bank", initial: "S", color: "bg-indigo-600", m3: 3.62, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
+                    { bank: "Standard Bank - Online", initial: "S", color: "bg-indigo-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Standard Chartered", initial: "S", color: "bg-blue-900", m3: 4.16, m6: 6.38, m9: 9.28, m12: 12.35, m18: 16.27, m24: 21.95, m36: 29.87 },
+                    { bank: "Standard Chartered - Online", initial: "S", color: "bg-blue-800", m3: 6.19, m6: 8.38, m9: 11.26, m12: 14.29, m18: 18.17, m24: 23.77, m36: null },
+                    { bank: "Trust Bank", initial: "T", color: "bg-rose-600", m3: 4.16, m6: 5.82, m9: 7.52, m12: 9.28, m18: 13.63, m24: 17.64, m36: 23.45 },
+                    { bank: "Trust Bank - Online", initial: "T", color: "bg-rose-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "UCBL", initial: "U", color: "bg-gray-600", m3: 3.30, m6: 5.48, m9: 7.75, m12: 9.52, m18: 13.63, m24: 17.64, m36: null },
+                    { bank: "UCBL - Online", initial: "U", color: "bg-gray-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: 20.90, m36: null },
+                ];
+
+                // Calculate EMI for a given price, months, and charge percentage
+                const calculateEMI = (price, months, chargePercent) => {
+                    if (!chargePercent) return null;
+                    const chargeAmount = (price * chargePercent) / 100;
+                    const totalAmount = price + chargeAmount;
+                    const monthlyEMI = totalAmount / months;
+                    return {
+                        emi: monthlyEMI,
+                        charge: chargePercent,
+                        effectiveCost: totalAmount
+                    };
+                };
+
+                // Get EMI plans for selected bank
+                const getEmiPlans = (bank) => {
+                    const plans = [];
+                    const months = [
+                        { key: 'm3', label: 3 },
+                        { key: 'm6', label: 6 },
+                        { key: 'm9', label: 9 },
+                        { key: 'm12', label: 12 },
+                        { key: 'm18', label: 18 },
+                        { key: 'm24', label: 24 },
+                        { key: 'm36', label: 36 }
+                    ];
+
+                    months.forEach(({ key, label }) => {
+                        if (bank[key]) {
+                            const calc = calculateEMI(currentPrice, label, bank[key]);
+                            if (calc) {
+                                plans.push({
+                                    months: label,
+                                    ...calc
+                                });
+                            }
+                        }
+                    });
+
+                    return plans;
+                };
+
                 return (
-                    <div className="space-y-6">
-                        <h3 className="font-bold text-lg">EMI Availability</h3>
-                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                            <div className="flex items-center gap-3 mb-3">
-                                <CreditCard className="h-6 w-6 text-purple-600" />
-                                <h4 className="font-bold text-purple-900">Starting from ৳4,000/mo</h4>
-                            </div>
-                            <p className="text-sm text-purple-800 mb-4">
-                                Enjoy 0% interest EMI for up to 12 months with selected bank credit cards.
-                            </p>
-                            <ul className="space-y-2 text-sm text-purple-800">
-                                <li className="flex justify-between border-b border-purple-200 pb-1"><span>3 Months</span> <span>৳{Math.round(currentPrice / 3).toLocaleString()}/mo</span></li>
-                                <li className="flex justify-between border-b border-purple-200 pb-1"><span>6 Months</span> <span>৳{Math.round(currentPrice / 6).toLocaleString()}/mo</span></li>
-                                <li className="flex justify-between"><span>12 Months</span> <span>৳{Math.round(currentPrice / 12).toLocaleString()}/mo</span></li>
-                            </ul>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                            * EMI facility is available for purchase over ৳5,000. Terms and conditions apply.
-                        </p>
-                    </div>
+                    <EMICalculator
+                        currentPrice={currentPrice}
+                        bankEmiData={bankEmiData}
+                        getEmiPlans={getEmiPlans}
+                    />
                 );
             default:
                 return null;
@@ -300,7 +473,7 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                     />
 
                     {/* Sidebar */}
-                    <div className="relative w-full max-w-md bg-background h-full shadow-2xl p-6 overflow-y-auto animate-in slide-in-from-right duration-300">
+                    <div className={`relative w-full ${activeDrawer === 'emi' ? 'max-w-3xl' : 'max-w-md'} bg-background h-full shadow-2xl p-6 overflow-y-auto animate-in slide-in-from-right duration-300`}>
                         <button
                             onClick={closeDrawer}
                             className="absolute top-4 right-4 p-2 hover:bg-secondary rounded-full transition-colors"
