@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import {
     Search, ShoppingCart, Menu, Zap, FileText, GitCompare, MapPin, Package, Home,
     Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight, User, Battery, LayoutGrid, Speaker,
-    MonitorSmartphone, TabletSmartphone, MonitorPlay, Volume2, RefreshCcw, Plug2, ChevronDown, ChevronRight
+    MonitorSmartphone, TabletSmartphone, MonitorPlay, Volume2, RefreshCcw, Plug2, ChevronDown, ChevronRight, Loader2
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useProduct } from "@/context/ProductContext";
@@ -55,7 +55,7 @@ const NAVBAR_CATEGORIES = [
 
 export default function Navbar() {
     const { openDrawer, cartCount } = useCart();
-    const { searchProducts } = useProduct();
+    const { searchProducts, isFullyLoaded, products } = useProduct();
     const { isAuthenticated, loading: authLoading } = useAuth();
     const pathname = usePathname();
     const router = useRouter();
@@ -350,6 +350,14 @@ export default function Navbar() {
         router.push(`/products/${productId}`);
     };
 
+    // Re-run search when products are loaded to update results
+    useEffect(() => {
+        if (searchQuery.trim().length > 0) {
+            const results = searchProducts(searchQuery);
+            setSearchResults(results.slice(0, 5));
+        }
+    }, [isFullyLoaded, products]); // Run when loading state or products list changes
+
     // Close search results when clicking outside
     useEffect(() => {
         const handleClickOutside = () => setShowResults(false);
@@ -449,7 +457,7 @@ export default function Navbar() {
 
                         {/* Search Results Dropdown - Responsive */}
                         {showResults && (
-                            <div className="fixed md:absolute left-2 right-2 md:left-0 md:right-0 top-16 md:top-full mt-0 md:mt-2 bg-background border border-border rounded-xl shadow-2xl overflow-hidden z-[100] md:z-50 max-h-[70vh] md:max-h-[80vh] overflow-y-auto">
+                            <div className="fixed left-2 right-2 top-16 md:top-20 md:left-1/2 md:-translate-x-1/2 md:w-[80vw] md:max-w-6xl md:right-auto mt-0 bg-background border border-border rounded-xl shadow-2xl overflow-hidden z-[100] max-h-[70vh] md:max-h-[85vh] overflow-y-auto">
                                 {searchResults.length > 0 ? (
                                     <div className="flex flex-col md:flex-row">
                                         {/* Left Column - Categories (Hidden on Mobile) */}
@@ -535,8 +543,17 @@ export default function Navbar() {
                                     </div>
                                 ) : (
                                     <div className="p-6 md:p-8 text-center text-muted-foreground">
-                                        <Search className="h-6 w-6 md:h-8 md:w-8 mx-auto mb-2 opacity-50" />
-                                        <p className="text-sm">No products found for "{searchQuery}"</p>
+                                        {!isFullyLoaded ? (
+                                            <div className="flex flex-col items-center justify-center">
+                                                <Loader2 className="h-8 w-8 animate-spin text-[#FCB042] mb-2" />
+                                                <p className="text-sm">Searching products...</p>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <Search className="h-6 w-6 md:h-8 md:w-8 mx-auto mb-2 opacity-50" />
+                                                <p className="text-sm">No products found for "{searchQuery}"</p>
+                                            </>
+                                        )}
                                     </div>
                                 )}
                             </div>
