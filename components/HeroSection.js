@@ -8,17 +8,17 @@ import { ChevronLeft, ChevronRight, BadgeCheck, Truck, CreditCard, ArrowLeftRigh
 const defaultSlides = [
     {
         id: 1,
-        image: "https://www.gadgetboddaa.com/_next/image?url=https%3A%2F%2Fwww.outletexpense.xyz%2Fuploads%2F188-MD.-Alamin%2F1757580565.jpg&w=1920&q=75&dpl=dpl_6WN3M3DvNUSRMDgWoGLnzs95CDYS",
+        image: "https://www.outletexpense.xyz/uploads/265-Dizmo/1766068956_694412dc8523d.jpg",
         link: "/products"
     },
     {
         id: 2,
-        image: "https://www.gadgetboddaa.com/_next/image?url=https%3A%2F%2Fwww.outletexpense.xyz%2Fuploads%2F188-MD.-Alamin%2F1746470827.jpg&w=1920&q=75&dpl=dpl_6WN3M3DvNUSRMDgWoGLnzs95CDYS",
+        image: "https://www.outletexpense.xyz/uploads/265-Dizmo/1766068967_694412e7adfa1.jpg",
         link: "/products"
     },
     {
         id: 3,
-        image: "https://www.gadgetboddaa.com/_next/image?url=https%3A%2F%2Fwww.outletexpense.xyz%2Fuploads%2F188-MD.-Alamin%2F1746470565.jpg&w=1920&q=75&dpl=dpl_6WN3M3DvNUSRMDgWoGLnzs95CDYS",
+        image: "https://www.outletexpense.xyz/uploads/265-Dizmo/1766068972_694412ecde400.jpg",
         link: "/products"
     }
 ];
@@ -26,12 +26,12 @@ const defaultSlides = [
 const defaultBanners = [
     {
         id: 1,
-        image: "https://images.macrumors.com/t/hOuhsJYfJN_KtfPwJWT4WeohyPk=/1600x0/article-new/2024/09/apple-watch-ultra-2-new-black.jpg",
+        image: "https://www.outletexpense.xyz/uploads/265-DIZMO/1766855767_69501457ad9ac.jpg",
         link: "/products"
     },
     {
         id: 2,
-        image: "https://dazzle.com.bd/_next/image?url=https%3A%2F%2Fdazzle.sgp1.cdn.digitaloceanspaces.com%2F72118%2Fipad-air-m3.jpg&w=1920&q=75",
+        image: "https://www.outletexpense.xyz/uploads/265-DIZMO/1766855822_6950148ef29d2.jpg",
         link: "/products"
     }
 ];
@@ -60,7 +60,7 @@ export default function HeroSection() {
                 const sliderEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_SLIDERS;
                 const bannerEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_BANNERS;
 
-                // Check localStorage cache first
+                // Check localStorage cache first - but don't block
                 const cachedData = localStorage.getItem('hero_section_cache');
                 if (cachedData) {
                     const { slides: cachedSlides, banners: cachedBanners, timestamp } = JSON.parse(cachedData);
@@ -68,8 +68,6 @@ export default function HeroSection() {
                     if (Date.now() - timestamp < 5 * 60 * 1000) {
                         if (cachedSlides?.length) setSlides(cachedSlides);
                         if (cachedBanners?.length) setBanners(cachedBanners);
-                        setLoading(false);
-                        return;
                     }
                 }
 
