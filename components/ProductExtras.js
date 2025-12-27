@@ -4,66 +4,129 @@ import { useState } from "react";
 import { FileText, Gift, Truck, CreditCard, X, ShieldCheck, CheckCircle2, Clock, MapPin } from "lucide-react";
 
 // EMI Calculator Component
-function EMICalculator({ currentPrice, bankEmiData, getEmiPlans }) {
+function EMICalculator({ currentPrice, bankEmiData }) {
     const [selectedBank, setSelectedBank] = useState(bankEmiData[0]);
+    const [customAmount, setCustomAmount] = useState(currentPrice);
+
+    // Calculate EMI for a given price, months, and charge percentage
+    const calculateEMI = (price, months, chargePercent) => {
+        if (!chargePercent) return null;
+        const chargeAmount = (price * chargePercent) / 100;
+        const totalAmount = price + chargeAmount;
+        const monthlyEMI = totalAmount / months;
+        return {
+            emi: monthlyEMI,
+            charge: chargePercent,
+            effectiveCost: totalAmount
+        };
+    };
+
+    // Get EMI plans for selected bank based on customAmount
+    const getEmiPlans = (bank) => {
+        const plans = [];
+        const months = [
+            { key: 'm3', label: 3 },
+            { key: 'm6', label: 6 },
+            { key: 'm9', label: 9 },
+            { key: 'm12', label: 12 },
+            { key: 'm18', label: 18 },
+            { key: 'm24', label: 24 },
+            { key: 'm36', label: 36 }
+        ];
+
+        months.forEach(({ key, label }) => {
+            if (bank[key]) {
+                const calc = calculateEMI(customAmount, label, bank[key]);
+                if (calc) {
+                    plans.push({
+                        months: label,
+                        ...calc
+                    });
+                }
+            }
+        });
+
+        return plans;
+    };
+
     const plans = getEmiPlans(selectedBank);
 
     return (
         <div className="space-y-4">
             <h3 className="font-bold text-lg text-[#103E34]">EMI Options</h3>
 
-            <div className="flex gap-4 h-[calc(100vh-100px)]">
+            <div className="flex flex-row gap-2 md:gap-4 h-[500px] md:h-[600px]">
                 {/* Left: Bank List */}
-                <div className="w-1/3 overflow-y-auto border border-gray-200 rounded-lg">
-                    {bankEmiData.map((bank, idx) => (
-                        <button
-                            key={idx}
-                            onClick={() => setSelectedBank(bank)}
-                            className={`w-full flex items-center gap-3 p-3 text-left border-b border-gray-100 last:border-0 transition-all ${selectedBank.bank === bank.bank
-                                ? 'bg-orange-50 border-l-4 border-l-[#FCB042]'
-                                : 'hover:bg-gray-50'
-                                }`}
-                        >
-                            <div className={`w-8 h-8 ${bank.color} rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
-                                {bank.initial}
-                            </div>
-                            <span className="text-sm font-medium text-gray-700 truncate">{bank.bank}</span>
-                        </button>
-                    ))}
+                <div className="w-[110px] md:w-1/3 border border-gray-200 rounded-lg flex flex-col h-full sticky top-0">
+                    <div className="p-2 md:p-3 bg-gray-50 border-b border-gray-200 font-semibold text-xs md:text-sm text-gray-700 sticky top-0 bg-gray-50 z-10">
+                        BANK NAME
+                    </div>
+                    <div className="overflow-y-auto flex-1">
+                        {bankEmiData.map((bank, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => setSelectedBank(bank)}
+                                className={`w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 p-2 md:p-3 text-center md:text-left border-b border-gray-100 last:border-0 transition-all ${selectedBank.bank === bank.bank
+                                    ? 'bg-[#0a3d2e]/10 border-r-4 md:border-r-0 md:border-l-4 border-[#0a3d2e]'
+                                    : 'hover:bg-gray-50'
+                                    }`}
+                            >
+                                <div className={`w-8 h-8 md:w-8 md:h-8 ${bank.color} rounded-full flex items-center justify-center text-white font-bold text-xs md:text-sm flex-shrink-0 mx-auto md:mx-0`}>
+                                    {bank.initial}
+                                </div>
+                                <span className="text-[10px] md:text-sm font-medium text-gray-700 truncate w-full md:w-auto overflow-hidden text-ellipsis whitespace-nowrap block">{bank.bank}</span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Right: EMI Details */}
-                <div className="w-2/3 space-y-4">
-                    {/* Amount Display */}
+                <div className="flex-1 space-y-3 md:space-y-4 h-full overflow-y-auto">
+                    {/* Amount Input */}
                     <div>
-                        <label className="text-sm text-gray-500 mb-1 block">Enter Amount</label>
-                        <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-lg font-medium">
-                            {currentPrice.toLocaleString()}
+                        <label className="text-xs md:text-sm text-gray-500 mb-1 block">Amount</label>
+                        <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">৳</span>
+                            <input
+                                type="number"
+                                value={customAmount}
+                                onChange={(e) => setCustomAmount(Number(e.target.value))}
+                                className="w-full p-2 md:p-3 pl-8 bg-white border border-gray-200 rounded-lg text-base md:text-lg font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                            />
                         </div>
                     </div>
 
                     {/* EMI Table */}
-                    <div className="border border-gray-200 rounded-lg overflow-hidden">
-                        <table className="w-full text-sm">
+                    <div className="border border-gray-200 rounded-lg overflow-x-auto">
+                        <table className="w-full text-xs md:text-sm whitespace-nowrap">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="text-left p-3 font-medium text-gray-600">Plan (Monthly)</th>
-                                    <th className="text-left p-3 font-medium text-gray-600">EMI</th>
-                                    <th className="text-left p-3 font-medium text-gray-600">Charge</th>
-                                    <th className="text-left p-3 font-medium text-gray-600">Effective Cost</th>
+                                    <th className="text-center p-2 md:p-3 font-medium text-gray-600">
+                                        Plan <span className="block md:inline text-[10px] md:text-sm font-normal text-gray-400 md:text-gray-600">(Monthly)</span>
+                                    </th>
+                                    <th className="text-left p-2 md:p-3 font-medium text-gray-600">EMI</th>
+                                    <th className="text-right p-2 md:p-3 font-medium text-gray-600">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {plans.length > 0 ? plans.map((plan, idx) => (
-                                    <tr key={idx} className="border-t border-gray-100">
-                                        <td className="p-3 font-medium">{plan.months}</td>
-                                        <td className="p-3 text-gray-700">৳ {plan.emi.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-                                        <td className="p-3 text-gray-700">{plan.charge}%</td>
-                                        <td className="p-3 text-gray-700">৳ {plan.effectiveCost.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                                    <tr key={idx} className="border-t border-gray-100 odd:bg-white even:bg-gray-50/50">
+                                        <td className="p-2 md:p-3 text-center align-middle font-medium">
+                                            {plan.months}
+                                        </td>
+                                        <td className="p-2 md:p-3 align-middle">
+                                            <div className="flex flex-col">
+                                                <span className="text-[#0a3d2e] font-bold text-sm">BDT {plan.emi.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                                                <span className="text-[10px] text-gray-500">(Charge {plan.charge}%)</span>
+                                            </div>
+                                        </td>
+                                        <td className="p-2 md:p-3 text-right align-middle text-[#0a3d2e] font-bold">
+                                            {plan.effectiveCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                        </td>
                                     </tr>
                                 )) : (
                                     <tr>
-                                        <td colSpan={4} className="p-4 text-center text-gray-400">No EMI plans available</td>
+                                        <td colSpan={3} className="p-4 text-center text-gray-400">No EMI plans available</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -313,52 +376,10 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                     { bank: "UCBL - Online", initial: "U", color: "bg-gray-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: 20.90, m36: null },
                 ];
 
-                // Calculate EMI for a given price, months, and charge percentage
-                const calculateEMI = (price, months, chargePercent) => {
-                    if (!chargePercent) return null;
-                    const chargeAmount = (price * chargePercent) / 100;
-                    const totalAmount = price + chargeAmount;
-                    const monthlyEMI = totalAmount / months;
-                    return {
-                        emi: monthlyEMI,
-                        charge: chargePercent,
-                        effectiveCost: totalAmount
-                    };
-                };
-
-                // Get EMI plans for selected bank
-                const getEmiPlans = (bank) => {
-                    const plans = [];
-                    const months = [
-                        { key: 'm3', label: 3 },
-                        { key: 'm6', label: 6 },
-                        { key: 'm9', label: 9 },
-                        { key: 'm12', label: 12 },
-                        { key: 'm18', label: 18 },
-                        { key: 'm24', label: 24 },
-                        { key: 'm36', label: 36 }
-                    ];
-
-                    months.forEach(({ key, label }) => {
-                        if (bank[key]) {
-                            const calc = calculateEMI(currentPrice, label, bank[key]);
-                            if (calc) {
-                                plans.push({
-                                    months: label,
-                                    ...calc
-                                });
-                            }
-                        }
-                    });
-
-                    return plans;
-                };
-
                 return (
                     <EMICalculator
                         currentPrice={currentPrice}
                         bankEmiData={bankEmiData}
-                        getEmiPlans={getEmiPlans}
                     />
                 );
             default:
@@ -463,25 +484,31 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                 );
             })()}
 
-            {/* Drawer Overlay */}
+            {/* Drawer/Modal Overlay */}
             {activeDrawer && (
-                <div className="fixed inset-0 z-50 flex justify-end">
+                <div className={`fixed inset-0 z-50 flex ${activeDrawer === 'emi' ? 'items-center justify-center p-4' : 'justify-end'}`}>
                     {/* Backdrop */}
                     <div
-                        className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
                         onClick={closeDrawer}
                     />
 
-                    {/* Sidebar */}
-                    <div className={`relative w-full ${activeDrawer === 'emi' ? 'max-w-3xl' : 'max-w-md'} bg-background h-full shadow-2xl p-6 overflow-y-auto animate-in slide-in-from-right duration-300`}>
+                    {/* Container - Modal for EMI, Sidebar for others */}
+                    <div className={`
+                        relative bg-background shadow-2xl p-4 md:p-6 overflow-hidden flex flex-col
+                        ${activeDrawer === 'emi'
+                            ? 'w-[95vw] md:w-full max-w-5xl rounded-2xl max-h-[90vh] animate-in zoom-in-95 fade-in-0'
+                            : 'w-full max-w-md h-full animate-in slide-in-from-right duration-300'
+                        }
+                    `}>
                         <button
                             onClick={closeDrawer}
-                            className="absolute top-4 right-4 p-2 hover:bg-secondary rounded-full transition-colors"
+                            className="absolute top-4 right-4 p-2 hover:bg-secondary rounded-full transition-colors z-10"
                         >
                             <X className="h-5 w-5" />
                         </button>
 
-                        <div className="mt-8">
+                        <div className="overflow-y-auto flex-1">
                             {renderDrawerContent()}
                         </div>
                     </div>
