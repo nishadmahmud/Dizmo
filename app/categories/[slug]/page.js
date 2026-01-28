@@ -53,7 +53,7 @@ export default function CategoryDetailPage({ params }) {
     const [categoryBanner, setCategoryBanner] = useState(null);
 
     // Filter States
-    const [priceRange, setPriceRange] = useState({ min: 0, max: 200000 });
+    const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
     const [availability, setAvailability] = useState('all');
     const [selectedColors, setSelectedColors] = useState([]);
     const [selectedBrand, setSelectedBrand] = useState(null);
@@ -221,13 +221,6 @@ export default function CategoryDetailPage({ params }) {
 
             if (firstPageProducts.length > 0) {
                 setAllPages({ 1: firstPageProducts });
-
-                // Set initial price range
-                const prices = firstPageProducts.map(p => p.price);
-                setPriceRange({
-                    min: Math.floor(Math.min(...prices)),
-                    max: Math.ceil(Math.max(...prices))
-                });
             }
 
             setLoading(false);
@@ -253,19 +246,6 @@ export default function CategoryDetailPage({ params }) {
                 // Store this page
                 setAllPages(prev => ({ ...prev, [page]: pageProducts }));
                 setTotalPagesKnown(page);
-
-                // Update price range with all products so far
-                setAllPages(current => {
-                    const allProducts = Object.values(current).flat();
-                    if (allProducts.length > 0) {
-                        const prices = allProducts.map(p => p.price);
-                        setPriceRange(prev => ({
-                            min: Math.min(prev.min, Math.floor(Math.min(...prices))),
-                            max: Math.max(prev.max, Math.ceil(Math.max(...prices)))
-                        }));
-                    }
-                    return current;
-                });
 
                 // If we got fewer than 20, this is the last page
                 if (pageProducts.length < 20) {

@@ -28,15 +28,21 @@ export default function CategoryFilters({
     });
     const [showAllColors, setShowAllColors] = useState(false);
 
-    // Local state for price range
-    const [localPrice, setLocalPrice] = useState(priceRange);
+    // Local state for price range with safe defaults
+    const [localPrice, setLocalPrice] = useState(() => ({
+        min: priceRange?.min ?? 0,
+        max: priceRange?.max ?? 1000000
+    }));
     const sliderTrackRef = useRef(null);
     const [activeThumb, setActiveThumb] = useState(null); // 'min' or 'max' or null
     const localPriceRef = useRef(localPrice);
 
     // Sync local state with prop when prop changes
     useEffect(() => {
-        setLocalPrice(priceRange);
+        setLocalPrice({
+            min: priceRange?.min ?? 0,
+            max: priceRange?.max ?? 1000000
+        });
     }, [priceRange]);
 
     // Keep ref in sync for event handlers
@@ -52,17 +58,42 @@ export default function CategoryFilters({
     };
 
     const handlePriceCommit = () => {
-        onPriceChange(localPriceRef.current);
+        // Sanitize values before sending to parent - ensure valid numbers
+        const sanitized = {
+            min: typeof localPriceRef.current.min === 'number' && !Number.isNaN(localPriceRef.current.min)
+                ? localPriceRef.current.min
+                : 0,
+            max: typeof localPriceRef.current.max === 'number' && !Number.isNaN(localPriceRef.current.max)
+                ? localPriceRef.current.max
+                : 1000000
+        };
+        onPriceChange(sanitized);
     };
 
     const handleMinChange = (e) => {
-        const value = Number(e.target.value);
-        setLocalPrice(prev => ({ ...prev, min: value }));
+        const val = e.target.value;
+        setLocalPrice(prev => ({ ...prev, min: val === '' ? '' : Number(val) }));
     };
 
     const handleMaxChange = (e) => {
-        const value = Number(e.target.value);
-        setLocalPrice(prev => ({ ...prev, max: value }));
+        const val = e.target.value;
+        setLocalPrice(prev => ({ ...prev, max: val === '' ? '' : Number(val) }));
+    };
+
+    // Helper to safely get display value
+    const getInputValue = (val) => {
+        if (val === '' || val === undefined || val === null) return '';
+        if (Number.isNaN(Number(val))) return '';
+        return val;
+    };
+
+    // Helper to safely calculate slider percentage
+    const getSliderPercent = (val, defaultVal = 0) => {
+        const num = Number(val);
+        if (Number.isNaN(num) || val === '' || val === undefined || val === null) {
+            return defaultVal;
+        }
+        return (num / 1000000) * 100;
     };
 
     // Custom Slider Logic
@@ -71,7 +102,6 @@ export default function CategoryFilters({
             document.body.style.userSelect = 'none';
             document.body.style.webkitUserSelect = 'none';
         } else {
-            document.body.style.userSelect = '';
             document.body.style.webkitUserSelect = '';
         }
 
@@ -81,7 +111,7 @@ export default function CategoryFilters({
             if (!sliderTrackRef.current) return;
             const rect = sliderTrackRef.current.getBoundingClientRect();
             const percentage = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
-            const value = Math.round(percentage * 200000); // Max price is 200000
+            const value = Math.round(percentage * 1000000); // Max price is 1000000
 
             setLocalPrice(prev => {
                 if (activeThumb === 'min') {
@@ -168,20 +198,20 @@ export default function CategoryFilters({
                     <div className="flex items-center gap-3">
                         <input
                             type="number"
-                            value={localPrice.min}
+                            value={getInputValue(localPrice.min)}
                             onChange={handleMinChange}
-                            onBlur={() => onPriceChange(localPrice)}
-                            onKeyDown={(e) => e.key === 'Enter' && onPriceChange(localPrice)}
+                            onBlur={handlePriceCommit}
+                            onKeyDown={(e) => e.key === 'Enter' && handlePriceCommit()}
                             className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                             placeholder="Min"
                         />
                         <span className="text-muted-foreground">-</span>
                         <input
                             type="number"
-                            value={localPrice.max}
+                            value={getInputValue(localPrice.max)}
                             onChange={handleMaxChange}
-                            onBlur={() => onPriceChange(localPrice)}
-                            onKeyDown={(e) => e.key === 'Enter' && onPriceChange(localPrice)}
+                            onBlur={handlePriceCommit}
+                            onKeyDown={(e) => e.key === 'Enter' && handlePriceCommit()}
                             className="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                             placeholder="Max"
                         />
@@ -197,7 +227,7 @@ export default function CategoryFilters({
                             if (e.target === sliderTrackRef.current || e.target.classList.contains('bg-secondary') || e.target.classList.contains('bg-primary')) {
                                 const rect = sliderTrackRef.current.getBoundingClientRect();
                                 const percentage = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
-                                const value = Math.round(percentage * 200000);
+                                const value = Math.round(percentage * 1000000);
 
                                 // Determine which thumb is closer
                                 const distMin = Math.abs(value - localPrice.min);
@@ -220,15 +250,15 @@ export default function CategoryFilters({
                         <div
                             className="absolute top-1/2 h-1.5 bg-primary rounded-full -translate-y-1/2 pointer-events-none"
                             style={{
-                                left: `${(localPrice.min / 200000) * 100}%`,
-                                right: `${100 - (localPrice.max / 200000) * 100}%`
+                                left: `${getSliderPercent(localPrice.min, 0)}%`,
+                                right: `${100 - getSliderPercent(localPrice.max, 100)}%`
                             }}
                         ></div>
 
                         {/* Min Thumb */}
                         <div
                             className={`absolute top-1/2 w-4 h-4 bg-primary rounded-full -translate-y-1/2 -translate-x-1/2 cursor-grab shadow-md hover:scale-110 transition-transform z-20 ${activeThumb === 'min' ? 'cursor-grabbing scale-110' : ''}`}
-                            style={{ left: `${(localPrice.min / 200000) * 100}%` }}
+                            style={{ left: `${getSliderPercent(localPrice.min, 0)}%` }}
                             onMouseDown={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -243,7 +273,7 @@ export default function CategoryFilters({
                         {/* Max Thumb */}
                         <div
                             className={`absolute top-1/2 w-4 h-4 bg-primary rounded-full -translate-y-1/2 -translate-x-1/2 cursor-grab shadow-md hover:scale-110 transition-transform z-20 ${activeThumb === 'max' ? 'cursor-grabbing scale-110' : ''}`}
-                            style={{ left: `${(localPrice.max / 200000) * 100}%` }}
+                            style={{ left: `${getSliderPercent(localPrice.max, 100)}%` }}
                             onMouseDown={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
