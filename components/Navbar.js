@@ -100,6 +100,7 @@ export default function Navbar() {
     const [searchResults, setSearchResults] = useState([]);
     const [showResults, setShowResults] = useState(false);
     const [isListening, setIsListening] = useState(false);
+    const [selectedSearchCategory, setSelectedSearchCategory] = useState(null); // For filtering within search modal
 
     // localStorage key for cached brands
     const BRANDS_CACHE_KEY = 'dizmo_category_brands';
@@ -317,20 +318,91 @@ export default function Navbar() {
 
         recognition.start();
     };
+    // API-based search with debouncing
+    const [isSearching, setIsSearching] = useState(false);
+    const searchTimeoutRef = useRef(null);
+
+    // Search products from API
+    const searchProductsFromAPI = async (query) => {
+        if (!query || query.trim().length < 2) return [];
+
+        try {
+            const apiBaseUrl = process.env.NEXT_PUBLIC_API_BLOG_BASE_URL;
+            const storeId = process.env.NEXT_PUBLIC_STORE_ID;
+
+            const response = await fetch(`${apiBaseUrl}/public/search-product`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    keyword: query.trim(),
+                    user_id: storeId,
+                    limit: 20
+                })
+            });
+
+            if (!response.ok) return [];
+
+            const result = await response.json();
+
+            // Handle paginated response structure: result.data.data contains the products array
+            if (!result.success || !result.data || !result.data.data) return [];
+
+            const products = result.data.data;
+
+            // Transform to expected format
+            return products.slice(0, 10).map(product => ({
+                id: product.id,
+                name: product.name,
+                price: parseFloat(product.retails_price) - (product.discount_type === 'Fixed' ? parseFloat(product.discount) : 0) || 0,
+                originalPrice: parseFloat(product.retails_price) || 0,
+                image: product.image_path,
+                brand: product.brands?.name || '',
+                category: product.category?.name || 'Products'
+            }));
+        } catch (error) {
+            console.error('Search API error:', error);
+            return [];
+        }
+    };
+
+    // Re-run search when query changes - with debouncing and API call
+    useEffect(() => {
+        // Clear any existing timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        if (searchQuery.trim().length === 0) {
+            setSearchResults([]);
+            setShowResults(false);
+            setIsSearching(false);
+            setSelectedSearchCategory(null); // Reset category filter
+            return;
+        }
+
+        // Show loading state
+        setShowResults(true);
+        setIsSearching(true);
+
+        // Debounce the API call (wait 300ms after typing stops)
+        searchTimeoutRef.current = setTimeout(async () => {
+            const apiResults = await searchProductsFromAPI(searchQuery);
+            setSearchResults(apiResults.slice(0, 6));
+            setIsSearching(false);
+        }, 300);
+
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, [searchQuery]);
 
     // Handle search input change
     const handleSearch = (e) => {
-        const query = e.target.value;
-        setSearchQuery(query);
-
-        if (query.length > 0) {
-            const results = searchProducts(query);
-            setSearchResults(results.slice(0, 5)); // Limit to 5 results
-            setShowResults(true);
-        } else {
-            setSearchResults([]);
-            setShowResults(false);
-        }
+        setSearchQuery(e.target.value);
     };
 
     // Handle search submit (Enter key)
@@ -349,14 +421,6 @@ export default function Navbar() {
         setShowSearch(false);
         router.push(`/products/${productId}`);
     };
-
-    // Re-run search when products are loaded to update results
-    useEffect(() => {
-        if (searchQuery.trim().length > 0) {
-            const results = searchProducts(searchQuery);
-            setSearchResults(results.slice(0, 5));
-        }
-    }, [isFullyLoaded, products]); // Run when loading state or products list changes
 
     // Close search results when clicking outside
     useEffect(() => {
@@ -464,15 +528,21 @@ export default function Navbar() {
                                         <div className="hidden md:block md:w-1/3 border-r border-border bg-gray-50/50 p-4">
                                             <h3 className="font-bold text-sm text-foreground mb-3">Categories</h3>
                                             <ul className="space-y-2">
+                                                {/* All option at the top */}
+                                                <li>
+                                                    <button
+                                                        onClick={() => setSelectedSearchCategory(null)}
+                                                        className={`text-sm transition-colors text-left w-full truncate ${selectedSearchCategory === null ? 'text-[#FCB042] font-semibold' : 'text-muted-foreground hover:text-[#FCB042]'}`}
+                                                    >
+                                                        All
+                                                    </button>
+                                                </li>
                                                 {/* Get unique categories from search results */}
                                                 {[...new Set(searchResults.map(p => p.category || 'Products'))].slice(0, 8).map((category, idx) => (
                                                     <li key={idx}>
                                                         <button
-                                                            onClick={() => {
-                                                                router.push(`/products?search=${encodeURIComponent(searchQuery)}&category=${encodeURIComponent(category)}`);
-                                                                setShowResults(false);
-                                                            }}
-                                                            className="text-sm text-muted-foreground hover:text-[#FCB042] transition-colors text-left w-full truncate"
+                                                            onClick={() => setSelectedSearchCategory(category)}
+                                                            className={`text-sm transition-colors text-left w-full truncate ${selectedSearchCategory === category ? 'text-[#FCB042] font-semibold' : 'text-muted-foreground hover:text-[#FCB042]'}`}
                                                         >
                                                             {category}
                                                         </button>
@@ -484,7 +554,9 @@ export default function Navbar() {
                                         {/* Right Column - Products Grid */}
                                         <div className="w-full md:w-2/3 p-3 md:p-4">
                                             <div className="flex items-center justify-between mb-3 md:mb-4">
-                                                <h3 className="font-bold text-sm text-foreground">Products</h3>
+                                                <h3 className="font-bold text-sm text-foreground">
+                                                    Products {selectedSearchCategory && <span className="font-normal text-muted-foreground">in {selectedSearchCategory}</span>}
+                                                </h3>
                                                 <button
                                                     onClick={() => {
                                                         router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
@@ -497,7 +569,10 @@ export default function Navbar() {
                                             </div>
 
                                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
-                                                {searchResults.slice(0, 6).map((product) => {
+                                                {(selectedSearchCategory
+                                                    ? searchResults.filter(p => p.category === selectedSearchCategory)
+                                                    : searchResults
+                                                ).slice(0, 6).map((product) => {
                                                     const discount = product.originalPrice && product.originalPrice > product.price
                                                         ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
                                                         : 0;
@@ -543,7 +618,7 @@ export default function Navbar() {
                                     </div>
                                 ) : (
                                     <div className="p-6 md:p-8 text-center text-muted-foreground">
-                                        {!isFullyLoaded ? (
+                                        {isSearching ? (
                                             <div className="flex flex-col items-center justify-center">
                                                 <Loader2 className="h-8 w-8 animate-spin text-[#FCB042] mb-2" />
                                                 <p className="text-sm">Searching products...</p>
