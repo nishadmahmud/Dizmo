@@ -170,8 +170,8 @@ export default function CheckoutPage() {
                 sales_id: parseInt(storeId),
                 wholeseller_id: 1,
                 status: 3,
-                city_id: cityId,
-                zone_id: zoneId,
+                city_id: cityId ? parseInt(String(cityId).replace(/\D/g, '')) : null,
+                zone_id: zoneId ? parseInt(String(zoneId).replace(/\D/g, '')) : null,
             };
 
             const response = await fetch('https://www.outletexpense.xyz/api/public/ecommerce-save-sales', {

@@ -409,13 +409,21 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
 
                 <button
                     onClick={handleAddToCart}
-                    className="flex-1 bg-secondary text-primary border border-primary/20 hover:bg-primary/5 font-bold py-3 rounded-full transition-colors"
+                    disabled={product.stock?.toLowerCase().includes("out")}
+                    className={`flex-1 font-bold py-3 rounded-full transition-colors ${product.stock?.toLowerCase().includes("out")
+                        ? "bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-200"
+                        : "bg-secondary text-primary border border-primary/20 hover:bg-primary/5"
+                        }`}
                 >
                     Add to Cart
                 </button>
                 <button
                     onClick={handleBuyNow}
-                    className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-bold py-3 rounded-full transition-colors shadow-lg shadow-accent/20"
+                    disabled={product.stock?.toLowerCase().includes("out")}
+                    className={`flex-1 font-bold py-3 rounded-full transition-colors shadow-lg ${product.stock?.toLowerCase().includes("out")
+                        ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+                        : "bg-accent text-accent-foreground hover:bg-accent/90 shadow-accent/20"
+                        }`}
                 >
                     Buy Now
                 </button>
