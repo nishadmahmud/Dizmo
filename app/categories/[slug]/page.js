@@ -507,7 +507,19 @@ export default function CategoryDetailPage({ params }) {
                 if (brandBannerUrl) {
                     return (
                         <div className="container pt-6">
-                            <div className="relative h-40 md:h-52 w-full rounded-2xl overflow-hidden shadow-lg">
+                            {/* Mobile: maintain aspect ratio */}
+                            <div className="md:hidden w-full rounded-2xl overflow-hidden shadow-lg">
+                                <Image
+                                    src={brandBannerUrl}
+                                    alt={bannerText}
+                                    width={1000}
+                                    height={1000}
+                                    className="w-full h-auto"
+                                    unoptimized
+                                />
+                            </div>
+                            {/* Desktop: fixed height cover */}
+                            <div className="hidden md:block relative h-52 w-full rounded-2xl overflow-hidden shadow-lg">
                                 <Image
                                     src={brandBannerUrl}
                                     alt={bannerText}
@@ -524,7 +536,19 @@ export default function CategoryDetailPage({ params }) {
                 if (!selectedBrand && categoryBanner) {
                     return (
                         <div className="container pt-6">
-                            <div className="relative h-40 md:h-52 w-full rounded-2xl overflow-hidden shadow-lg">
+                            {/* Mobile: maintain aspect ratio */}
+                            <div className="md:hidden w-full rounded-2xl overflow-hidden shadow-lg">
+                                <Image
+                                    src={categoryBanner}
+                                    alt={bannerText}
+                                    width={1000}
+                                    height={1000}
+                                    className="w-full h-auto"
+                                    unoptimized
+                                />
+                            </div>
+                            {/* Desktop: fixed height cover */}
+                            <div className="hidden md:block relative h-52 w-full rounded-2xl overflow-hidden shadow-lg">
                                 <Image
                                     src={categoryBanner}
                                     alt={bannerText}

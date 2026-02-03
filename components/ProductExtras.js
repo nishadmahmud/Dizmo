@@ -415,11 +415,13 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
             {(() => {
                 const categoryLower = (product.category || '').toLowerCase();
                 const isPhoneCategory = categoryLower.includes('phone') || categoryLower.includes('phones');
+                const productNameLower = (product.name || '').toLowerCase();
+                const isAdapter = productNameLower.includes('adaptar') || productNameLower.includes('adapter');
 
                 // Calculate extended warranty prices for non-phone categories
                 const productPrice = product.price || 0;
-                const warranty12MonthPrice = Math.round(productPrice * 0.10); // 20% of product price
-                const warranty18MonthPrice = Math.round(productPrice * 0.20); // 30% of product price
+                const warranty12MonthPrice = Math.round(productPrice * 0.10); // 10% of product price
+                const warranty18MonthPrice = Math.round(productPrice * 0.20); // 20% of product price
 
                 // Care plans for phones
                 const phoneCarePlans = product.carePlans && product.carePlans.length > 0 ? product.carePlans : [
@@ -428,20 +430,27 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                     { id: 'parts', name: '1 Year Parts Warranty', description: '', price: 700 },
                 ];
 
-                // Extended warranty for other categories (like the uploaded image style)
+                // Extended warranty for other categories
                 const otherCategoryPlans = [
                     { id: 'warranty_12', name: '6 Months Extended Warranty', description: 'Extended coverage for hardware issues', price: warranty12MonthPrice },
                     { id: 'warranty_18', name: '12 Months Extended Warranty', description: 'Extended coverage for hardware issues', price: warranty18MonthPrice },
                 ];
 
-                const carePlansToShow = isPhoneCategory ? phoneCarePlans : otherCategoryPlans;
+                // Adapter specific plan
+                const adapterPlans = [
+                    { id: 'warranty_adapter', name: '12 month instant replacement warranty', description: 'Instant replacement for any issues', price: 0 } // Price 0 or calculated as needed
+                ];
+
+                const carePlansToShow = isAdapter ? adapterPlans : (isPhoneCategory ? phoneCarePlans : otherCategoryPlans);
 
                 return (
                     <div className="bg-secondary/10 rounded-xl overflow-hidden border border-border">
-                        <div className="bg-black text-white p-2.5 flex items-center gap-2">
-                            <ShieldCheck className="h-4 w-4 text-accent" />
-                            <span className="font-bold text-sm">Dizmo Care</span>
-                        </div>
+                        {!isAdapter && (
+                            <div className="bg-black text-white p-2.5 flex items-center gap-2">
+                                <ShieldCheck className="h-4 w-4 text-accent" />
+                                <span className="font-bold text-sm">Dizmo Care</span>
+                            </div>
+                        )}
 
                         <div className="p-2 space-y-2">
                             {carePlansToShow.map((plan) => (
