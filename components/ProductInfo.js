@@ -13,6 +13,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
     const [quantity, setQuantity] = useState(1);
     const [deliveryMethod, setDeliveryMethod] = useState("delivery");
     // const [emiModalOpen, setEmiModalOpen] = useState(false); // Moved to Extras
+    const [paymentMode, setPaymentMode] = useState('cash');
 
     const { addToCart } = useCart();
     const router = useRouter();
@@ -383,6 +384,64 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
                                 <span className="font-medium">{region.label}</span>
                             </button>
                         ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Payment Mode Selection */}
+            {product.discount > 0 && (
+                <div className="space-y-3 mb-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-3">
+                    {/* Offer Price Option */}
+                    <div
+                        onClick={() => setPaymentMode('cash')}
+                        className={`relative border rounded-xl p-3 cursor-pointer transition-all h-full ${paymentMode === 'cash'
+                            ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                            : 'border-border hover:border-gray-300'
+                            }`}
+                    >
+                        <div className="flex items-start gap-3 h-full">
+                            <div className={`mt-1 w-5 h-5 min-w-[1.25rem] rounded-full border flex items-center justify-center ${paymentMode === 'cash' ? 'border-primary' : 'border-gray-300'
+                                }`}>
+                                {paymentMode === 'cash' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap items-baseline justify-between gap-x-2">
+                                    <span className="font-bold text-foreground text-sm whitespace-nowrap">Offer Price</span>
+                                    <span className="font-bold text-lg md:text-xl text-primary">
+                                        ৳{(product.discountType === 'Fixed'
+                                            ? totalPrice - product.discount
+                                            : Math.round(totalPrice * (1 - product.discount / 100))
+                                        ).toLocaleString()}
+                                    </span>
+                                </div>
+                                <p className="text-[11px] md:text-xs text-muted-foreground mt-0.5 line-clamp-1">Cash/Card/MFS Payment</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Regular Price Option */}
+                    <div
+                        onClick={() => setPaymentMode('emi')}
+                        className={`relative border rounded-xl p-3 cursor-pointer transition-all h-full ${paymentMode === 'emi'
+                            ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                            : 'border-border hover:border-gray-300'
+                            }`}
+                    >
+                        <div className="flex items-start gap-3 h-full">
+                            <div className={`mt-1 w-5 h-5 min-w-[1.25rem] rounded-full border flex items-center justify-center ${paymentMode === 'emi' ? 'border-primary' : 'border-gray-300'
+                                }`}>
+                                {paymentMode === 'emi' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap items-baseline justify-between gap-x-2">
+                                    <span className="font-bold text-foreground text-sm whitespace-nowrap">Regular Price</span>
+                                    <span className="font-bold text-lg md:text-xl text-primary">৳{totalPrice.toLocaleString()}</span>
+                                </div>
+                                <p className="text-[11px] md:text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                                    EMI from {Math.round(totalPrice / 36).toLocaleString()} BDT/mo
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
