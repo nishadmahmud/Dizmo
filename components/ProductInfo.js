@@ -387,6 +387,17 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
                 </div>
             )}
 
+            {/* Estimated Delivery */}
+            <div className="text-sm font-medium mb-1 pl-1">
+                Estimated delivery: <span className="underline">{
+                    (product.name || '').toLowerCase().includes('adapter') ||
+                        (product.name || '').toLowerCase().includes('adaptar') ||
+                        (product.name || '').toLowerCase().includes('cable')
+                        ? '0-2 days'
+                        : '0-3 days'
+                }</span>
+            </div>
+
             {/* Quantity & Actions */}
             <div className="flex items-center gap-3 pt-4">
                 {/* Quantity Selector */}

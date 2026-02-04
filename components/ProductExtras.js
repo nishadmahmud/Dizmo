@@ -71,8 +71,24 @@ function EMICalculator({ currentPrice, bankEmiData }) {
                                     : 'hover:bg-gray-50'
                                     }`}
                             >
-                                <div className={`w-8 h-8 md:w-8 md:h-8 ${bank.color} rounded-full flex items-center justify-center text-white font-bold text-xs md:text-sm flex-shrink-0 mx-auto md:mx-0`}>
-                                    {bank.initial}
+                                <div className={`w-8 h-8 md:w-8 md:h-8 ${!bank.logo && bank.color} rounded-full flex items-center justify-center text-white font-bold text-xs md:text-sm flex-shrink-0 mx-auto md:mx-0 overflow-hidden bg-white`}>
+                                    {bank.logo ? (
+                                        <img
+                                            src={bank.logo}
+                                            alt={bank.bank}
+                                            className="w-full h-full object-contain"
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                e.target.parentElement.classList.remove('bg-white');
+                                                e.target.parentElement.classList.add(bank.color.split(' ')[0]);
+                                                e.target.parentElement.innerHTML = bank.initial;
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className={`w-full h-full ${bank.color} flex items-center justify-center`}>
+                                            {bank.initial}
+                                        </div>
+                                    )}
                                 </div>
                                 <span className="text-[10px] md:text-sm font-medium text-gray-700 truncate w-full md:w-auto overflow-hidden text-ellipsis whitespace-nowrap block">{bank.bank}</span>
                             </button>
@@ -308,72 +324,72 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
 
                 // Bank EMI data (Online rates - no POS charge)
                 const bankEmiData = [
-                    { bank: "AB Bank", initial: "A", color: "bg-red-500", m3: 4.16, m6: 6.38, m9: 7.52, m12: 8.69, m18: null, m24: null, m36: null },
-                    { bank: "AB Bank - Online", initial: "A", color: "bg-red-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "Al-Arafah Islami Bank", initial: "A", color: "bg-red-600", m3: 4.71, m6: 5.82, m9: 6.95, m12: 8.69, m18: null, m24: null, m36: null },
-                    { bank: "Al-Arafah Islami Bank - Online", initial: "A", color: "bg-red-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "Bank Asia", initial: "B", color: "bg-orange-500", m3: 4.71, m6: 5.82, m9: 6.95, m12: 8.69, m18: null, m24: null, m36: null },
-                    { bank: "Bank Asia - Online", initial: "B", color: "bg-orange-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
-                    { bank: "Brac Bank", initial: "B", color: "bg-orange-600", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: 12.35, m24: 16.27, m36: null },
-                    { bank: "CBBL - Online", initial: "C", color: "bg-blue-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "Citizens Bank", initial: "C", color: "bg-blue-500", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: null, m24: null, m36: null },
-                    { bank: "Citizens Bank - Online", initial: "C", color: "bg-blue-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
-                    { bank: "City Bank", initial: "C", color: "bg-blue-600", m3: 4.16, m6: 5.82, m9: 6.95, m12: 8.10, m18: 11.73, m24: 15.60, m36: 24.22 },
-                    { bank: "City Bank (AMEX) - Online", initial: "C", color: "bg-blue-700", m3: 6.72, m6: 8.34, m9: 10.58, m12: 12.92, m18: 16.62, m24: 21.97, m36: 27.85 },
-                    { bank: "Commercial Bank of Ceylon", initial: "C", color: "bg-blue-800", m3: 5.26, m6: 7.52, m9: 9.89, m12: 11.73, m18: 14.94, m24: 19.04, m36: null },
-                    { bank: "DBBL", initial: "D", color: "bg-green-600", m3: 4.60, m6: 6.83, m9: 7.99, m12: 9.17, m18: 14.15, m24: 15.47, m36: 18.20 },
-                    { bank: "DBBL - Online", initial: "D", color: "bg-green-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "Dhaka Bank", initial: "D", color: "bg-green-700", m3: 3.62, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: 23.45 },
-                    { bank: "Dhaka Bank - Online", initial: "D", color: "bg-green-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
-                    { bank: "Eastern Bank", initial: "E", color: "bg-purple-500", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: 11.73, m24: 16.27, m36: 23.45 },
-                    { bank: "Eastern Bank - Online", initial: "E", color: "bg-purple-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "Exim Bank - Online", initial: "E", color: "bg-purple-600", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
-                    { bank: "Islami Bank", initial: "I", color: "bg-teal-500", m3: 4.16, m6: 5.26, m9: 6.38, m12: 7.52, m18: null, m24: null, m36: null },
-                    { bank: "Islami Bank - Online", initial: "I", color: "bg-teal-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "Jamuna Bank", initial: "J", color: "bg-indigo-500", m3: 4.16, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
-                    { bank: "Jamuna Bank - Online", initial: "J", color: "bg-indigo-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "Lanka Bangla", initial: "L", color: "bg-lime-600", m3: 4.16, m6: 6.38, m9: 7.52, m12: 9.89, m18: null, m24: null, m36: null },
-                    { bank: "Lanka Bangla - Online", initial: "L", color: "bg-lime-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
-                    { bank: "Meghna Bank", initial: "M", color: "bg-pink-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
-                    { bank: "Meghna Bank - Online", initial: "M", color: "bg-pink-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "Mercantile Bank", initial: "M", color: "bg-pink-600", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: null, m24: null, m36: null },
-                    { bank: "Mercantile Bank - Online", initial: "M", color: "bg-pink-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "Midland Bank", initial: "M", color: "bg-fuchsia-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
-                    { bank: "Midland Bank - Online", initial: "M", color: "bg-fuchsia-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
-                    { bank: "Modhumoti Bank", initial: "M", color: "bg-violet-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 8.69, m18: 11.11, m24: 14.94, m36: null },
-                    { bank: "Modhumoti Bank - Online", initial: "M", color: "bg-violet-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
-                    { bank: "Mutual Trust Bank", initial: "M", color: "bg-rose-500", m3: 3.62, m6: 5.26, m9: 6.95, m12: 9.28, m18: null, m24: null, m36: null },
-                    { bank: "Mutual Trust Bank - Online", initial: "M", color: "bg-rose-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "NCC Bank", initial: "N", color: "bg-cyan-500", m3: 3.62, m6: 4.16, m9: 6.38, m12: 7.52, m18: 11.11, m24: null, m36: null },
-                    { bank: "NCC Bank - Online", initial: "N", color: "bg-cyan-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "NRB Bank", initial: "N", color: "bg-cyan-600", m3: 3.09, m6: 5.26, m9: 6.38, m12: 7.52, m18: 12.35, m24: 14.94, m36: 19.04 },
-                    { bank: "NRB Bank - Online", initial: "N", color: "bg-cyan-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "NRB Commercial Bank", initial: "N", color: "bg-sky-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 8.10, m18: null, m24: null, m36: null },
-                    { bank: "NRBC Bank - Online", initial: "N", color: "bg-sky-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
-                    { bank: "One Bank", initial: "O", color: "bg-amber-500", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: null, m24: null, m36: null },
-                    { bank: "One Bank - Online", initial: "O", color: "bg-amber-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
-                    { bank: "Premier Bank", initial: "P", color: "bg-amber-600", m3: 4.16, m6: 5.26, m9: 6.38, m12: 8.69, m18: null, m24: null, m36: null },
-                    { bank: "Premier Bank - Online", initial: "P", color: "bg-amber-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
-                    { bank: "Prime Bank", initial: "P", color: "bg-yellow-600", m3: 4.16, m6: 5.26, m9: 6.38, m12: 7.52, m18: null, m24: null, m36: null },
-                    { bank: "Prime Bank - Online", initial: "P", color: "bg-yellow-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
-                    { bank: "Pubali Bank", initial: "P", color: "bg-yellow-400", m3: 4.16, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
-                    { bank: "Pubali Bank - Online", initial: "P", color: "bg-yellow-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
-                    { bank: "SBAC", initial: "S", color: "bg-emerald-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 8.69, m18: null, m24: null, m36: null },
-                    { bank: "SBAC - Online", initial: "S", color: "bg-emerald-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
-                    { bank: "Shahjalal Islami Bank", initial: "S", color: "bg-emerald-600", m3: 4.71, m6: 5.26, m9: 6.95, m12: 9.28, m18: 11.11, m24: 14.28, m36: null },
-                    { bank: "Shahjalal Islami Bank - Online", initial: "S", color: "bg-emerald-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
-                    { bank: "Shimanto Bank - Online", initial: "S", color: "bg-green-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
-                    { bank: "Social Islami Bank", initial: "S", color: "bg-teal-600", m3: 4.71, m6: 5.26, m9: 6.95, m12: 9.28, m18: 11.11, m24: 14.28, m36: null },
-                    { bank: "Southeast Bank", initial: "S", color: "bg-teal-700", m3: 4.16, m6: 5.26, m9: 7.52, m12: 9.89, m18: 13.63, m24: 19.04, m36: 25.00 },
-                    { bank: "Southeast Bank - Online", initial: "S", color: "bg-teal-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "Standard Bank", initial: "S", color: "bg-indigo-600", m3: 3.62, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
-                    { bank: "Standard Bank - Online", initial: "S", color: "bg-indigo-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
-                    { bank: "Standard Chartered", initial: "S", color: "bg-blue-900", m3: 4.16, m6: 6.38, m9: 9.28, m12: 12.35, m18: 16.27, m24: 21.95, m36: 29.87 },
-                    { bank: "Standard Chartered - Online", initial: "S", color: "bg-blue-800", m3: 6.19, m6: 8.38, m9: 11.26, m12: 14.29, m18: 18.17, m24: 23.77, m36: null },
-                    { bank: "Trust Bank", initial: "T", color: "bg-rose-600", m3: 4.16, m6: 5.82, m9: 7.52, m12: 9.28, m18: 13.63, m24: 17.64, m36: 23.45 },
-                    { bank: "Trust Bank - Online", initial: "T", color: "bg-rose-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
-                    { bank: "UCBL", initial: "U", color: "bg-gray-600", m3: 3.30, m6: 5.48, m9: 7.75, m12: 9.52, m18: 13.63, m24: 17.64, m36: null },
-                    { bank: "UCBL - Online", initial: "U", color: "bg-gray-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: 20.90, m36: null },
+                    { bank: "AB Bank", logo: "https://upload.wikimedia.org/wikipedia/commons/7/73/Logo_of_AB_Bank.svg", initial: "A", color: "bg-red-500", m3: 4.16, m6: 6.38, m9: 7.52, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "AB Bank - Online", logo: "https://upload.wikimedia.org/wikipedia/commons/7/73/Logo_of_AB_Bank.svg", initial: "A", color: "bg-red-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Al-Arafah Islami Bank", logo: "https://images.seeklogo.com/logo-png/36/1/al-arafah-islami-bank-limited-logo-png_seeklogo-367896.png", initial: "A", color: "bg-red-600", m3: 4.71, m6: 5.82, m9: 6.95, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "Al-Arafah Islami Bank - Online", logo: "https://images.seeklogo.com/logo-png/36/1/al-arafah-islami-bank-limited-logo-png_seeklogo-367896.png", initial: "A", color: "bg-red-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Bank Asia", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d6/Logo_of_Bank_Asia.svg", initial: "B", color: "bg-orange-500", m3: 4.71, m6: 5.82, m9: 6.95, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "Bank Asia - Online", logo: "https://upload.wikimedia.org/wikipedia/commons/d/d6/Logo_of_Bank_Asia.svg", initial: "B", color: "bg-orange-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Brac Bank", logo: "https://cdn.brandfetch.io/idcfUmYxDL/w/1882/h/1882/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1764488567824", initial: "B", color: "bg-orange-600", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: 12.35, m24: 16.27, m36: null },
+                    { bank: "CBBL - Online", logo: "https://www.communitybankbd.com/wp-content/uploads/2020/10/community-cash.png", initial: "C", color: "bg-blue-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Citizens Bank", logo: "https://cdn.brandfetch.io/idKfR1XVeV/w/846/h/367/theme/dark/logo.png?c=1bxid64Mup7aczewSAYMX&t=1715047471790", initial: "C", color: "bg-blue-500", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "Citizens Bank - Online", logo: "https://cdn.brandfetch.io/idKfR1XVeV/w/846/h/367/theme/dark/logo.png?c=1bxid64Mup7aczewSAYMX&t=1715047471790", initial: "C", color: "bg-blue-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
+                    { bank: "City Bank", logo: "https://images.seeklogo.com/logo-png/26/1/city-bank-logo-png_seeklogo-263036.png", initial: "C", color: "bg-blue-600", m3: 4.16, m6: 5.82, m9: 6.95, m12: 8.10, m18: 11.73, m24: 15.60, m36: 24.22 },
+                    { bank: "City Bank (AMEX) - Online", logo: "https://images.seeklogo.com/logo-png/26/1/city-bank-logo-png_seeklogo-263036.png", initial: "C", color: "bg-blue-700", m3: 6.72, m6: 8.34, m9: 10.58, m12: 12.92, m18: 16.62, m24: 21.97, m36: 27.85 },
+                    { bank: "Commercial Bank of Ceylon", logo: "https://upload.wikimedia.org/wikipedia/commons/f/fb/Commercial_Bank_logo.svg", initial: "C", color: "bg-blue-800", m3: 5.26, m6: 7.52, m9: 9.89, m12: 11.73, m18: 14.94, m24: 19.04, m36: null },
+                    { bank: "DBBL", logo: "https://upload.wikimedia.org/wikipedia/commons/1/16/Dutch-bangla-bank-ltd.svg", initial: "D", color: "bg-green-600", m3: 4.60, m6: 6.83, m9: 7.99, m12: 9.17, m18: 14.15, m24: 15.47, m36: 18.20 },
+                    { bank: "DBBL - Online", logo: "https://upload.wikimedia.org/wikipedia/commons/1/16/Dutch-bangla-bank-ltd.svg", initial: "D", color: "bg-green-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Dhaka Bank", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo_of_Dhaka_Bank.svg", initial: "D", color: "bg-green-700", m3: 3.62, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: 23.45 },
+                    { bank: "Dhaka Bank - Online", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Logo_of_Dhaka_Bank.svg", initial: "D", color: "bg-green-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
+                    { bank: "Eastern Bank", logo: "https://cdn.brandfetch.io/id-Sih_qNB/theme/dark/logo.svg?c=1bxid64Mup7aczewSAYMX&t=1764583453827", initial: "E", color: "bg-purple-500", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: 11.73, m24: 16.27, m36: 23.45 },
+                    { bank: "Eastern Bank - Online", logo: "https://cdn.brandfetch.io/id-Sih_qNB/theme/dark/logo.svg?c=1bxid64Mup7aczewSAYMX&t=1764583453827", initial: "E", color: "bg-purple-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Exim Bank - Online", logo: "https://upload.wikimedia.org/wikipedia/commons/f/fd/Logo_of_Exim_Bank_%28Bangladesh%29.svg", initial: "E", color: "bg-purple-600", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
+                    { bank: "Islami Bank", logo: "https://logo.clearbit.com/islamibankbd.com", initial: "I", color: "bg-teal-500", m3: 4.16, m6: 5.26, m9: 6.38, m12: 7.52, m18: null, m24: null, m36: null },
+                    { bank: "Islami Bank - Online", logo: "https://logo.clearbit.com/islamibankbd.com", initial: "I", color: "bg-teal-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Jamuna Bank", logo: "https://logo.clearbit.com/jamunabankbd.com", initial: "J", color: "bg-indigo-500", m3: 4.16, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
+                    { bank: "Jamuna Bank - Online", logo: "https://logo.clearbit.com/jamunabankbd.com", initial: "J", color: "bg-indigo-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Lanka Bangla", logo: "https://logo.clearbit.com/lankabangla.com", initial: "L", color: "bg-lime-600", m3: 4.16, m6: 6.38, m9: 7.52, m12: 9.89, m18: null, m24: null, m36: null },
+                    { bank: "Lanka Bangla - Online", logo: "https://logo.clearbit.com/lankabangla.com", initial: "L", color: "bg-lime-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Meghna Bank", logo: "https://logo.clearbit.com/meghnabank.com.bd", initial: "M", color: "bg-pink-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
+                    { bank: "Meghna Bank - Online", logo: "https://logo.clearbit.com/meghnabank.com.bd", initial: "M", color: "bg-pink-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Mercantile Bank", logo: "https://logo.clearbit.com/mblbd.com", initial: "M", color: "bg-pink-600", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "Mercantile Bank - Online", logo: "https://logo.clearbit.com/mblbd.com", initial: "M", color: "bg-pink-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Midland Bank", logo: "https://logo.clearbit.com/midlandbankbd.net", initial: "M", color: "bg-fuchsia-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
+                    { bank: "Midland Bank - Online", logo: "https://logo.clearbit.com/midlandbankbd.net", initial: "M", color: "bg-fuchsia-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Modhumoti Bank", logo: "https://logo.clearbit.com/modhumotibank.net", initial: "M", color: "bg-violet-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 8.69, m18: 11.11, m24: 14.94, m36: null },
+                    { bank: "Modhumoti Bank - Online", logo: "https://logo.clearbit.com/modhumotibank.net", initial: "M", color: "bg-violet-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Mutual Trust Bank", logo: "https://logo.clearbit.com/mutualtrustbank.com", initial: "M", color: "bg-rose-500", m3: 3.62, m6: 5.26, m9: 6.95, m12: 9.28, m18: null, m24: null, m36: null },
+                    { bank: "Mutual Trust Bank - Online", logo: "https://logo.clearbit.com/mutualtrustbank.com", initial: "M", color: "bg-rose-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "NCC Bank", logo: "https://logo.clearbit.com/nccbank.com.bd", initial: "N", color: "bg-cyan-500", m3: 3.62, m6: 4.16, m9: 6.38, m12: 7.52, m18: 11.11, m24: null, m36: null },
+                    { bank: "NCC Bank - Online", logo: "https://logo.clearbit.com/nccbank.com.bd", initial: "N", color: "bg-cyan-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "NRB Bank", logo: "https://logo.clearbit.com/nrbbankbd.com", initial: "N", color: "bg-cyan-600", m3: 3.09, m6: 5.26, m9: 6.38, m12: 7.52, m18: 12.35, m24: 14.94, m36: 19.04 },
+                    { bank: "NRB Bank - Online", logo: "https://logo.clearbit.com/nrbbankbd.com", initial: "N", color: "bg-cyan-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "NRB Commercial Bank", logo: "https://logo.clearbit.com/nrbcommercialbank.com", initial: "N", color: "bg-sky-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 8.10, m18: null, m24: null, m36: null },
+                    { bank: "NRBC Bank - Online", logo: "https://logo.clearbit.com/nrbcommercialbank.com", initial: "N", color: "bg-sky-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "One Bank", logo: "https://logo.clearbit.com/onebank.com.bd", initial: "O", color: "bg-amber-500", m3: 4.16, m6: 5.26, m9: 7.52, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "One Bank - Online", logo: "https://logo.clearbit.com/onebank.com.bd", initial: "O", color: "bg-amber-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
+                    { bank: "Premier Bank", logo: "https://logo.clearbit.com/premierbankltd.com", initial: "P", color: "bg-amber-600", m3: 4.16, m6: 5.26, m9: 6.38, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "Premier Bank - Online", logo: "https://logo.clearbit.com/premierbankltd.com", initial: "P", color: "bg-amber-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
+                    { bank: "Prime Bank", logo: "https://logo.clearbit.com/primebank.com.bd", initial: "P", color: "bg-yellow-600", m3: 4.16, m6: 5.26, m9: 6.38, m12: 7.52, m18: null, m24: null, m36: null },
+                    { bank: "Prime Bank - Online", logo: "https://logo.clearbit.com/primebank.com.bd", initial: "P", color: "bg-yellow-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Pubali Bank", logo: "https://logo.clearbit.com/pubalibankbd.com", initial: "P", color: "bg-yellow-400", m3: 4.16, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
+                    { bank: "Pubali Bank - Online", logo: "https://logo.clearbit.com/pubalibankbd.com", initial: "P", color: "bg-yellow-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "SBAC", logo: "https://logo.clearbit.com/sbacbank.com", initial: "S", color: "bg-emerald-500", m3: 3.62, m6: 5.26, m9: 6.38, m12: 8.69, m18: null, m24: null, m36: null },
+                    { bank: "SBAC - Online", logo: "https://logo.clearbit.com/sbacbank.com", initial: "S", color: "bg-emerald-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Shahjalal Islami Bank", logo: "https://logo.clearbit.com/sjiblbd.com", initial: "S", color: "bg-emerald-600", m3: 4.71, m6: 5.26, m9: 6.95, m12: 9.28, m18: 11.11, m24: 14.28, m36: null },
+                    { bank: "Shahjalal Islami Bank - Online", logo: "https://logo.clearbit.com/sjiblbd.com", initial: "S", color: "bg-emerald-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: null, m36: null },
+                    { bank: "Shimanto Bank - Online", logo: "https://logo.clearbit.com/shimantobank.com", initial: "S", color: "bg-green-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Social Islami Bank", logo: "https://logo.clearbit.com/siblbd.com", initial: "S", color: "bg-teal-600", m3: 4.71, m6: 5.26, m9: 6.95, m12: 9.28, m18: 11.11, m24: 14.28, m36: null },
+                    { bank: "Southeast Bank", logo: "https://logo.clearbit.com/southeastbank.com.bd", initial: "S", color: "bg-teal-700", m3: 4.16, m6: 5.26, m9: 7.52, m12: 9.89, m18: 13.63, m24: 19.04, m36: 25.00 },
+                    { bank: "Southeast Bank - Online", logo: "https://logo.clearbit.com/southeastbank.com.bd", initial: "S", color: "bg-teal-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "Standard Bank", logo: "https://logo.clearbit.com/standardbankbd.com", initial: "S", color: "bg-indigo-600", m3: 3.62, m6: 5.26, m9: 6.38, m12: 7.52, m18: 11.11, m24: 14.94, m36: null },
+                    { bank: "Standard Bank - Online", logo: "https://logo.clearbit.com/standardbankbd.com", initial: "S", color: "bg-indigo-300", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: null },
+                    { bank: "Standard Chartered", logo: "https://logo.clearbit.com/sc.com", initial: "S", color: "bg-blue-900", m3: 4.16, m6: 6.38, m9: 9.28, m12: 12.35, m18: 16.27, m24: 21.95, m36: 29.87 },
+                    { bank: "Standard Chartered - Online", logo: "https://logo.clearbit.com/sc.com", initial: "S", color: "bg-blue-800", m3: 6.19, m6: 8.38, m9: 11.26, m12: 14.29, m18: 18.17, m24: 23.77, m36: null },
+                    { bank: "Trust Bank", logo: "https://logo.clearbit.com/tblbd.com", initial: "T", color: "bg-rose-600", m3: 4.16, m6: 5.82, m9: 7.52, m12: 9.28, m18: 13.63, m24: 17.64, m36: 23.45 },
+                    { bank: "Trust Bank - Online", logo: "https://logo.clearbit.com/tblbd.com", initial: "T", color: "bg-rose-400", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: 15.55, m24: 20.90, m36: 26.78 },
+                    { bank: "UCBL", logo: "https://logo.clearbit.com/ucb.com.bd", initial: "U", color: "bg-gray-600", m3: 3.30, m6: 5.48, m9: 7.75, m12: 9.52, m18: 13.63, m24: 17.64, m36: null },
+                    { bank: "UCBL - Online", logo: "https://logo.clearbit.com/ucb.com.bd", initial: "U", color: "bg-gray-500", m3: 5.65, m6: 7.27, m9: 9.51, m12: 11.85, m18: null, m24: 20.90, m36: null },
                 ];
 
                 return (
@@ -417,6 +433,7 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                 const isPhoneCategory = categoryLower.includes('phone') || categoryLower.includes('phones');
                 const productNameLower = (product.name || '').toLowerCase();
                 const isAdapter = productNameLower.includes('adaptar') || productNameLower.includes('adapter');
+                const isCable = productNameLower.includes('cable');
 
                 // Calculate extended warranty prices for non-phone categories
                 const productPrice = product.price || 0;
@@ -438,19 +455,33 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
 
                 // Adapter specific plan
                 const adapterPlans = [
-                    { id: 'warranty_adapter', name: '12 month instant replacement warranty', description: 'Instant replacement for any issues', price: 0 } // Price 0 or calculated as needed
+                    { id: 'warranty_adapter', name: '12 month instant replacement warranty', description: 'Instant replacement for any issues', price: 0 }
                 ];
 
-                const carePlansToShow = isAdapter ? adapterPlans : (isPhoneCategory ? phoneCarePlans : otherCategoryPlans);
+                // Cable specific plan
+                const cablePlans = [
+                    { id: 'warranty_cable', name: '6 month instant replacement warranty', description: 'Instant replacement for any issues', price: 0 }
+                ];
+
+                let carePlansToShow;
+                if (isAdapter) {
+                    carePlansToShow = adapterPlans;
+                } else if (isCable) {
+                    carePlansToShow = cablePlans;
+                } else if (isPhoneCategory) {
+                    carePlansToShow = phoneCarePlans;
+                } else {
+                    carePlansToShow = otherCategoryPlans;
+                }
+
+                const hideHeader = false; // Always show header
 
                 return (
                     <div className="bg-secondary/10 rounded-xl overflow-hidden border border-border">
-                        {!isAdapter && (
-                            <div className="bg-black text-white p-2.5 flex items-center gap-2">
-                                <ShieldCheck className="h-4 w-4 text-accent" />
-                                <span className="font-bold text-sm">Dizmo Care</span>
-                            </div>
-                        )}
+                        <div className="bg-black text-white p-2.5 flex items-center gap-2">
+                            <ShieldCheck className="h-4 w-4 text-accent" />
+                            <span className="font-bold text-sm">Dizmo Care</span>
+                        </div>
 
                         <div className="p-2 space-y-2">
                             {carePlansToShow.map((plan) => (
