@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Timer } from "lucide-react";
 import ProductCard from "./ProductCard";
+import { getProductImage } from "@/utils/imageHelper";
 
 export default function FlashSale() {
     const [products, setProducts] = useState([]);
@@ -28,7 +29,7 @@ export default function FlashSale() {
                         price: parseFloat(item.discounted_price),
                         originalPrice: parseFloat(item.retails_price),
                         discount: parseFloat(item.discount) || 0,
-                        image: item.image_path,
+                        image: getProductImage(item),
                         inStock: item.status === "In stock",
                         rating: parseFloat(item.review_summary?.average_rating) || 0,
                         reviews: item.review_summary?.total_reviews || 0

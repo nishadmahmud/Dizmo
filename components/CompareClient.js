@@ -5,6 +5,7 @@ import { GitCompare, Plus, X, Search, Check, Trash2 } from "lucide-react";
 import { useProduct } from "@/context/ProductContext";
 import Link from "next/link";
 import Image from "next/image";
+import { getProductImage } from "@/utils/imageHelper";
 
 export default function CompareClient() {
     const { searchProducts } = useProduct();
@@ -64,13 +65,8 @@ export default function CompareClient() {
                 price = Math.min(...prices);
             }
 
-            // Handle images - try image_paths array, then images array, then single image
-            let image = product.image; // Fallback to search result image
-            if (fullProduct.image_paths && fullProduct.image_paths.length > 0) {
-                image = fullProduct.image_paths[0];
-            } else if (fullProduct.images && fullProduct.images.length > 0) {
-                image = fullProduct.images[0];
-            }
+            // Handle images using helper to support array/object formats
+            let image = getProductImage(fullProduct) || product.image;
 
             newSelected[activeSlot] = {
                 ...fullProduct,

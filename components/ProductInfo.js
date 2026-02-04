@@ -344,25 +344,43 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
                 <div className="md:space-y-3 bg-white md:bg-transparent p-4 md:p-0 rounded-xl md:rounded-none border md:border-0 border-border">
                     <h3 className="text-sm font-semibold text-foreground mb-3 md:mb-0">Color:</h3>
                     <div className="flex flex-wrap gap-2">
-                        {availableColors.map((color) => (
-                            <button
-                                key={color.id}
-                                onClick={() => {
-                                    setSelectedColor(color.id);
-                                    if (onColorChange) onColorChange(color.id);
-                                }}
-                                className={`flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full md:rounded-lg border transition-all ${selectedColor === color.id
-                                    ? "border-primary ring-2 ring-primary bg-primary/5"
-                                    : "border-border hover:border-primary/50 bg-white md:bg-transparent"
-                                    }`}
-                            >
-                                <div
-                                    className="w-4 h-4 md:w-6 md:h-6 rounded-full border-2 border-white shadow-sm"
-                                    style={{ backgroundColor: color.hex }}
-                                />
-                                <span className="text-sm font-medium whitespace-nowrap">{color.label}</span>
-                            </button>
-                        ))}
+                        {availableColors.map((color) => {
+                            // Check stock status for this specific color-storage combination
+                            const colorStock = product.imeis?.find(i =>
+                                i.storage === selectedStorage &&
+                                i.color === color.id &&
+                                i.in_stock > 0 &&
+                                !i.defected
+                            );
+                            const isOutOfStock = !colorStock;
+
+                            return (
+                                <button
+                                    key={color.id}
+                                    onClick={() => {
+                                        if (isOutOfStock) {
+                                            alert("This color variant is currently out of stock.");
+                                            return;
+                                        }
+                                        setSelectedColor(color.id);
+                                        if (onColorChange) onColorChange(color.id);
+                                    }}
+                                    className={`flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full md:rounded-lg border transition-all ${selectedColor === color.id
+                                        ? "border-primary ring-2 ring-primary bg-primary/5"
+                                        : "border-border hover:border-primary/50 bg-white md:bg-transparent"
+                                        } ${isOutOfStock ? "opacity-50 grayscale cursor-not-allowed" : ""}`}
+                                >
+                                    <div
+                                        className="w-4 h-4 md:w-6 md:h-6 rounded-full border-2 border-white shadow-sm"
+                                        style={{ backgroundColor: color.hex }}
+                                    />
+                                    <span className="text-sm font-medium whitespace-nowrap">
+                                        {color.label}
+                                        {isOutOfStock && <span className="text-xs ml-1 text-red-500">(Out of Stock)</span>}
+                                    </span>
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
             )}

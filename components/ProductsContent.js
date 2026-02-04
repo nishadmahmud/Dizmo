@@ -1,6 +1,7 @@
 "use client";
 
 import ProductCard from "@/components/ProductCard";
+import { getProductImage } from "@/utils/imageHelper";
 import { Search, SlidersHorizontal, ArrowUpDown, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -103,7 +104,7 @@ export default function ProductsContent() {
                             discount: parseFloat(product.discount) || 0,
                             category: category,
                             inStock: product.status === "In stock",
-                            image: product.image_path,
+                            image: getProductImage(product),
                             brand: product.brand_name,
                             stock: product.current_stock,
                             rating: parseFloat(product.review_summary?.average_rating) || 0,

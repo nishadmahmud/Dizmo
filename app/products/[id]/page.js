@@ -142,7 +142,13 @@ export default async function ProductPage({ params, searchParams }) {
     });
 
     // Combine product images and all IMEI images
-    const allProductImages = productData.images || [];
+    // Combine product images and all IMEI images
+    let allProductImages = [];
+    if (Array.isArray(productData.images)) {
+        allProductImages = productData.images;
+    } else if (typeof productData.images === 'object' && productData.images !== null) {
+        allProductImages = Object.values(productData.images);
+    }
     const allImeiImages = imeis
         .map(i => i.image_path)
         .filter(Boolean)

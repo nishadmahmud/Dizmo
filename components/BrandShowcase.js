@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ProductCard from "./ProductCard";
+import { getProductImage } from "@/utils/imageHelper";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function BrandShowcase() {
@@ -72,7 +73,7 @@ export default function BrandShowcase() {
                         price: parseFloat(item.retails_price),
                         originalPrice: parseFloat(item.retails_price),
                         discount: parseFloat(item.discount) || 0,
-                        image: item.image_path,
+                        image: getProductImage(item),
                         inStock: item.current_stock > 0,
                         rating: parseFloat(item.review_summary?.average_rating) || 0,
                         reviews: item.review_summary?.total_reviews || 0

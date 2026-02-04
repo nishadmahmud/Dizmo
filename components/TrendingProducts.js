@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import ProductCard from "./ProductCard";
 import { ArrowRight, TrendingUp } from "lucide-react";
+import { getProductImage } from "@/utils/imageHelper";
 
 export default function TrendingProducts() {
     const [products, setProducts] = useState([]);
@@ -29,7 +30,7 @@ export default function TrendingProducts() {
                         price: parseFloat(item.discounted_price || item.retails_price),
                         originalPrice: parseFloat(item.retails_price),
                         discount: parseFloat(item.discount || item.discount_rate) || 0,
-                        image: item.image_path,
+                        image: getProductImage(item),
                         inStock: item.status === "In stock",
                         trending: true,
                         rating: parseFloat(item.review_summary?.average_rating) || 0,

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import ProductCard from "./ProductCard";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { getProductImage } from "@/utils/imageHelper";
 
 export default function NewArrivals() {
     const [products, setProducts] = useState([]);
@@ -26,7 +27,7 @@ export default function NewArrivals() {
                         price: parseFloat(item.retails_price), // New arrivals might not have discount
                         originalPrice: parseFloat(item.retails_price),
                         discount: 0,
-                        image: item.image_path,
+                        image: getProductImage(item),
                         inStock: item.status === "In stock",
                         category: item.category_name || "New",
                         isNew: true,
