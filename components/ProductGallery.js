@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { ImageIcon } from "lucide-react";
 
 export default function ProductGallery({ images }) {
     const [activeImage, setActiveImage] = useState(0);
+
+    // Reset active image when images change (e.g. color selection changes)
+    useEffect(() => {
+        setActiveImage(0);
+    }, [images]);
 
     return (
         <div className="space-y-4">
