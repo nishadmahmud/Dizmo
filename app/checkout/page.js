@@ -138,6 +138,8 @@ export default function CheckoutPage() {
             // Build product array
             const productArray = cart.map(item => ({
                 product_id: item.id,
+                variant_id: item.variantId || null, // IMEI ID
+                model: item.selectedVariants?.model || null,
                 qty: item.quantity,
                 price: item.price,
                 mode: 1,

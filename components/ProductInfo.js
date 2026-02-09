@@ -9,6 +9,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
     const [selectedStorage, setSelectedStorage] = useState(product.variants?.storage?.[0]?.id || null);
     const [selectedColor, setSelectedColor] = useState(selectedColorProp || product.variants?.colors?.[0]?.id || null);
     const [selectedRegion, setSelectedRegion] = useState(product.variants?.regions?.[0]?.id || null);
+    const [selectedModel, setSelectedModel] = useState(product.variants?.models?.[0]?.id || null);
     // const [selectedCarePlans, setSelectedCarePlans] = useState([]); // Lifted up
     const [quantity, setQuantity] = useState(1);
     const [deliveryMethod, setDeliveryMethod] = useState("delivery");
@@ -61,7 +62,8 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
             const match = product.imeis.find(i =>
                 (!selectedStorage || i.storage === selectedStorage) &&
                 (!selectedColor || i.color === selectedColor) &&
-                (!selectedRegion || i.region === selectedRegion)
+                (!selectedRegion || i.region === selectedRegion) &&
+                (!selectedModel || i.model === selectedModel)
             );
 
             if (match) return match.sale_price;
@@ -98,6 +100,14 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
     // };
 
     const handleAddToCart = () => {
+        // Find the matching IMEI to get variant ID
+        const matchingImei = product.imeis?.find(i =>
+            (!selectedStorage || i.storage === selectedStorage) &&
+            (!selectedColor || i.color === selectedColor) &&
+            (!selectedRegion || i.region === selectedRegion) &&
+            (!selectedModel || i.model === selectedModel)
+        );
+
         // Add the main product
         const productWithVariants = {
             ...product,
@@ -105,7 +115,9 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
                 storage: product.variants?.storage?.find(s => s.id === selectedStorage)?.label,
                 color: product.variants?.colors?.find(c => c.id === selectedColor)?.label,
                 region: product.variants?.regions?.find(r => r.id === selectedRegion)?.label,
+                model: product.variants?.models?.find(m => m.id === selectedModel)?.label,
             },
+            variantId: matchingImei?.id || null, // IMEI ID as variant ID
             price: getCurrentPrice(), // Just the product price, not including care plans
             image: product.images?.[0] || product.image,
         };
@@ -400,6 +412,27 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
                                     }`}
                             >
                                 <span className="font-medium">{region.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Model Variant Selector */}
+            {product.have_variant === 1 && product.variants?.models?.length > 0 && (
+                <div className="md:space-y-3 bg-white md:bg-transparent p-4 md:p-0 rounded-xl md:rounded-none border md:border-0 border-border">
+                    <h3 className="text-sm font-semibold text-foreground mb-3 md:mb-0">Model:</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {product.variants.models.map((model) => (
+                            <button
+                                key={model.id}
+                                onClick={() => setSelectedModel(model.id)}
+                                className={`px-3 py-1.5 md:px-3 md:py-2 rounded-full md:rounded-lg border text-sm transition-all ${selectedModel === model.id
+                                    ? "border-primary bg-primary/5 ring-1 ring-primary"
+                                    : "border-border hover:border-primary/50 bg-white md:bg-transparent"
+                                    }`}
+                            >
+                                <span className="font-medium">{model.label}</span>
                             </button>
                         ))}
                     </div>

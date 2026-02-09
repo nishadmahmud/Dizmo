@@ -130,6 +130,9 @@ export default async function ProductPage({ params, searchParams }) {
 
     const uniqueRegions = [...new Set(imeis.map(i => i.region).filter(Boolean))];
 
+    // Extract unique models from IMEIs
+    const uniqueModels = [...new Set(imeis.map(i => i.model).filter(Boolean))];
+
     // Organize IMEI images by color
     const imeiImagesByColor = {};
     imeis.forEach(imei => {
@@ -176,6 +179,9 @@ export default async function ProductPage({ params, searchParams }) {
         // IMEI images organized by color for dynamic gallery filtering
         imeiImagesByColor: imeiImagesByColor,
 
+        // Variant flag from API
+        have_variant: productData.have_variant || 0,
+
         // Mapped variants
         variants: {
             storage: uniqueStorage.map(s => {
@@ -200,6 +206,10 @@ export default async function ProductPage({ params, searchParams }) {
                 id: r,
                 label: r,
                 description: getRegionDescription(r)
+            })),
+            models: uniqueModels.map(m => ({
+                id: m,
+                label: m
             }))
         },
 
