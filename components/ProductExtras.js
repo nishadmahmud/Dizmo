@@ -434,6 +434,9 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                 const productNameLower = (product.name || '').toLowerCase();
                 const isAdapter = productNameLower.includes('adaptar') || productNameLower.includes('adapter');
                 const isCable = productNameLower.includes('cable');
+                const isLaptop = categoryLower.includes('laptop') || categoryLower.includes('macbook') ||
+                    productNameLower.includes('macbook') || productNameLower.includes('laptop') ||
+                    productNameLower.includes('notebook') || productNameLower.includes('mac');
 
                 // Calculate extended warranty prices for non-phone categories
                 const productPrice = product.price || 0;
@@ -442,9 +445,9 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
 
                 // Care plans for phones
                 const phoneCarePlans = product.carePlans && product.carePlans.length > 0 ? product.carePlans : [
-                    { id: 'care_android', name: 'Dizmo Care+ 1 Year', description: 'Brand New Replacement Guarantee', price: 1152 },
-                    { id: 'screen_care', name: 'Dizmo Screen Care+ : 730 days', description: 'One time display replacements (excluding physical damage)', price: 987 },
-                    { id: 'parts', name: '1 Year Parts Warranty', description: '', price: 700 },
+                    { id: 'care_android', name: 'Dizmo Care+ 1 Year', description: 'Brand New Replacement Guarantee', price: Math.round(productPrice * 0.05) },
+                    { id: 'screen_care', name: 'Dizmo Screen Care+ : 730 days', description: 'One time display replacements (excluding physical damage)', price: Math.round(productPrice * 0.06) },
+                    { id: 'parts', name: '1 Year Parts Warranty', description: '', price: Math.round(productPrice * 0.04) },
                 ];
 
                 // Extended warranty for other categories
@@ -463,11 +466,18 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                     { id: 'warranty_cable', name: '6 month instant replacement warranty', description: 'Instant replacement for any issues', price: 0 }
                 ];
 
+                // Laptop specific plan (Only Dizmo Care+)
+                const laptopPlans = [
+                    { id: 'care_laptop', name: 'Dizmo Care+ 1 Year', description: 'Brand New Replacement Guarantee', price: Math.round(productPrice * 0.05) }
+                ];
+
                 let carePlansToShow;
                 if (isAdapter) {
                     carePlansToShow = adapterPlans;
                 } else if (isCable) {
                     carePlansToShow = cablePlans;
+                } else if (isLaptop) {
+                    carePlansToShow = laptopPlans;
                 } else if (isPhoneCategory) {
                     carePlansToShow = phoneCarePlans;
                 } else {
@@ -517,7 +527,7 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                                 <div className="w-3.5 h-3.5 bg-green-500 rounded flex items-center justify-center shrink-0">
                                     <CheckCircle2 className="h-2.5 w-2.5 text-white" />
                                 </div>
-                                <span className="text-[10px] text-muted-foreground leading-tight">I agree to Dizmo's <a href="#" className="text-primary hover:underline">terms & conditions</a></span>
+                                <span className="text-[10px] text-muted-foreground leading-tight">I agree to Dizmo's <a href="/terms" target="_blank" className="text-primary hover:underline">terms & conditions</a></span>
                             </div>
                         </div>
                     </div>
