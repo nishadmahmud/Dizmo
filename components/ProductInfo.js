@@ -119,6 +119,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
             },
             variantId: matchingImei?.id || null, // IMEI ID as variant ID
             price: getCurrentPrice(), // Just the product price, not including care plans
+            minBookingAmount: product.isPhone ? (getCurrentPrice() > 100000 ? 10000 : 5000) : 300,
             image: product.images?.[0] || product.image,
         };
         addToCart(productWithVariants, quantity);
@@ -224,12 +225,18 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
 
             {/* Minimum Booking & Purchase Points */}
             {(() => {
-                // Calculate Minimum Booking: 20% of price, rounded to nearest 100 for products >= 10000, else nearest 10
-                const price = totalPrice || product.price || 0;
-                const bookingRaw = price * 0.20;
-                const minBooking = price >= 10000
-                    ? Math.round(bookingRaw / 100) * 100
-                    : Math.round(bookingRaw / 10) * 10;
+                // Calculate Minimum Booking based on product type and price rules
+                // Use currentPrice (base product price) to determine booking amount, not total with add-ons
+                const price = currentPrice || product.price || 0;
+                let minBooking = 300; // Default for non-phones
+
+                if (product.isPhone) {
+                    if (price > 100000) {
+                        minBooking = 10000;
+                    } else {
+                        minBooking = 5000;
+                    }
+                }
 
                 // Calculate Purchase Points: 1 point per 1000 BDT, minimum 10, rounded to nearest 10
                 const pointsRaw = Math.max(price / 1000, 10);

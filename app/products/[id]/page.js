@@ -220,7 +220,8 @@ export default async function ProductPage({ params, searchParams }) {
         carePlans: [],
 
         // Category for conditional rendering (resolved from category_id lookup)
-        category: categoryName
+        category: categoryName,
+        isPhone: (categoryName || "").toLowerCase().includes('phone') || (categoryName || "").toLowerCase().includes('mobile')
     };
 
     return (
