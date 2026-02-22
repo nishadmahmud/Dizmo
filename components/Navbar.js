@@ -65,12 +65,12 @@ export default function Navbar() {
     const [showMenu, setShowMenu] = useState(false);
     const [showAllCategories, setShowAllCategories] = useState(false);
     const [categories, setCategories] = useState(defaultCategories);
-    const [categoryBrands, setCategoryBrands] = useState({});
+    // const [categoryBrands, setCategoryBrands] = useState({});
     const [hoveredCategory, setHoveredCategory] = useState(null);
     const [hoveredSidebarCategory, setHoveredSidebarCategory] = useState(null);
-    const [loadingBrands, setLoadingBrands] = useState({});
+    // const [loadingBrands, setLoadingBrands] = useState({});
     const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
-    const [brandsPreloaded, setBrandsPreloaded] = useState(false);
+    // const [brandsPreloaded, setBrandsPreloaded] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     // Check localStorage for auth on mount and listen for changes
@@ -102,171 +102,51 @@ export default function Navbar() {
     const [isListening, setIsListening] = useState(false);
     const [selectedSearchCategory, setSelectedSearchCategory] = useState(null); // For filtering within search modal
 
-    // localStorage key for cached brands
-    const BRANDS_CACHE_KEY = 'dizmo_category_brands';
-    const BRANDS_CACHE_EXPIRY_KEY = 'dizmo_category_brands_expiry';
-    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    // // localStorage key for cached brands
+    // const BRANDS_CACHE_KEY = 'dizmo_category_brands';
+    // const BRANDS_CACHE_EXPIRY_KEY = 'dizmo_category_brands_expiry';
+    // const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-    // Load cached brands from localStorage on mount
-    useEffect(() => {
-        try {
-            const cachedBrands = localStorage.getItem(BRANDS_CACHE_KEY);
-            const cacheExpiry = localStorage.getItem(BRANDS_CACHE_EXPIRY_KEY);
+    // // Load cached brands from localStorage on mount
+    // useEffect(() => {
+    //     try {
+    //         const cachedBrands = localStorage.getItem(BRANDS_CACHE_KEY);
+    //         const cacheExpiry = localStorage.getItem(BRANDS_CACHE_EXPIRY_KEY);
 
-            if (cachedBrands && cacheExpiry) {
-                const expiryTime = parseInt(cacheExpiry);
-                if (Date.now() < expiryTime) {
-                    // Cache is still valid
-                    const parsedBrands = JSON.parse(cachedBrands);
-                    setCategoryBrands(parsedBrands);
-                    setBrandsPreloaded(true);
-                    console.log('Loaded brands from localStorage cache');
-                } else {
-                    // Cache expired, clear it
-                    localStorage.removeItem(BRANDS_CACHE_KEY);
-                    localStorage.removeItem(BRANDS_CACHE_EXPIRY_KEY);
-                }
-            }
-        } catch (error) {
-            console.error('Error loading cached brands:', error);
-        }
-    }, []);
+    //         if (cachedBrands && cacheExpiry) {
+    //             const expiryTime = parseInt(cacheExpiry);
+    //             if (Date.now() < expiryTime) {
+    //                 // Cache is still valid
+    //                 const parsedBrands = JSON.parse(cachedBrands);
+    //                 setCategoryBrands(parsedBrands);
+    //                 setBrandsPreloaded(true);
+    //                 console.log('Loaded brands from localStorage cache');
+    //             } else {
+    //                 // Cache expired, clear it
+    //                 localStorage.removeItem(BRANDS_CACHE_KEY);
+    //                 localStorage.removeItem(BRANDS_CACHE_EXPIRY_KEY);
+    //             }
+    //         }
+    //     } catch (error) {
+    //         console.error('Error loading cached brands:', error);
+    //     }
+    // }, []);
 
-    // Function to fetch brands for a single category (used for preloading)
-    const fetchBrandsForCategory = async (categoryId) => {
-        try {
-            const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-            const productsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
+    // // Function to fetch brands for a single category (used for preloading) - COMMENTED OUT
+    // const fetchBrandsForCategory = async (categoryId) => { ... };
 
-            let allProducts = [];
-            const limit = 20;
-            const maxPages = 2;
+    // // Preload all category brands in background - COMMENTED OUT
+    // useEffect(() => { ... }, [categories, brandsPreloaded]);
 
-            for (let page = 1; page <= maxPages; page++) {
-                try {
-                    const url = `${apiBaseUrl}${productsEndpoint}/${categoryId}?page=${page}&limit=${limit}`;
-                    const response = await fetch(url);
-                    if (!response.ok) break;
-
-                    const data = await response.json();
-                    if (!data.success || !data.data || data.data.length === 0) break;
-
-                    allProducts.push(...data.data);
-
-                    if (data.data.length < limit) break;
-                } catch (e) {
-                    break;
-                }
-            }
-
-            if (allProducts.length > 0) {
-                const uniqueBrands = [];
-                const brandIds = new Set();
-
-                allProducts.forEach(product => {
-                    let brandId, brandName;
-
-                    if (product.brand_id && product.brand_name) {
-                        brandId = product.brand_id;
-                        brandName = product.brand_name;
-                    } else if (product.brands && product.brands.id) {
-                        brandId = product.brands.id;
-                        brandName = product.brands.name;
-                    }
-
-                    if (brandId && brandName && !brandIds.has(brandId)) {
-                        brandIds.add(brandId);
-                        uniqueBrands.push({ id: brandId, name: brandName });
-                    }
-                });
-
-                uniqueBrands.sort((a, b) => a.name.localeCompare(b.name));
-                return uniqueBrands;
-            }
-            return [];
-        } catch (error) {
-            console.error(`Error fetching brands for category ${categoryId}:`, error);
-            return [];
-        }
-    };
-
-    // Preload all category brands in background after categories are loaded
-    useEffect(() => {
-        if (categories.length === 0 || brandsPreloaded) return;
-
-        const preloadAllBrands = async () => {
-            console.log('Preloading brands for all categories in background...');
-            const allBrands = {};
-
-            // Fetch brands for all categories in parallel (with small batches to avoid overload)
-            const batchSize = 3;
-            for (let i = 0; i < categories.length; i += batchSize) {
-                const batch = categories.slice(i, i + batchSize);
-                const results = await Promise.all(
-                    batch.map(async (cat) => {
-                        const brands = await fetchBrandsForCategory(cat.id);
-                        return { categoryId: cat.id, brands };
-                    })
-                );
-
-                results.forEach(({ categoryId, brands }) => {
-                    if (brands.length > 0) {
-                        allBrands[categoryId] = brands;
-                    }
-                });
-            }
-
-            // Update state with all brands
-            setCategoryBrands(prev => ({ ...prev, ...allBrands }));
-            setBrandsPreloaded(true);
-
-            // Save to localStorage
-            try {
-                localStorage.setItem(BRANDS_CACHE_KEY, JSON.stringify({ ...categoryBrands, ...allBrands }));
-                localStorage.setItem(BRANDS_CACHE_EXPIRY_KEY, (Date.now() + CACHE_DURATION).toString());
-                console.log('Brands cached to localStorage');
-            } catch (error) {
-                console.error('Error saving brands to localStorage:', error);
-            }
-        };
-
-        // Start preloading after a short delay to not block initial render
-        const timer = setTimeout(preloadAllBrands, 1000);
-        return () => clearTimeout(timer);
-    }, [categories, brandsPreloaded]);
-
-    // Fetch brands on hover (fallback if not preloaded)
-    const fetchCategoryBrands = async (categoryId) => {
-        // If brands already loaded, don't fetch again
-        if (categoryBrands[categoryId]) return;
-
-        setLoadingBrands(prev => ({ ...prev, [categoryId]: true }));
-
-        const brands = await fetchBrandsForCategory(categoryId);
-
-        if (brands.length > 0) {
-            setCategoryBrands(prev => {
-                const updated = { ...prev, [categoryId]: brands };
-                // Also update localStorage
-                try {
-                    localStorage.setItem(BRANDS_CACHE_KEY, JSON.stringify(updated));
-                    localStorage.setItem(BRANDS_CACHE_EXPIRY_KEY, (Date.now() + CACHE_DURATION).toString());
-                } catch (e) { }
-                return updated;
-            });
-        }
-
-        setLoadingBrands(prev => ({ ...prev, [categoryId]: false }));
-    };
+    // // Fetch brands on hover (fallback if not preloaded) - COMMENTED OUT
+    // const fetchCategoryBrands = async (categoryId) => { ... };
 
     const handleTopCategoryHover = (categoryId) => {
         setHoveredCategory(categoryId);
-        fetchCategoryBrands(categoryId);
     };
 
     const handleSidebarCategoryHover = (categoryId) => {
         setHoveredSidebarCategory(categoryId);
-        fetchCategoryBrands(categoryId);
     };
 
     // Handle Voice Search
@@ -453,7 +333,8 @@ export default function Navbar() {
                             .map((cat) => ({
                                 id: cat.category_id.toString(),
                                 name: cat.name,
-                                Icon: iconMap[cat.name] || Package
+                                Icon: iconMap[cat.name] || Package,
+                                subCategories: cat.sub_category || []
                             }));
 
                         // Remove duplicates by ID (in case API returns duplicates)
@@ -734,7 +615,7 @@ export default function Navbar() {
                                         {categories.map((category) => {
                                             const IconComponent = category.Icon;
                                             const isHovered = hoveredSidebarCategory === category.id;
-                                            const brands = categoryBrands[category.id] || [];
+                                            const subCategories = category.subCategories || [];
 
                                             return (
                                                 <div
@@ -752,11 +633,11 @@ export default function Navbar() {
                                                         <span className="text-sm font-medium">{category.name.toUpperCase()}</span>
                                                     </Link>
 
-                                                    {/* Brand Dropdown (Side) */}
+                                                    {/* Subcategory Dropdown (Side) */}
                                                     {isHovered && (
                                                         <div className="absolute top-0 left-full ml-2 w-[300px] bg-background rounded-xl shadow-xl border border-border z-50 p-4 animate-in fade-in slide-in-from-left-2 min-h-[200px]">
                                                             <div className="flex items-center justify-between mb-3 border-b border-border pb-2">
-                                                                <h3 className="font-bold text-base text-primary">{category.name.toUpperCase()} Brands</h3>
+                                                                <h3 className="font-bold text-base text-primary">{category.name.toUpperCase()} Subcategories</h3>
                                                                 <Link
                                                                     href={`/categories/${category.id}`}
                                                                     onClick={() => setShowAllCategories(false)}
@@ -766,26 +647,22 @@ export default function Navbar() {
                                                                 </Link>
                                                             </div>
 
-                                                            {loadingBrands[category.id] ? (
-                                                                <div className="py-8 text-center text-muted-foreground text-xs">
-                                                                    Loading...
-                                                                </div>
-                                                            ) : brands.length > 0 ? (
+                                                            {subCategories.length > 0 ? (
                                                                 <div className="grid grid-cols-2 gap-2">
-                                                                    {brands.map((brand) => (
+                                                                    {subCategories.map((sub) => (
                                                                         <Link
-                                                                            key={brand.id}
-                                                                            href={`/categories/${category.id}?brand=${brand.id}`}
+                                                                            key={sub.id}
+                                                                            href={`/categories/${category.id}?sub=${sub.id}`}
                                                                             onClick={() => setShowAllCategories(false)}
                                                                             className="text-xs text-muted-foreground hover:text-primary hover:font-medium transition-colors py-1 truncate"
                                                                         >
-                                                                            {brand.name}
+                                                                            {sub.name}
                                                                         </Link>
                                                                     ))}
                                                                 </div>
                                                             ) : (
-                                                                <div className="py-8 text-center text-muted-foreground text-xs">
-                                                                    No brands
+                                                                <div className="py-6 text-center text-muted-foreground text-xs">
+                                                                    No subcategories available
                                                                 </div>
                                                             )}
                                                         </div>
@@ -804,7 +681,7 @@ export default function Navbar() {
                                 {categories.slice(0, 8).map((category, index) => {
                                     const IconComponent = category.Icon;
                                     const isHovered = hoveredCategory === category.id;
-                                    const brands = categoryBrands[category.id] || [];
+                                    const subCategories = category.subCategories || [];
                                     const isRightAligned = index > 4; // Right align for last 3 items
 
                                     return (
@@ -835,7 +712,7 @@ export default function Navbar() {
                                                     }}
                                                 >
                                                     <div className="flex items-center justify-between mb-4 border-b border-border pb-2">
-                                                        <h3 className="font-bold text-lg text-primary">{category.name.toUpperCase()} Brands</h3>
+                                                        <h3 className="font-bold text-lg text-primary">{category.name.toUpperCase()} Subcategories</h3>
                                                         <Link
                                                             href={`/categories/${category.id}`}
                                                             className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
@@ -844,25 +721,21 @@ export default function Navbar() {
                                                         </Link>
                                                     </div>
 
-                                                    {loadingBrands[category.id] ? (
-                                                        <div className="py-8 text-center text-muted-foreground text-sm">
-                                                            Loading brands...
-                                                        </div>
-                                                    ) : brands.length > 0 ? (
+                                                    {subCategories.length > 0 ? (
                                                         <div className="grid grid-cols-3 gap-x-4 gap-y-2">
-                                                            {brands.map((brand) => (
+                                                            {subCategories.map((sub) => (
                                                                 <Link
-                                                                    key={brand.id}
-                                                                    href={`/categories/${category.id}?brand=${brand.id}`}
+                                                                    key={sub.id}
+                                                                    href={`/categories/${category.id}?sub=${sub.id}`}
                                                                     className="text-sm text-muted-foreground hover:text-primary hover:font-medium transition-colors py-1 block truncate"
                                                                 >
-                                                                    {brand.name}
+                                                                    {sub.name}
                                                                 </Link>
                                                             ))}
                                                         </div>
                                                     ) : (
-                                                        <div className="py-8 text-center text-muted-foreground text-sm">
-                                                            No brands available
+                                                        <div className="py-6 text-center text-muted-foreground text-sm">
+                                                            No subcategories available
                                                         </div>
                                                     )}
                                                 </div>
@@ -927,12 +800,11 @@ export default function Navbar() {
                                     <span className="font-semibold text-[#103E34] uppercase text-sm">All Category</span>
                                 </Link>
 
-                                {/* Category List with Collapsible Brands */}
+                                {/* Category List with Collapsible Subcategories */}
                                 {categories.slice(0, 9).map((category) => {
                                     const IconComponent = category.Icon;
                                     const isExpanded = expandedMobileCategory === category.id;
-                                    const brands = categoryBrands[category.id] || [];
-                                    const isLoadingBrands = loadingBrands[category.id];
+                                    const subCategories = category.subCategories || [];
 
                                     return (
                                         <div key={category.id} className="border-b border-gray-200">
@@ -943,7 +815,6 @@ export default function Navbar() {
                                                         setExpandedMobileCategory(null);
                                                     } else {
                                                         setExpandedMobileCategory(category.id);
-                                                        fetchCategoryBrands(category.id);
                                                     }
                                                 }}
                                                 className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
@@ -953,29 +824,26 @@ export default function Navbar() {
                                                     <span className="font-medium text-[#103E34] text-sm">{category.name.toUpperCase()}</span>
                                                 </div>
                                                 <ChevronRight
-                                                    className={`h-4 w-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''
-                                                        }`}
+                                                    className={`h-4 w-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                                                 />
                                             </button>
 
-                                            {/* Brand Dropdown */}
+                                            {/* Subcategory Dropdown */}
                                             {isExpanded && (
                                                 <div className="bg-gray-50 py-2">
-                                                    {isLoadingBrands ? (
-                                                        <div className="px-4 py-2 text-sm text-gray-500">Loading brands...</div>
-                                                    ) : brands.length > 0 ? (
-                                                        brands.map((brand) => (
+                                                    {subCategories.length > 0 ? (
+                                                        subCategories.map((sub) => (
                                                             <Link
-                                                                key={brand.id}
-                                                                href={`/categories/${category.id}?brand=${brand.id}`}
+                                                                key={sub.id}
+                                                                href={`/categories/${category.id}?sub=${sub.id}`}
                                                                 onClick={() => setShowMenu(false)}
                                                                 className="block px-8 py-2 text-sm text-[#103E34] hover:bg-gray-100 transition-colors"
                                                             >
-                                                                {brand.name}
+                                                                {sub.name}
                                                             </Link>
                                                         ))
                                                     ) : (
-                                                        <div className="px-8 py-2 text-sm text-gray-500">No brands available</div>
+                                                        <div className="px-8 py-2 text-sm text-gray-400">No subcategories available</div>
                                                     )}
                                                 </div>
                                             )}
