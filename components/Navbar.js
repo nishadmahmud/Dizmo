@@ -60,6 +60,8 @@ export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
     const recognitionRef = useRef(null);
+    const topHoverTimeoutRef = useRef(null);
+    const sidebarHoverTimeoutRef = useRef(null);
 
     const [showSearch, setShowSearch] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
@@ -142,11 +144,25 @@ export default function Navbar() {
     // const fetchCategoryBrands = async (categoryId) => { ... };
 
     const handleTopCategoryHover = (categoryId) => {
+        if (topHoverTimeoutRef.current) clearTimeout(topHoverTimeoutRef.current);
         setHoveredCategory(categoryId);
     };
 
+    const handleTopCategoryLeave = () => {
+        topHoverTimeoutRef.current = setTimeout(() => {
+            setHoveredCategory(null);
+        }, 300); // 300ms bridge delay
+    };
+
     const handleSidebarCategoryHover = (categoryId) => {
+        if (sidebarHoverTimeoutRef.current) clearTimeout(sidebarHoverTimeoutRef.current);
         setHoveredSidebarCategory(categoryId);
+    };
+
+    const handleSidebarCategoryLeave = () => {
+        sidebarHoverTimeoutRef.current = setTimeout(() => {
+            setHoveredSidebarCategory(null);
+        }, 300); // 300ms bridge delay
     };
 
     // Handle Voice Search
@@ -622,7 +638,7 @@ export default function Navbar() {
                                                     key={category.id}
                                                     className="relative"
                                                     onMouseEnter={() => handleSidebarCategoryHover(category.id)}
-                                                    onMouseLeave={() => setHoveredSidebarCategory(null)}
+                                                    onMouseLeave={handleSidebarCategoryLeave}
                                                 >
                                                     <Link
                                                         href={`/categories/${category.id}`}
@@ -635,36 +651,42 @@ export default function Navbar() {
 
                                                     {/* Subcategory Dropdown (Side) */}
                                                     {isHovered && (
-                                                        <div className="absolute top-0 left-full ml-2 w-[300px] bg-background rounded-xl shadow-xl border border-border z-50 p-4 animate-in fade-in slide-in-from-left-2 min-h-[200px]">
-                                                            <div className="flex items-center justify-between mb-3 border-b border-border pb-2">
-                                                                <h3 className="font-bold text-base text-primary">{category.name.toUpperCase()} Subcategories</h3>
-                                                                <Link
-                                                                    href={`/categories/${category.id}`}
-                                                                    onClick={() => setShowAllCategories(false)}
-                                                                    className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-1"
-                                                                >
-                                                                    View All <ArrowRight className="h-3 w-3" />
-                                                                </Link>
-                                                            </div>
+                                                        <div
+                                                            className="absolute top-0 left-full ml-0 pl-2 w-[300px] z-50 animate-in fade-in slide-in-from-left-2"
+                                                            onMouseEnter={() => handleSidebarCategoryHover(category.id)}
+                                                            onMouseLeave={handleSidebarCategoryLeave}
+                                                        >
+                                                            <div className="bg-background rounded-xl shadow-xl border border-border p-4 min-h-[200px]">
+                                                                <div className="flex items-center justify-between mb-3 border-b border-border pb-2">
+                                                                    <h3 className="font-bold text-base text-primary">{category.name.toUpperCase()} Subcategories</h3>
+                                                                    <Link
+                                                                        href={`/categories/${category.id}`}
+                                                                        onClick={() => setShowAllCategories(false)}
+                                                                        className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-1"
+                                                                    >
+                                                                        View All <ArrowRight className="h-3 w-3" />
+                                                                    </Link>
+                                                                </div>
 
-                                                            {subCategories.length > 0 ? (
-                                                                <div className="grid grid-cols-2 gap-2">
-                                                                    {subCategories.map((sub) => (
-                                                                        <Link
-                                                                            key={sub.id}
-                                                                            href={`/categories/${category.id}?sub=${sub.id}`}
-                                                                            onClick={() => setShowAllCategories(false)}
-                                                                            className="text-xs text-muted-foreground hover:text-primary hover:font-medium transition-colors py-1 truncate"
-                                                                        >
-                                                                            {sub.name}
-                                                                        </Link>
-                                                                    ))}
-                                                                </div>
-                                                            ) : (
-                                                                <div className="py-6 text-center text-muted-foreground text-xs">
-                                                                    No subcategories available
-                                                                </div>
-                                                            )}
+                                                                {subCategories.length > 0 ? (
+                                                                    <div className="grid grid-cols-2 gap-2">
+                                                                        {subCategories.map((sub) => (
+                                                                            <Link
+                                                                                key={sub.id}
+                                                                                href={`/categories/${category.id}?sub=${sub.id}`}
+                                                                                onClick={() => setShowAllCategories(false)}
+                                                                                className="text-xs text-muted-foreground hover:text-primary hover:font-medium transition-colors py-1 truncate"
+                                                                            >
+                                                                                {sub.name}
+                                                                            </Link>
+                                                                        ))}
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="py-6 text-center text-muted-foreground text-xs">
+                                                                        No subcategories available
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     )}
                                                 </div>
@@ -689,7 +711,7 @@ export default function Navbar() {
                                             key={category.id}
                                             className="relative"
                                             onMouseEnter={() => handleTopCategoryHover(category.id)}
-                                            onMouseLeave={() => setHoveredCategory(null)}
+                                            onMouseLeave={handleTopCategoryLeave}
                                         >
                                             <Link
                                                 href={`/categories/${category.id}`}
@@ -704,40 +726,44 @@ export default function Navbar() {
 
                                             {isHovered && (
                                                 <div
-                                                    className={`absolute top-full mt-2 w-[600px] bg-background rounded-xl shadow-xl border border-border z-50 p-6 ${isRightAligned ? 'right-0' : 'left-0'}`}
+                                                    className={`absolute top-full mt-0 pt-2 w-[600px] z-50 ${isRightAligned ? 'right-0' : 'left-0'}`}
+                                                    onMouseEnter={() => handleTopCategoryHover(category.id)}
+                                                    onMouseLeave={handleTopCategoryLeave}
                                                     style={{
                                                         animation: 'slideDown 0.3s ease-out',
                                                         transformOrigin: 'top',
                                                         transition: 'opacity 0.3s ease-out, transform 0.3s ease-out'
                                                     }}
                                                 >
-                                                    <div className="flex items-center justify-between mb-4 border-b border-border pb-2">
-                                                        <h3 className="font-bold text-lg text-primary">{category.name.toUpperCase()} Subcategories</h3>
-                                                        <Link
-                                                            href={`/categories/${category.id}`}
-                                                            className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
-                                                        >
-                                                            View All <ArrowRight className="h-3 w-3" />
-                                                        </Link>
-                                                    </div>
+                                                    <div className="bg-background rounded-xl shadow-xl border border-border p-6">
+                                                        <div className="flex items-center justify-between mb-4 border-b border-border pb-2">
+                                                            <h3 className="font-bold text-lg text-primary">{category.name.toUpperCase()} Subcategories</h3>
+                                                            <Link
+                                                                href={`/categories/${category.id}`}
+                                                                className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
+                                                            >
+                                                                View All <ArrowRight className="h-3 w-3" />
+                                                            </Link>
+                                                        </div>
 
-                                                    {subCategories.length > 0 ? (
-                                                        <div className="grid grid-cols-3 gap-x-4 gap-y-2">
-                                                            {subCategories.map((sub) => (
-                                                                <Link
-                                                                    key={sub.id}
-                                                                    href={`/categories/${category.id}?sub=${sub.id}`}
-                                                                    className="text-sm text-muted-foreground hover:text-primary hover:font-medium transition-colors py-1 block truncate"
-                                                                >
-                                                                    {sub.name}
-                                                                </Link>
-                                                            ))}
-                                                        </div>
-                                                    ) : (
-                                                        <div className="py-6 text-center text-muted-foreground text-sm">
-                                                            No subcategories available
-                                                        </div>
-                                                    )}
+                                                        {subCategories.length > 0 ? (
+                                                            <div className="grid grid-cols-3 gap-x-4 gap-y-2">
+                                                                {subCategories.map((sub) => (
+                                                                    <Link
+                                                                        key={sub.id}
+                                                                        href={`/categories/${category.id}?sub=${sub.id}`}
+                                                                        className="text-sm text-muted-foreground hover:text-primary hover:font-medium transition-colors py-1 block truncate"
+                                                                    >
+                                                                        {sub.name}
+                                                                    </Link>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <div className="py-6 text-center text-muted-foreground text-sm">
+                                                                No subcategories available
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
