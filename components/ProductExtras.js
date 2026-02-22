@@ -158,7 +158,9 @@ function EMICalculator({ currentPrice, bankEmiData }) {
     );
 }
 
-export default function ProductExtras({ product, selectedCarePlans, toggleCarePlan }) {
+export default function ProductExtras({ product, selectedCarePlans, toggleCarePlan, currentPrice: currentPriceProp }) {
+    // Use the live variant price if provided, fall back to product.price
+    const currentPrice = currentPriceProp ?? product.price ?? 0;
     const [activeDrawer, setActiveDrawer] = useState(null);
 
     const closeDrawer = () => setActiveDrawer(null);
@@ -320,7 +322,7 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                     </div>
                 );
             case "emi":
-                const currentPrice = product.price || 0;
+                const currentPrice = currentPriceProp ?? product.price ?? 0;
 
                 // Bank EMI data (Online rates - no POS charge)
                 const bankEmiData = [
@@ -439,7 +441,7 @@ export default function ProductExtras({ product, selectedCarePlans, toggleCarePl
                     productNameLower.includes('notebook') || productNameLower.includes('mac');
 
                 // Calculate extended warranty prices for non-phone categories
-                const productPrice = product.price || 0;
+                const productPrice = currentPrice;
                 const warranty12MonthPrice = Math.round(productPrice * 0.10); // 10% of product price
                 const warranty18MonthPrice = Math.round(productPrice * 0.20); // 20% of product price
 

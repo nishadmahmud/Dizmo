@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShieldCheck, MapPin, CreditCard, Truck, Star, Share2, Plus, Minus, Check, Gift } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 
-export default function ProductInfo({ product, onColorChange, selectedColorProp, selectedCarePlans }) {
+export default function ProductInfo({ product, onColorChange, selectedColorProp, selectedCarePlans, onPriceChange }) {
     const [selectedStorage, setSelectedStorage] = useState(product.variants?.storage?.[0]?.id || null);
     const [selectedColor, setSelectedColor] = useState(selectedColorProp || product.variants?.colors?.[0]?.id || null);
     const [selectedRegion, setSelectedRegion] = useState(product.variants?.regions?.[0]?.id || null);
@@ -90,6 +90,14 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
         });
         return total;
     };
+
+    // Notify parent whenever the live price changes (variant selection changes)
+    useEffect(() => {
+        if (onPriceChange) {
+            onPriceChange(getCurrentPrice());
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedStorage, selectedColor, selectedRegion, selectedModel]);
 
     // const toggleCarePlan = (planId) => {
     //     setSelectedCarePlans(prev =>

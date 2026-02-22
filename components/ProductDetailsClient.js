@@ -28,6 +28,9 @@ export default function ProductDetailsClient({ product }) {
 
     const [selectedCarePlans, setSelectedCarePlans] = useState([]);
 
+    // Track the live variant price so ProductExtras can react to variant changes
+    const [selectedPrice, setSelectedPrice] = useState(product.price || 0);
+
     // Toggle care plan - now stores full plan objects with id, name, price
     const toggleCarePlan = (plan) => {
         setSelectedCarePlans(prev => {
@@ -53,6 +56,7 @@ export default function ProductDetailsClient({ product }) {
                     onColorChange={setSelectedColor}
                     selectedColorProp={selectedColor}
                     selectedCarePlans={selectedCarePlans}
+                    onPriceChange={setSelectedPrice}
                 />
             </div>
 
@@ -62,6 +66,7 @@ export default function ProductDetailsClient({ product }) {
                     product={product}
                     selectedCarePlans={selectedCarePlans}
                     toggleCarePlan={toggleCarePlan}
+                    currentPrice={selectedPrice}
                 />
             </div>
         </div>

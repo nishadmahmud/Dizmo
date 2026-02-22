@@ -34,11 +34,13 @@ const getRandomColor = () => {
 export default function CategoryDetailPage({ params }) {
     const searchParams = useSearchParams();
     const brandFromUrl = searchParams.get('brand');
+    const subcategoryId = searchParams.get('sub'); // Subcategory filter from Navbar
 
     const [allPages, setAllPages] = useState({}); // Store all fetched pages {1: [...products], 2: [...products]}
     const [loading, setLoading] = useState(true);
     const [showMobileFilters, setShowMobileFilters] = useState(false);
     const [categoryName, setCategoryName] = useState('');
+    const [subcategoryName, setSubcategoryName] = useState(''); // Name of the active subcategory
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPagesKnown, setTotalPagesKnown] = useState(1);
     const [isFetchingBackground, setIsFetchingBackground] = useState(false);
@@ -119,14 +121,51 @@ export default function CategoryDetailPage({ params }) {
         fetchCategoryName();
     }, [slug]);
 
+    // Resolve subcategory name whenever slug or subcategoryId changes
+    useEffect(() => {
+        if (!slug || !subcategoryId) {
+            setSubcategoryName('');
+            return;
+        }
+        const resolveSubcategoryName = async () => {
+            try {
+                const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+                const categoriesEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORIES;
+                const storeId = process.env.NEXT_PUBLIC_STORE_ID;
+                const res = await fetch(`${apiBaseUrl}${categoriesEndpoint}/${storeId}`);
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.success && data.data) {
+                    const category = data.data.find(cat => cat.category_id.toString() === slug);
+                    if (category && Array.isArray(category.sub_category)) {
+                        const sub = category.sub_category.find(s => s.id.toString() === subcategoryId.toString());
+                        if (sub) setSubcategoryName(sub.name);
+                    }
+                }
+            } catch (e) {
+                console.error('Error resolving subcategory name:', e);
+            }
+        };
+        resolveSubcategoryName();
+    }, [slug, subcategoryId]);
+
     // Helper function to fetch and process a single page
     const fetchProductsPage = async (page) => {
         try {
             const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-            const productsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
             const limit = 20;
 
-            const url = `${apiBaseUrl}${productsEndpoint}/${slug}?page=${page}&limit=${limit}`;
+            let url;
+            if (subcategoryId) {
+                // Subcategory mode: use subcategorywise-products endpoint
+                const subcategoryEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_SUBCATEGORY_PRODUCTS;
+                url = `${apiBaseUrl}${subcategoryEndpoint}/${subcategoryId}?page=${page}`;
+            } else {
+                // Default category mode
+                const productsEndpoint = process.env.NEXT_PUBLIC_ENDPOINT_CATEGORY_PRODUCTS;
+                url = `${apiBaseUrl}${productsEndpoint}/${slug}?page=${page}&limit=${limit}`;
+            }
+
             const response = await fetch(url);
 
             if (!response.ok) {
@@ -258,7 +297,7 @@ export default function CategoryDetailPage({ params }) {
         };
 
         loadInitialAndBackground();
-    }, [slug]);
+    }, [slug, subcategoryId]); // Re-fetch when subcategoryId changes too
 
     // Navigate to specific page (instant since data is already fetched)
     const goToPage = (page) => {
@@ -487,6 +526,12 @@ export default function CategoryDetailPage({ params }) {
                     subText = `Browse the best ${categoryName} in town`;
                 }
 
+                // Override with subcategory name if filtering by subcategory
+                if (subcategoryName) {
+                    bannerText = subcategoryName;
+                    subText = `Browse the best ${subcategoryName} in ${categoryName}`;
+                }
+
                 // Override with brand name if a brand is selected and found
                 if (selectedBrand && uniqueBrands.length > 0) {
                     const brandObj = uniqueBrands.find(b => b.id === selectedBrand);
@@ -588,7 +633,9 @@ export default function CategoryDetailPage({ params }) {
                     <span>/</span>
                     <Link href="/categories" className="hover:text-primary transition-colors">Categories</Link>
                     <span>/</span>
-                    <span className="text-foreground font-medium">{categoryName || 'Loading...'}</span>
+                    <span className="text-foreground font-medium">
+                        {subcategoryName || categoryName || 'Loading...'}
+                    </span>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -652,7 +699,9 @@ export default function CategoryDetailPage({ params }) {
                         {/* Header with count and sort */}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                             <div className="flex items-center gap-3">
-                                <h1 className="text-2xl font-bold text-primary">Products of {categoryName || 'Category'}</h1>
+                                <h1 className="text-2xl font-bold text-primary">
+                                    Products of {subcategoryName || categoryName || 'Category'}
+                                </h1>
                                 <button
                                     onClick={() => setShowMobileFilters(true)}
                                     className="lg:hidden p-2 border border-border rounded-lg hover:bg-secondary transition-colors"
