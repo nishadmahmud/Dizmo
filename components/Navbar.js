@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import {
     Search, ShoppingCart, Menu, Zap, FileText, GitCompare, MapPin, Package, Home,
     Smartphone, Laptop, Tablet, Watch, Headphones, Cable, Gamepad2, Camera, X, Mic, ArrowRight, User, Battery, LayoutGrid, Speaker,
-    MonitorSmartphone, TabletSmartphone, MonitorPlay, Volume2, RefreshCcw, Plug2, ChevronDown, ChevronRight, Loader2
+    MonitorSmartphone, TabletSmartphone, MonitorPlay, Volume2, RefreshCcw, Plug2, ChevronDown, ChevronRight, Loader2,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useProduct } from "@/context/ProductContext";
@@ -47,7 +47,7 @@ const NAVBAR_CATEGORIES = [
     "Tablet",
     "Laptop",
     "Smart Watch",
-    "Gadgets",
+    "Airpods",
     "Accessories",
     "Sounds",
     "Used Phone"
