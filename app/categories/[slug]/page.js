@@ -633,9 +633,17 @@ export default function CategoryDetailPage({ params }) {
                     <span>/</span>
                     <Link href="/categories" className="hover:text-primary transition-colors">Categories</Link>
                     <span>/</span>
-                    <span className="text-foreground font-medium">
-                        {subcategoryName || categoryName || 'Loading...'}
-                    </span>
+                    {subcategoryName ? (
+                        <>
+                            <Link href={`/categories/${slug}`} className="hover:text-primary transition-colors">{categoryName}</Link>
+                            <span>/</span>
+                            <span className="text-foreground font-medium">{subcategoryName}</span>
+                        </>
+                    ) : (
+                        <span className="text-foreground font-medium">
+                            {categoryName || 'Loading...'}
+                        </span>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -700,7 +708,13 @@ export default function CategoryDetailPage({ params }) {
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                             <div className="flex items-center gap-3">
                                 <h1 className="text-2xl font-bold text-primary">
-                                    Products of {subcategoryName || categoryName || 'Category'}
+                                    {subcategoryName ? (
+                                        <>
+                                            {subcategoryName} <span className="text-muted-foreground font-normal text-lg">in {categoryName}</span>
+                                        </>
+                                    ) : (
+                                        `Products of ${categoryName || 'Category'}`
+                                    )}
                                 </h1>
                                 <button
                                     onClick={() => setShowMobileFilters(true)}
