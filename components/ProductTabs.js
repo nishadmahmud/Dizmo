@@ -34,23 +34,26 @@ export default function ProductTabs({ product }) {
             {/* Tab Content */}
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                 {activeTab === "description" && (
-                    <div className="prose prose-sm md:prose-base max-w-none">
+                    <div className="prose prose-sm md:prose-base max-w-none w-full">
                         {/* Render HTML description from API */}
                         <div
                             className="
-                                [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:text-primary [&>h1]:mb-4 [&>h1]:mt-6
-                                [&>h2]:text-xl [&>h2]:font-bold [&>h2]:text-primary [&>h2]:mb-3 [&>h2]:mt-5
-                                [&>h3]:text-lg [&>h3]:font-semibold [&>h3]:text-foreground [&>h3]:mb-2 [&>h3]:mt-4
-                                [&>p]:text-muted-foreground [&>p]:leading-relaxed [&>p]:mb-4
-                                [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mb-4 [&>ul]:space-y-2
-                                [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:mb-4 [&>ol]:space-y-2
-                                [&>li]:text-muted-foreground [&>li]:leading-relaxed
-                                [&>img]:rounded-lg [&>img]:my-4 [&>img]:w-full [&>img]:h-auto [&>img]:object-contain
+                                w-full break-words
+                                [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto
+                                [&_img]:max-w-full [&_img]:h-auto
+                                [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:text-primary [&>h1]:mb-4 [&>h1]:mt-6 [&>h1]:break-words
+                                [&>h2]:text-xl [&>h2]:font-bold [&>h2]:text-primary [&>h2]:mb-3 [&>h2]:mt-5 [&>h2]:break-words
+                                [&>h3]:text-lg [&>h3]:font-semibold [&>h3]:text-foreground [&>h3]:mb-2 [&>h3]:mt-4 [&>h3]:break-words
+                                [&>p]:text-muted-foreground [&>p]:leading-relaxed [&>p]:mb-4 [&>p]:break-words [&>p]:whitespace-pre-wrap
+                                [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mb-4 [&>ul]:space-y-2 [&>ul]:break-words
+                                [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:mb-4 [&>ol]:space-y-2 [&>ol]:break-words
+                                [&>li]:text-muted-foreground [&>li]:leading-relaxed [&>li]:break-words
+                                [&>img]:rounded-lg [&>img]:my-4 [&>img]:max-w-full [&>img]:h-auto [&>img]:object-contain
                                 [&>strong]:font-semibold [&>strong]:text-foreground
-                                [&>a]:text-primary [&>a]:underline [&>a]:hover:text-primary/80
-                                [&>blockquote]:border-l-4 [&>blockquote]:border-primary [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:my-4
-                                [&>code]:bg-secondary [&>code]:px-2 [&>code]:py-1 [&>code]:rounded [&>code]:text-sm
-                                [&>pre]:bg-secondary [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:overflow-x-auto [&>pre]:my-4
+                                [&>a]:text-primary [&>a]:underline [&>a]:hover:text-primary/80 [&>a]:break-all
+                                [&>blockquote]:border-l-4 [&>blockquote]:border-primary [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:my-4 [&>blockquote]:break-words
+                                [&>code]:bg-secondary [&>code]:px-2 [&>code]:py-1 [&>code]:rounded [&>code]:text-sm [&>code]:break-all
+                                [&>pre]:bg-secondary [&>pre]:p-4 [&>pre]:rounded-lg [&>pre]:overflow-x-auto [&>pre]:my-4 [&>pre]:whitespace-pre-wrap [&>pre]:break-words
                             "
                             dangerouslySetInnerHTML={{ __html: product.description || "No description available." }}
                         />

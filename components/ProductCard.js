@@ -54,7 +54,7 @@ export default function ProductCard({ product, category }) {
 
                     <div className="flex items-baseline gap-2 mb-2">
                         <span className="text-base font-bold text-primary">৳{price.toLocaleString()}</span>
-                        {originalPrice && (
+                        {originalPrice > price && (
                             <span className="text-xs text-muted-foreground line-through">৳{originalPrice.toLocaleString()}</span>
                         )}
                     </div>

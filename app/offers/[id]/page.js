@@ -15,7 +15,7 @@ export default function OfferProductsPage() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [sortBy, setSortBy] = useState("default");
+    const [sortBy, setSortBy] = useState("price-high");
 
     // Countdown timer state
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
