@@ -37,7 +37,9 @@ export default function ProductVariantsGrid({ imeis, product }) {
                 region: variant.region,
             },
             // You might want to pass specific IMEI info if needed
-            specificVariantId: variant.id // Assuming IMEI object has an ID
+            specificVariantId: variant.id, // Assuming IMEI object has an ID
+            variantId: variant.id,
+            imei: variant.imei_number || variant.imei || null
         };
         addToCart(cartItem, 1);
         router.push("/checkout");

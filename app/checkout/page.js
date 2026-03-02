@@ -138,14 +138,18 @@ export default function CheckoutPage() {
             // Build product array
             const productArray = cart.map(item => ({
                 product_id: item.id,
-                variant_id: item.variantId || null, // IMEI ID
+                variant_id: item.variantId || item.specificVariantId || null, // IMEI ID
                 model: item.selectedVariants?.model || null,
                 qty: item.quantity,
                 price: item.price,
                 mode: 1,
                 size: 1,
-                sales_id: parseInt(storeId)
+                sales_id: parseInt(storeId),
+                imei: item.imei || null
             }));
+
+            // Extract all IMEI numbers
+            const allImeis = cart.map(item => item.imei).filter(Boolean);
 
             // Construct payload
             const payload = {
@@ -164,7 +168,7 @@ export default function CheckoutPage() {
                 delivery_customer_phone: formData.phone,
                 delivery_fee: deliveryFee,
                 variants: [],
-                imeis: [null],
+                imeis: allImeis.length > 0 ? allImeis : [null],
                 created_at: new Date().toISOString(),
                 customer_id: null,
                 customer_name: formData.fullName,

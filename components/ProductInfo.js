@@ -126,6 +126,7 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
                 model: product.variants?.models?.find(m => m.id === selectedModel)?.label,
             },
             variantId: matchingImei?.id || null, // IMEI ID as variant ID
+            imei: matchingImei?.imei_number || matchingImei?.imei || null,
             price: getCurrentPrice(), // Just the product price, not including care plans
             minBookingAmount: product.isPhone ? (getCurrentPrice() > 100000 ? 10000 : 5000) : 300,
             image: product.images?.[0] || product.image,
