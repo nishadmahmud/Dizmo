@@ -7,6 +7,12 @@ import { Eye } from "lucide-react";
 export default function ProductCard({ product, category }) {
     const { id, name, price, originalPrice, image, discount, discountType } = product;
 
+    // Base price is the original retail price
+    const basePrice = originalPrice || price;
+
+    // Discount is always fixed: current price = base price - discount
+    const displayPrice = discount > 0 ? basePrice - discount : price;
+
     // Construct URL with category query param if available
     const productUrl = category
         ? `/products/${id}?category=${encodeURIComponent(category)}`
@@ -17,7 +23,7 @@ export default function ProductCard({ product, category }) {
             {/* Discount Badge */}
             {discount > 0 && (
                 <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    {discountType === 'Fixed' ? `-${discount.toLocaleString()} Taka` : `-${discount}%`}
+                    -{discount.toLocaleString()}৳
                 </div>
             )}
 
@@ -53,9 +59,11 @@ export default function ProductCard({ product, category }) {
                     </h3>
 
                     <div className="flex items-baseline gap-2 mb-2">
-                        <span className="text-base font-bold text-primary">৳{price.toLocaleString()}</span>
-                        {originalPrice > price && (
-                            <span className="text-xs text-muted-foreground line-through">৳{originalPrice.toLocaleString()}</span>
+                        <span className="text-base font-bold text-primary">৳{displayPrice.toLocaleString()}</span>
+                        {(discount > 0 || basePrice > displayPrice) && (
+                            <span className="text-xs text-muted-foreground line-through">
+                                ৳{basePrice.toLocaleString()}
+                            </span>
                         )}
                     </div>
                 </div>

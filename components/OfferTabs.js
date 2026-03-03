@@ -54,6 +54,7 @@ export default function OfferTabs() {
                         price: parseFloat(item.discounted_price || item.retails_price),
                         originalPrice: parseFloat(item.retails_price),
                         discount: parseFloat(item.discount || item.discount_rate) || 0,
+                        discountType: item.discount_type,
                         image: item.image_path,
                         inStock: item.status === "In stock",
                         rating: parseFloat(item.review_summary?.average_rating) || 0,

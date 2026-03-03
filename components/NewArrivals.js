@@ -26,7 +26,8 @@ export default function NewArrivals() {
                         name: item.name,
                         price: parseFloat(item.retails_price), // New arrivals might not have discount
                         originalPrice: parseFloat(item.retails_price),
-                        discount: 0,
+                        discount: parseFloat(item.discount) || 0,
+                        discountType: item.discount_type,
                         image: getProductImage(item),
                         inStock: item.status === "In stock",
                         category: item.category_name || "New",
