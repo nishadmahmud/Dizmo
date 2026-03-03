@@ -496,10 +496,10 @@ export default function ProductInfo({ product, onColorChange, selectedColorProp,
                             <div className="flex-1 min-w-0">
                                 <div className="flex flex-wrap items-baseline justify-between gap-x-2">
                                     <span className="font-bold text-foreground text-sm whitespace-nowrap">Regular Price</span>
-                                    <span className="font-bold text-lg md:text-xl text-primary">৳{totalPrice.toLocaleString()}</span>
+                                    <span className="font-bold text-lg md:text-xl text-primary">৳{(product.originalPrice || totalPrice).toLocaleString()}</span>
                                 </div>
                                 <p className="text-[11px] md:text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                                    EMI from {Math.round(totalPrice / 36).toLocaleString()} BDT/mo
+                                    EMI from {Math.round((product.originalPrice || totalPrice) / 36).toLocaleString()} BDT/mo
                                 </p>
                             </div>
                         </div>
