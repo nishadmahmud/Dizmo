@@ -13,6 +13,19 @@ import PromoBanners from "@/components/PromoBanners";
 import FullWidthBanner from "@/components/FullWidthBanner";
 import SEOContent from "@/components/SEOContent";
 
+export const metadata = {
+  title: "Dizmo - Premium Gadget Shop | Home",
+  description:
+    "Shop the latest smartphones, laptops, tablets & gadgets with authentic warranty at Dizmo Bangladesh.",
+  openGraph: {
+    title: "Dizmo - Premium Gadget Shop",
+    description:
+      "Shop the latest smartphones, laptops, tablets & gadgets with authentic warranty at Dizmo Bangladesh.",
+    url: "/",
+    images: [{ url: "/dizmo.jpg", width: 1200, height: 630 }],
+  },
+};
+
 export default function Home() {
 
   return (

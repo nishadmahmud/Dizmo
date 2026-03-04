@@ -3,6 +3,35 @@ import ProductVariantsGrid from "@/components/ProductVariantsGrid";
 import ProductTabs from "@/components/ProductTabs";
 import OfferTabs from "@/components/OfferTabs";
 
+export async function generateMetadata({ params }) {
+    const { id } = await params;
+    const data = await getProduct(id);
+
+    if (!data?.success || !data?.data) {
+        return { title: "Product Not Found - Dizmo" };
+    }
+
+    const product = data.data;
+    const productImage = product.image_path || "/dizmo.jpg";
+    const price = product.selling_price || product.retails_price || "";
+
+    return {
+        title: `${product.name} - Dizmo`,
+        description: `Buy ${product.name} at ৳${price}. Authentic product with warranty at Dizmo Bangladesh.`,
+        openGraph: {
+            title: `${product.name} - Dizmo`,
+            description: `Buy ${product.name} at ৳${price}. Authentic product with warranty at Dizmo Bangladesh.`,
+            images: [{ url: productImage }],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: `${product.name} - Dizmo`,
+            description: `Buy ${product.name} at ৳${price}. Authentic product with warranty at Dizmo Bangladesh.`,
+            images: [productImage],
+        },
+    };
+}
+
 async function getProduct(id) {
     try {
         const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
