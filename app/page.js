@@ -14,11 +14,11 @@ import FullWidthBanner from "@/components/FullWidthBanner";
 import SEOContent from "@/components/SEOContent";
 
 export const metadata = {
-  title: "DIZMO - Premium Apple Products ReSeller Gadget Shop | Home",
+  title: "DIZMO - Premium Apple Products ReSeller | Home",
   description:
     "Shop the latest smartphones, laptops, tablets & gadgets with authentic warranty at Dizmo Bangladesh.",
   openGraph: {
-    title: "DIZMO - Premium Apple Products ReSeller Gadget Shop",
+    title: "DIZMO - Premium Apple Products ReSeller",
     description:
       "Shop the latest smartphones, laptops, tablets & gadgets with authentic warranty at Dizmo Bangladesh.",
     url: "/",
