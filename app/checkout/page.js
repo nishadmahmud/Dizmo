@@ -424,20 +424,19 @@ export default function CheckoutPage() {
                                         <span className="text-xs font-bold text-center">Cash on Delivery</span>
                                     </label>
 
-                                    <label className={`cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all hover:shadow-md h-[120px] ${formData.paymentMethod === 'online' ? 'border-[#FCB042] bg-[#FCB042]/5 ring-1 ring-[#FCB042]' : 'border-gray-200 bg-white'}`}>
+                                    <label className={`relative cursor-not-allowed border rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all h-[120px] bg-gray-50 border-gray-200 opacity-60`} title="Coming Soon">
                                         <input
                                             type="radio"
                                             name="paymentMethod"
                                             value="online"
                                             className="hidden"
-                                            checked={formData.paymentMethod === 'online'}
-                                            onChange={handleInputChange}
+                                            disabled={true}
                                         />
-                                        <div className="p-2 bg-blue-100 rounded-full text-blue-600">
+                                        <div className="p-2 bg-gray-200 rounded-full text-gray-400">
                                             <CreditCard className="h-5 w-5" />
                                         </div>
-                                        <span className="text-xs font-bold text-center">Online Payment</span>
-                                        <span className="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded">SSLCOMMERZ</span>
+                                        <span className="text-xs font-bold text-center text-gray-500">Online Payment</span>
+                                        <span className="text-[10px] bg-gray-400 text-white px-1.5 py-0.5 rounded">Coming Soon</span>
                                     </label>
                                 </div>
                             </section>
