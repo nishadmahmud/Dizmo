@@ -82,6 +82,19 @@ export default function CheckoutPage() {
         setDeliveryFee(fee);
     }, [selectedDistrict, selectedCity, formData.deliveryMethod]);
 
+    // Trigger Facebook Pixel InitiateCheckout event
+    useEffect(() => {
+        if (cart.length > 0 && typeof window !== 'undefined' && window.fbq && !window.hasTrackedCheckout) {
+            window.fbq('track', 'InitiateCheckout', {
+                value: cartTotal,
+                currency: 'BDT',
+                num_items: cart.reduce((count, item) => count + item.quantity, 0),
+                content_ids: cart.map(item => item.id)
+            });
+            window.hasTrackedCheckout = true;
+        }
+    }, [cart, cartTotal]);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -133,7 +146,56 @@ export default function CheckoutPage() {
             const storeId = process.env.NEXT_PUBLIC_STORE_ID;
 
             // Construct full address string
-            const fullAddress = `${formData.address}, ${selectedCity}, ${selectedDistrict}`;
+            const fullAddress = `${formData.address}${selectedCity ? ', ' + selectedCity : ''}${selectedDistrict ? ', ' + selectedDistrict : ''}`;
+
+            const sslPayment = (invoice, amount, productNames) => {
+                const userEmailStr = (() => {
+                    try {
+                        const user = JSON.parse(localStorage.getItem("user"));
+                        return user?.email || "customer@dizmo.com.bd";
+                    } catch (e) {
+                        return "customer@dizmo.com.bd";
+                    }
+                })();
+
+                const sslSchema = {
+                    user_id: parseInt(storeId),
+                    amount: amount,
+                    customer_name: formData.fullName,
+                    customer_email: userEmailStr,
+                    customer_phone: formData.phone,
+                    customer_address: fullAddress,
+                    customer_city: selectedCity || "Dhaka",
+                    customer_country: "Bangladesh",
+                    product_name: productNames || "Dizmo Product",
+                    invoice_id: invoice,
+                    product_category: "Electronics",
+                };
+
+                fetch('https://www.outletexpense.xyz/api/payment/initiate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sslSchema)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data?.url) {
+                            window.location.href = data.url;
+                        } else {
+                            toast.dismiss('ssl_redirect');
+                            toast.error("Failed to initiate payment. Please try again.");
+                            setOrderPlaced(false);
+                            setIsSubmitting(false);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Payment initiation failed:", error);
+                        toast.dismiss('ssl_redirect');
+                        toast.error("Payment gateway error. Please contact support.");
+                        setOrderPlaced(false);
+                        setIsSubmitting(false);
+                    });
+            };
 
             // Build product array
             const productArray = cart.map(item => ({
@@ -215,8 +277,24 @@ export default function CheckoutPage() {
                 setInvoiceId(data.data.invoice_id);
             }
 
-            clearCart();
-            setOrderPlaced(true);
+            // Trigger Facebook Pixel Purchase Event
+            if (typeof window !== 'undefined' && window.fbq) {
+                window.fbq('track', 'Purchase', {
+                    value: payload.paid_amount || (cartTotal + deliveryFee),
+                    currency: 'BDT',
+                    content_ids: payload.product.map(p => p.product_id)
+                });
+            }
+
+            if (formData.paymentMethod === 'online' && invoiceId) {
+                // For online payment, initiate SSL Commerz flow and DO NOT clear cart
+                toast.loading('Redirecting to payment gateway...', { id: 'ssl_redirect' });
+                sslPayment(invoiceId, payload.paid_amount, payload.product.map(p => p.product_id).join(','));
+            } else {
+                // For COD: Clear cart and show success state immediately
+                clearCart();
+                setOrderPlaced(true);
+            }
         } catch (err) {
             console.error('Order placement error:', err);
             setError(err.message || 'Something went wrong. Please try again.');

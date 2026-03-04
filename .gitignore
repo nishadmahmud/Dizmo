@@ -9,7 +9,7 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-delveryfor.js
+# delveryfor.js
 # testing
 /coverage
 

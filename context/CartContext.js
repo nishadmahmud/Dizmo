@@ -41,6 +41,17 @@ export function CartProvider({ children }) {
             }
             return [...prev, { ...product, quantity }];
         });
+
+        // Trigger Facebook Pixel AddToCart event
+        if (typeof window !== 'undefined' && window.fbq) {
+            window.fbq('track', 'AddToCart', {
+                value: product.price * quantity,
+                currency: 'BDT',
+                content_name: product.name,
+                content_ids: [product.id],
+            });
+        }
+
         setIsDrawerOpen(true); // Open drawer on add
     };
 
