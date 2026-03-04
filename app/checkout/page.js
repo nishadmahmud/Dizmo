@@ -148,8 +148,12 @@ export default function CheckoutPage() {
                 imei: item.imei || null
             }));
 
-            // Extract all IMEI numbers
-            const allImeis = cart.map(item => item.imei).filter(Boolean);
+            // Extract all IMEI database IDs (variantId holds the product_imeis row ID)
+            // Backend does: update product_imeis set in_stock=0 where id in (...)
+            const allImeis = cart
+                .filter(item => !item.isCarePlan)
+                .map(item => item.variantId || item.specificVariantId)
+                .filter(Boolean);
 
             // Construct payload
             const payload = {
