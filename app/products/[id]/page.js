@@ -12,7 +12,11 @@ export async function generateMetadata({ params }) {
     }
 
     const product = data.data;
-    const productImage = product.image_path || "/dizmo.jpg";
+    // images array has the product photos; fallback to first IMEI image, then default logo
+    const productImage =
+        (Array.isArray(product.images) && product.images[0]) ||
+        (product.imeis && product.imeis.find(i => i.image_path)?.image_path) ||
+        "/dizmo.jpg";
     const price = product.selling_price || product.retails_price || "";
 
     return {
