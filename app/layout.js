@@ -18,10 +18,10 @@ const outfit = Outfit({
 
 export const metadata = {
   metadataBase: new URL("https://www.dizmo.com.bd"),
-  title: "Dizmo - Premium Gadget Shop",
+  title: "DIZMO - Premium Apple Products ReSeller Gadget Shop",
   description: "Authentic Mobile, Laptop & Gadget Shop in BD",
   openGraph: {
-    title: "Dizmo - Premium Gadget Shop",
+    title: "DIZMO - Premium Apple Products ReSeller Gadget Shop",
     description: "Authentic Mobile, Laptop & Gadget Shop in BD",
     url: "/",
     siteName: "Dizmo",
@@ -30,7 +30,7 @@ export const metadata = {
         url: "/dizmo.jpg",
         width: 1200,
         height: 630,
-        alt: "Dizmo - Premium Gadget Shop",
+        alt: "DIZMO - Premium Apple Products ReSeller Gadget Shop",
       },
     ],
     locale: "en_US",
@@ -38,7 +38,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dizmo - Premium Gadget Shop",
+    title: "DIZMO - Premium Apple Products ReSeller Gadget Shop",
     description: "Authentic Mobile, Laptop & Gadget Shop in BD",
     images: ["/dizmo.jpg"],
   },
