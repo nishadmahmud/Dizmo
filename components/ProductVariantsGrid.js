@@ -127,12 +127,14 @@ export default function ProductVariantsGrid({ imeis, product }) {
                                 </div>
                             )}
 
-                            {/* Comes with Original Box */}
+                            {/* Box Condition */}
                             <div className="flex items-center gap-3 mt-1 pt-1">
-                                <span className="text-sm font-bold text-[#103E34]">Comes with:</span>
+                                <span className="text-sm font-bold text-[#103E34]">Box Condition:</span>
                                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-white shadow-sm">
                                     <Box className="h-4 w-4 text-[#FCB042] fill-[#FCB042]/20" />
-                                    <span className="text-sm font-bold text-[#103E34]">Original Box</span>
+                                    <span className="text-sm font-bold text-[#103E34]">
+                                        {item.box_status || "N/A"}
+                                    </span>
                                 </div>
                             </div>
                         </div>
