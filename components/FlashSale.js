@@ -106,7 +106,7 @@ export default function FlashSale() {
 
                     {/* Navigation Arrow */}
                     <Link
-                        href="/products"
+                        href="/flash-sale"
                         className="hidden md:flex items-center gap-2 text-primary hover:gap-3 transition-all font-medium"
                     >
                         View All

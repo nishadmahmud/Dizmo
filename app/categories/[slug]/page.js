@@ -175,8 +175,11 @@ export default function CategoryDetailPage({ params }) {
             const data = await response.json();
 
             if (!data.success || !data.data || data.data.length === 0) {
+                console.log(`Page ${page}: No products found in API response`);
                 return { products: [], brandBanners: {} };
             }
+
+            console.log(`Page ${page}: API returned ${data.data.length} raw products`);
 
             // Extract brand banners from filter_options (only on first page typically has this)
             const apiBrandBanners = data.filter_options?.brand_banners || {};
@@ -184,41 +187,52 @@ export default function CategoryDetailPage({ params }) {
             // Process products
             const products = data.data.map(product => {
                 // Get the base retail price (this is the original price before any discount)
-                const retailPrice = parseFloat(product.retails_price);
+                const retailPrice = parseFloat(product.retails_price) || 0;
 
                 // Check if there are IMEI prices (variant prices)
-                let currentPrice = retailPrice;
+                let currentPrice = null;
                 if (product.imeis && product.imeis.length > 0) {
-                    const prices = product.imeis.map(imei => parseFloat(imei.sale_price));
-                    currentPrice = Math.min(...prices);
+                    // Filter out null/invalid sale prices to avoid poisoning Math.min
+                    const validPrices = product.imeis
+                        .map(imei => parseFloat(imei.sale_price))
+                        .filter(price => !isNaN(price) && price !== null);
+
+                    if (validPrices.length > 0) {
+                        currentPrice = Math.min(...validPrices);
+                    }
                 }
+
+                // Fallback Strategy:
+                // 1. Use minimum variant price if found
+                // 2. Fallback to retailPrice if variant prices are missing/invalid
+                // 3. Last resort: 0
+                let baseToUse = currentPrice !== null ? currentPrice : (retailPrice || 0);
 
                 // Get discount information
                 const discountValue = parseFloat(product.discount) || 0;
                 const discountType = product.discount_type || 'Percentage';
 
                 // Calculate final price and original price based on discount type
-                let finalPrice = currentPrice;
-                let originalPrice = retailPrice;
+                let finalPrice = baseToUse;
+                let originalPrice = retailPrice || baseToUse;
 
                 if (discountValue > 0) {
                     if (discountType === 'Fixed') {
-                        // For fixed discount: final price = retail price - discount amount
-                        finalPrice = retailPrice - discountValue;
-                        originalPrice = retailPrice;
+                        finalPrice = baseToUse - discountValue;
                     } else {
-                        // For percentage discount: final price = retail price - (retail price * discount / 100)
-                        finalPrice = retailPrice - (retailPrice * discountValue / 100);
-                        originalPrice = retailPrice;
+                        finalPrice = baseToUse - (baseToUse * discountValue / 100);
                     }
                 }
+
+                // Add extra protection for price: ensure it's a valid number
+                const validFinalPrice = isNaN(finalPrice) ? (retailPrice || 0) : finalPrice;
 
                 return {
                     id: product.id,
                     name: product.name,
-                    price: finalPrice,
-                    originalPrice: discountValue > 0 ? originalPrice : null,
-                    discount: discountValue,
+                    price: validFinalPrice,
+                    originalPrice: discountValue > 0 ? (isNaN(originalPrice) ? null : originalPrice) : null,
+                    discount: isNaN(discountValue) ? 0 : discountValue,
                     discountType: discountType,
                     inStock: product.status === "In stock",
                     image: product.image_path,
@@ -231,6 +245,8 @@ export default function CategoryDetailPage({ params }) {
                     brands: product.brands
                 };
             });
+
+            console.log(`Page ${page}: Mapped ${products.length} products`);
 
             return { products, brandBanners: apiBrandBanners };
         } catch (error) {
@@ -371,8 +387,12 @@ export default function CategoryDetailPage({ params }) {
     const filteredProducts = useMemo(() => {
         let filtered = [...allProducts];
 
-        // Filter by price
-        filtered = filtered.filter(p => p.price >= priceRange.min && p.price <= priceRange.max);
+        // Filter by price (Handling potential NaN even though we added guard in fetch)
+        filtered = filtered.filter(p => {
+            const price = Number(p.price);
+            if (isNaN(price)) return true; // Show by default if price is broken
+            return price >= priceRange.min && price <= priceRange.max;
+        });
 
         // Filter by availability
         if (availability === 'in-stock') {

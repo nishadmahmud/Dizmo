@@ -773,19 +773,13 @@ export default function Navbar() {
                         </div>
 
                         {/* Right: Flash Sale Button */}
-                        <button
-                            onClick={() => {
-                                if (pathname === '/') {
-                                    document.getElementById('flash-sale')?.scrollIntoView({ behavior: 'smooth' });
-                                } else {
-                                    router.push('/#flash-sale');
-                                }
-                            }}
+                        <Link
+                            href="/flash-sale"
                             className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#103E34] text-white hover:bg-[#0c2e26] transition-colors text-sm font-bold shadow-sm flex-shrink-0"
                         >
                             <Zap className="h-4 w-4 fill-[#FCB042] text-[#FCB042] animate-pulse" />
                             <span className="hidden sm:inline">Flash Sale</span>
-                        </button>
+                        </Link>
                     </div>
                 </div>
             )}

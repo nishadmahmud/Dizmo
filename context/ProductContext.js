@@ -16,17 +16,28 @@ export function ProductProvider({ children }) {
         return productData
             .map((product) => {
                 // Get the lowest price from imeis if available
-                let lowestPrice = parseFloat(product.retails_price);
+                let lowestPrice = null;
+                const retailPrice = parseFloat(product.retails_price) || 0;
+
                 if (product.imeis && product.imeis.length > 0) {
-                    const prices = product.imeis.map(imei => parseFloat(imei.sale_price));
-                    lowestPrice = Math.min(...prices);
+                    // Filter out null/invalid sale prices
+                    const validPrices = product.imeis
+                        .map(imei => parseFloat(imei.sale_price))
+                        .filter(price => !isNaN(price) && price !== null);
+
+                    if (validPrices.length > 0) {
+                        lowestPrice = Math.min(...validPrices);
+                    }
                 }
+
+                // Fallback Strategy: Variant Min -> Retail Price -> 0
+                const finalBasePrice = lowestPrice !== null ? lowestPrice : retailPrice;
 
                 return {
                     id: product.id,
                     name: product.name,
-                    price: lowestPrice,
-                    originalPrice: parseFloat(product.retails_price),
+                    price: finalBasePrice,
+                    originalPrice: retailPrice || finalBasePrice,
                     discount: parseFloat(product.discount) || 0,
                     category: categoryName,
                     inStock: product.status === "In stock",
