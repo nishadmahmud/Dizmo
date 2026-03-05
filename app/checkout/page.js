@@ -159,8 +159,6 @@ export default function CheckoutPage() {
                     }
                 })();
 
-                const baseUrl = typeof window !== 'undefined' ? window.location.origin : "https://www.dizmo.com.bd";
-
                 const sslSchema = {
                     user_id: parseInt(storeId),
                     amount: amount,
@@ -173,10 +171,6 @@ export default function CheckoutPage() {
                     product_name: productNames || "Dizmo Product",
                     invoice_id: invoice,
                     product_category: "Electronics",
-                    source_website: "dizmo.com.bd",
-                    success_url: `${baseUrl}/payment-success/{$tran_id}`,
-                    fail_url: `${baseUrl}/order-cancel`,
-                    cancel_url: `${baseUrl}/order-cancel`,
                 };
 
                 fetch('https://www.outletexpense.xyz/api/payment/initiate', {
