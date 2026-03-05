@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, CheckCircle, Truck, Store, CreditCard, Banknote, Info, CheckSquare, MapPin, ShieldCheck, Loader2, User, Phone, Mail, Home } from "lucide-react";
 import AddressSelect from "@/components/AddressSelect";
+import toast from "react-hot-toast";
 
 export default function CheckoutPage() {
     const { cart, cartTotal, clearCart } = useCart();
@@ -158,6 +159,8 @@ export default function CheckoutPage() {
                     }
                 })();
 
+                const baseUrl = typeof window !== 'undefined' ? window.location.origin : "https://www.dizmo.com.bd";
+
                 const sslSchema = {
                     user_id: parseInt(storeId),
                     amount: amount,
@@ -170,6 +173,10 @@ export default function CheckoutPage() {
                     product_name: productNames || "Dizmo Product",
                     invoice_id: invoice,
                     product_category: "Electronics",
+                    source_website: "dizmo.com.bd",
+                    success_url: `${baseUrl}/payment-success/{$tran_id}`,
+                    fail_url: `${baseUrl}/order-cancel`,
+                    cancel_url: `${baseUrl}/order-cancel`,
                 };
 
                 fetch('https://www.outletexpense.xyz/api/payment/initiate', {
@@ -184,7 +191,6 @@ export default function CheckoutPage() {
                         } else {
                             toast.dismiss('ssl_redirect');
                             toast.error("Failed to initiate payment. Please try again.");
-                            setOrderPlaced(false);
                             setIsSubmitting(false);
                         }
                     })
@@ -192,7 +198,6 @@ export default function CheckoutPage() {
                         console.error("Payment initiation failed:", error);
                         toast.dismiss('ssl_redirect');
                         toast.error("Payment gateway error. Please contact support.");
-                        setOrderPlaced(false);
                         setIsSubmitting(false);
                     });
             };
@@ -286,10 +291,11 @@ export default function CheckoutPage() {
                 });
             }
 
-            if (formData.paymentMethod === 'online' && invoiceId) {
+            // Fix: Check data.data?.invoice_id directly since state `invoiceId` hasn't updated yet
+            if (formData.paymentMethod === 'online' && data.data?.invoice_id) {
                 // For online payment, initiate SSL Commerz flow and DO NOT clear cart
                 toast.loading('Redirecting to payment gateway...', { id: 'ssl_redirect' });
-                sslPayment(invoiceId, payload.paid_amount, payload.product.map(p => p.product_id).join(','));
+                sslPayment(data.data.invoice_id, payload.paid_amount, payload.product.map(p => p.product_id).join(','));
             } else {
                 // For COD: Clear cart and show success state immediately
                 clearCart();
@@ -502,19 +508,20 @@ export default function CheckoutPage() {
                                         <span className="text-xs font-bold text-center">Cash on Delivery</span>
                                     </label>
 
-                                    <label className={`relative cursor-not-allowed border rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all h-[120px] bg-gray-50 border-gray-200 opacity-60`} title="Coming Soon">
+                                    <label className={`cursor-pointer border rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all hover:shadow-md h-[120px] ${formData.paymentMethod === 'online' ? 'border-[#FCB042] bg-[#FCB042]/5 ring-1 ring-[#FCB042]' : 'border-gray-200 bg-white'}`}>
                                         <input
                                             type="radio"
                                             name="paymentMethod"
                                             value="online"
                                             className="hidden"
-                                            disabled={true}
+                                            checked={formData.paymentMethod === 'online'}
+                                            onChange={handleInputChange}
                                         />
-                                        <div className="p-2 bg-gray-200 rounded-full text-gray-400">
+                                        <div className="p-2 bg-blue-100 rounded-full text-blue-600">
                                             <CreditCard className="h-5 w-5" />
                                         </div>
-                                        <span className="text-xs font-bold text-center text-gray-500">Online Payment</span>
-                                        <span className="text-[10px] bg-gray-400 text-white px-1.5 py-0.5 rounded">Coming Soon</span>
+                                        <span className="text-xs font-bold text-center">Online Payment</span>
+                                        <span className="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded">SSLCOMMERZ</span>
                                     </label>
                                 </div>
                             </section>
