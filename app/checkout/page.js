@@ -216,7 +216,6 @@ export default function CheckoutPage() {
             }));
 
             // Extract all IMEI database IDs (variantId holds the product_imeis row ID)
-            // Backend does: update product_imeis set in_stock=0 where id in (...)
             const allImeis = cart
                 .filter(item => !item.isCarePlan)
                 .map(item => item.variantId || item.specificVariantId)
@@ -291,7 +290,6 @@ export default function CheckoutPage() {
                 });
             }
 
-            // Fix: Check data.data?.invoice_id directly since state `invoiceId` hasn't updated yet
             if (formData.paymentMethod === 'online' && data.data?.invoice_id) {
                 // For online payment, initiate SSL Commerz flow and DO NOT clear cart
                 toast.loading('Redirecting to payment gateway...', { id: 'ssl_redirect' });
