@@ -196,10 +196,22 @@ export default async function ProductPage({ params, searchParams }) {
     const product = {
         id: productData.id,
         name: productData.name,
-        price: productData.selling_price || productData.retails_price || 0, // Discounted/selling price
-        originalPrice: productData.retails_price || 0, // Original retail price
-        discount: productData.discount || 0, // Discount value
-        discountType: productData.discount_type || 'Percentage', // 'Fixed' or 'Percentage'
+        price: (() => {
+            const retails = parseFloat(productData.retails_price) || 0;
+            const discount = parseFloat(productData.discount) || 0;
+            const selling = parseFloat(productData.selling_price);
+
+            if (!isNaN(selling) && selling > 0) return selling;
+
+            if (discount > 0) {
+                if (productData.discount_type === 'Fixed') return retails - discount;
+                if (productData.discount_type === 'Percentage') return retails * (1 - discount / 100);
+            }
+            return retails;
+        })(),
+        originalPrice: parseFloat(productData.retails_price) || 0, // Original retail price
+        discount: parseFloat(productData.discount) || 0, // Discount value
+        discountType: productData.discount_type || 'Fixed', // 'Fixed' or 'Percentage'
         stock: productData.status || "In Stock",
         warranty: productData.warranty || "Official Warranty",
         description: productData.description || productData.short_description || "No description available.",

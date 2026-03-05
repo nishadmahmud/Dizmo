@@ -10,8 +10,13 @@ export default function ProductCard({ product, category }) {
     // Base price is the original retail price
     const basePrice = originalPrice || price;
 
-    // Discount is always fixed: current price = base price - discount
-    const displayPrice = discount > 0 ? basePrice - discount : price;
+    // Calculate display price based on discount type
+    const displayPrice = (() => {
+        if (discount <= 0) return price;
+        if (discountType === 'Fixed') return basePrice - discount;
+        if (discountType === 'Percentage') return basePrice * (1 - discount / 100);
+        return price;
+    })();
 
     // Construct URL with category query param if available
     const productUrl = category
