@@ -149,7 +149,7 @@ export default function CheckoutPage() {
             // Construct full address string
             const fullAddress = `${formData.address}${selectedCity ? ', ' + selectedCity : ''}${selectedDistrict ? ', ' + selectedDistrict : ''}`;
 
-            const sslPayment = (invoice, amount, productNames) => {
+            const sslPayment = async (invoice, amount, productNames) => {
                 const userEmailStr = (() => {
                     try {
                         const user = JSON.parse(localStorage.getItem("user"));
@@ -159,41 +159,49 @@ export default function CheckoutPage() {
                     }
                 })();
 
-                const sslSchema = {
-                    user_id: parseInt(storeId),
-                    amount: amount,
-                    customer_name: formData.fullName,
-                    customer_email: userEmailStr,
-                    customer_phone: formData.phone,
-                    customer_address: fullAddress,
-                    customer_city: selectedCity || "Dhaka",
-                    customer_country: "Bangladesh",
-                    product_name: productNames || "Dizmo Product",
-                    invoice_id: invoice,
-                    product_category: "Electronics",
-                };
+                try {
+                    const sslSchema = {
+                        user_id: parseInt(storeId),
+                        amount: amount,
+                        customer_name: formData.fullName,
+                        customer_email: userEmailStr,
+                        customer_phone: formData.phone,
+                        customer_address: fullAddress,
+                        customer_city: selectedCity || "Dhaka",
+                        customer_country: "Bangladesh",
+                        product_name: productNames || "Dizmo Product",
+                        invoice_id: invoice,
+                        product_category: "Electronics",
+                        payment_method: [
+                            {
+                                payment_type_id: 803,
+                                payment_type_category_id: 672,
+                                payment_amount: amount
+                            }
+                        ]
+                    };
 
-                fetch('https://www.outletexpense.xyz/api/payment/initiate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(sslSchema)
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data?.url) {
-                            window.location.href = data.url;
-                        } else {
-                            toast.dismiss('ssl_redirect');
-                            toast.error("Failed to initiate payment. Please try again.");
-                            setIsSubmitting(false);
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Payment initiation failed:", error);
-                        toast.dismiss('ssl_redirect');
-                        toast.error("Payment gateway error. Please contact support.");
-                        setIsSubmitting(false);
+                    const initResponse = await fetch('https://www.outletexpense.xyz/api/payment/initiate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(sslSchema)
                     });
+
+                    const initData = await initResponse.json();
+
+                    if (initData?.url) {
+                        window.location.href = initData.url;
+                    } else {
+                        toast.dismiss('ssl_redirect');
+                        toast.error("Failed to initiate payment. Please try again.");
+                        setIsSubmitting(false);
+                    }
+                } catch (error) {
+                    console.error("Payment initiation failed:", error);
+                    toast.dismiss('ssl_redirect');
+                    toast.error("Payment gateway error. Please contact support.");
+                    setIsSubmitting(false);
+                }
             };
 
             // Build product array
@@ -242,6 +250,13 @@ export default function CheckoutPage() {
                 status: 3,
                 city_id: cityId ? parseInt(String(cityId).replace(/\D/g, '')) : null,
                 zone_id: zoneId ? parseInt(String(zoneId).replace(/\D/g, '')) : null,
+                payment_method: [
+                    {
+                        payment_type_id: formData.paymentMethod === 'cod' ? 379 : 803,
+                        payment_type_category_id: formData.paymentMethod === 'cod' ? 330 : 672,
+                        payment_amount: formData.paymentMethod === 'cod' ? 0 : cartTotal + deliveryFee
+                    }
+                ]
             };
 
             const response = await fetch('https://www.outletexpense.xyz/api/public/ecommerce-save-sales', {
