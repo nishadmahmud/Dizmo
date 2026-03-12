@@ -670,7 +670,16 @@ export default function CheckoutPage() {
                                     <CheckSquare className="pointer-events-none absolute h-3 w-3 text-white opacity-0 peer-checked:opacity-100 top-0.5 left-0.5" />
                                 </div>
                                 <label htmlFor="terms" className="text-xs text-gray-500 cursor-pointer select-none">
-                                    I have read & agree to the website <Link href="/terms" className="text-[#FCB042] hover:underline">Terms and Conditions</Link>
+                                    I have read & agree to the website{" "}
+                                    <Link href="/terms" className="text-[#FCB042] hover:underline">Terms & Conditions</Link>
+                                    {" "}and{" "}
+                                    <span className="inline-flex flex-wrap gap-x-1">
+                                        <Link href="/privacy" className="text-[#FCB042] hover:underline">Privacy Policy</Link><span>,</span>
+                                        <Link href="/returns" className="text-[#FCB042] hover:underline">Returns & Refund Policy</Link><span>,</span>
+                                        <Link href="/warranty" className="text-[#FCB042] hover:underline">Warranty Policy</Link><span>,</span>
+                                        <Link href="/shipping" className="text-[#FCB042] hover:underline">Shipping Policy</Link><span>,</span>
+                                        <Link href="/emi" className="text-[#FCB042] hover:underline">EMI Policy</Link>
+                                    </span>
                                 </label>
                             </div>
 
